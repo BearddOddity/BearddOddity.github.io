@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Disclosure — The Oddity Forge</title>
+<link rel="icon" href="assets/statusforge-icon.png">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .disc-wrap { max-width: 720px; margin: 0 auto; padding: 56px 24px 80px; }
+  .disc-wrap h2 { font-size: 20px; margin: 40px 0 12px; }
+  .disc-wrap h2:first-of-type { margin-top: 0; }
+  .disc-wrap p { font-size: 14px; line-height: 1.75; color: var(--text-dim); margin: 0 0 14px; }
+  .disc-wrap ul { padding-left: 22px; margin: 0 0 14px; }
+  .disc-wrap li { font-size: 14px; line-height: 1.7; color: var(--text-dim); margin-bottom: 6px; }
+  .disc-wrap .updated { font-size: 12px; color: var(--text-faint); margin-top: 60px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="index.html">
+    <img src="assets/statusforge-icon.png" alt="The Oddity Forge">
+    The Oddity Forge
+  </a>
+  <div class="links">
+    <a href="index.html">Home</a>
+    <a href="index.html#projects">Projects</a>
+    <a href="guides/index.html">Guides</a>
+    <a href="blog/index.html">Blog</a>
+    <a href="about.html">About</a>
+    <a href="disclosure.html" class="active">Disclosure</a>
+  </div>
+</nav>
+
+<div class="hero" style="padding-bottom: 30px;">
+  <h1 style="font-size: 32px;">Disclosure</h1>
+  <p class="tagline">What's behind this site and the software it links to — plainly stated.</p>
+</div>
+
+<div class="disc-wrap">
+  <h2>AI-assisted development</h2>
+  <p>
+    Code and site content here are built with Claude (Anthropic) as a
+    development assistant — writing, reviewing, and shipping is directed
+    and reviewed by me. Nothing on this site or in StatusForge is
+    AI-generated without a human deciding it goes in.
+  </p>
+
+  <h2>Third-party game data</h2>
+  <p>
+    The Game Database and cover art shown for StatusForge aren't original
+    content — metadata is scraped and merged from public APIs:
+  </p>
+  <ul>
+    <li>Steam</li>
+    <li>GOG</li>
+    <li>RAWG</li>
+    <li>IGDB (Twitch-authenticated)</li>
+    <li>SteamGridDB (cover art / logos)</li>
+  </ul>
+  <p>All trademarks, cover art, and game names belong to their respective owners.</p>
+
+  <h2>Data &amp; privacy</h2>
+  <p>
+    StatusForge doesn't collect analytics or telemetry. OAuth tokens for
+    Twitch/Kick are stored in your OS's own keychain, not sent anywhere
+    except directly to Twitch/Kick's own APIs when pushing a category
+    update. The only outbound network calls the app makes on its own are:
+    the platform APIs you connect (Twitch/Kick), the metadata sources
+    above (only when you scan a game), and a GitHub Releases check for
+    app updates.
+  </p>
+
+  <h2>Unsigned software</h2>
+  <p>
+    Windows builds aren't signed with a paid code-signing certificate, so
+    SmartScreen will warn on first run — this is expected, not a sign
+    something's wrong. macOS builds are unsigned and un-notarized (no
+    Apple Developer account behind this project yet), so macOS requires a
+    manual right-click → Open the first time.
+  </p>
+
+  <p class="updated">Last updated: July 2026</p>
+</div>
+
+<footer>
+  <a href="https://github.com/BearddOddity">github.com/BearddOddity</a>
+</footer>
+
+</body>
+</html>
