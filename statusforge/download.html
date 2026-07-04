@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Download StatusForge — BearddOddity</title>
+<link rel="icon" href="../assets/statusforge-icon.png">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .download-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .os-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 26px;
+  }
+  .os-card .glyph { font-size: 30px; margin-bottom: 10px; }
+  .os-card h3 { margin: 0 0 4px; font-size: 17px; }
+  .os-card p.note { margin: 0 0 18px; font-size: 12px; color: var(--text-dimmer); line-height: 1.5; }
+  .os-card .file-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 13px;
+    transition: border-color 0.15s ease;
+  }
+  .os-card .file-link:hover { border-color: rgba(145, 70, 255, 0.4); }
+  .os-card .file-link .ext { color: var(--text-dimmer); font-size: 11px; }
+  .version-badge { text-align: center; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="../index.html">
+    <img src="../assets/statusforge-icon.png" alt="BearddOddity">
+    BearddOddity
+  </a>
+  <div class="links">
+    <a href="../index.html">Home</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="https://github.com/BearddOddity/StatusForge.io">Source</a>
+  </div>
+</nav>
+
+<div class="hero" style="padding-bottom: 40px;">
+  <img class="logo" src="../assets/statusforge-icon.png" alt="StatusForge">
+  <h1>Download StatusForge</h1>
+  <p class="tagline">Pick your platform below. All installers are signed for auto-update and built by CI from source.</p>
+</div>
+
+<section>
+  <div class="version-badge"><span class="badge brand">v0.5.0</span></div>
+  <div class="download-grid">
+    <div class="os-card">
+      <div class="glyph">🪟</div>
+      <h3>Windows</h3>
+      <p class="note">64-bit only. SmartScreen may warn on first run since the app is unsigned by a paid certificate — click "More info" → "Run anyway."</p>
+      <a class="file-link" href="https://github.com/BearddOddity/StatusForge.io/releases/download/v0.5.0/StatusForge.io_0.5.0_x64-setup.exe">
+        Installer (NSIS) <span class="ext">.exe</span>
+      </a>
+      <a class="file-link" href="https://github.com/BearddOddity/StatusForge.io/releases/download/v0.5.0/StatusForge.io_0.5.0_x64_en-US.msi">
+        Installer (MSI) <span class="ext">.msi</span>
+      </a>
+    </div>
+
+    <div class="os-card">
+      <div class="glyph">🍎</div>
+      <h3>macOS</h3>
+      <p class="note">Apple Silicon (M-series) only. Unsigned/un-notarized — right-click the app → Open, or run <code>xattr -dr com.apple.quarantine</code> on it.</p>
+      <a class="file-link" href="https://github.com/BearddOddity/StatusForge.io/releases/download/v0.5.0/StatusForge.io_0.5.0_aarch64.dmg">
+        Disk Image <span class="ext">.dmg</span>
+      </a>
+    </div>
+
+    <div class="os-card">
+      <div class="glyph">🐧</div>
+      <h3>Linux</h3>
+      <p class="note">AppImage needs no install — just chmod +x and run. .deb and .rpm install via your package manager.</p>
+      <a class="file-link" href="https://github.com/BearddOddity/StatusForge.io/releases/download/v0.5.0/StatusForge.io_0.5.0_amd64.AppImage">
+        AppImage <span class="ext">.AppImage</span>
+      </a>
+      <a class="file-link" href="https://github.com/BearddOddity/StatusForge.io/releases/download/v0.5.0/StatusForge.io_0.5.0_amd64.deb">
+        Debian/Ubuntu <span class="ext">.deb</span>
+      </a>
+      <a class="file-link" href="https://github.com/BearddOddity/StatusForge.io/releases/download/v0.5.0/StatusForge.io-0.5.0-1.x86_64.rpm">
+        Fedora/RHEL <span class="ext">.rpm</span>
+      </a>
+    </div>
+  </div>
+
+  <p style="text-align:center; margin-top: 32px; font-size: 13px;">
+    <a class="btn ghost" href="https://github.com/BearddOddity/StatusForge.io/releases/latest">See all releases on GitHub</a>
+  </p>
+</section>
+
+<footer>
+  <a href="https://github.com/BearddOddity/StatusForge.io">github.com/BearddOddity/StatusForge.io</a>
+</footer>
+
+</body>
+</html>

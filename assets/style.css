@@ -1,0 +1,322 @@
+:root {
+  color-scheme: dark;
+
+  /* Base */
+  --bg: #0a0a12;
+  --bg-elevated: #0f0f1a;
+  --surface: rgba(255, 255, 255, 0.03);
+  --surface-hover: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.16);
+
+  /* Brand */
+  --purple: #9146ff;
+  --purple-deep: #7c3aed;
+  --purple-bright: #b490ff;
+  --violet-twilight: #d4bbff;
+
+  /* State */
+  --green: #34d399;
+  --red: #f87171;
+  --amber: #fbbf24;
+  --cyan: #22d3ee;
+  --blue: #60a5fa;
+
+  /* Text */
+  --text: rgba(255, 255, 255, 0.9);
+  --text-dim: rgba(255, 255, 255, 0.55);
+  --text-dimmer: rgba(255, 255, 255, 0.4);
+  --text-faint: rgba(255, 255, 255, 0.25);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+a { color: inherit; }
+
+/* ─── Nav ─────────────────────────────────────────────────────────────── */
+
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 32px;
+  background: rgba(10, 10, 18, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.nav .brand img { width: 28px; height: 28px; border-radius: 8px; }
+
+.nav .links { display: flex; align-items: center; gap: 28px; }
+
+.nav .links a {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.nav .links a:hover,
+.nav .links a.active { color: #fff; }
+
+/* ─── Badge / status pill ─────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+.badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+}
+
+.badge.brand {
+  background: rgba(145, 70, 255, 0.12);
+  border-color: rgba(145, 70, 255, 0.3);
+  color: var(--violet-twilight);
+}
+
+/* ─── Hero ────────────────────────────────────────────────────────────── */
+
+.hero {
+  padding: 90px 24px 80px;
+  text-align: center;
+  background: radial-gradient(ellipse at top, rgba(145, 70, 255, 0.18), transparent 65%);
+}
+
+.hero img.logo {
+  width: 84px;
+  height: 84px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 20px 60px rgba(124, 58, 237, 0.35);
+}
+
+.hero h1 {
+  margin: 18px 0 16px;
+  font-size: 42px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--violet-twilight), var(--purple) 60%, var(--purple-deep));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hero p.tagline {
+  margin: 0 auto 36px;
+  max-width: 560px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-dim);
+}
+
+.hero .cta {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ─── Buttons (pill-shaped, per design system) ───────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 26px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.btn:hover { transform: translateY(-2px); }
+
+.btn.primary {
+  background: linear-gradient(135deg, var(--purple), var(--purple-deep));
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.35);
+}
+
+.btn.ghost {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btn.ghost:hover { border-color: var(--border-hover); }
+
+.platforms {
+  margin-top: 24px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ─── Sections ────────────────────────────────────────────────────────── */
+
+section { padding: 64px 24px; max-width: 1100px; margin: 0 auto; }
+
+section h2 {
+  text-align: center;
+  font-size: 26px;
+  margin: 0 0 8px;
+}
+
+section p.section-sub {
+  text-align: center;
+  color: var(--text-dimmer);
+  font-size: 14px;
+  margin: 0 0 40px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.feature-card:hover {
+  border-color: rgba(145, 70, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+.feature-card .icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(145, 70, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 14px;
+}
+
+.feature-card h3 { margin: 0 0 8px; font-size: 15px; }
+.feature-card p { margin: 0; font-size: 13px; line-height: 1.55; color: var(--text-dimmer); }
+
+footer {
+  text-align: center;
+  padding: 32px 24px 40px;
+  color: var(--text-faint);
+  font-size: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+footer a { color: var(--text-dimmer); text-decoration: none; }
+footer a:hover { color: var(--text-dim); }
+
+/* ─── Games grid (games.html) ────────────────────────────────────────── */
+
+.games-header {
+  padding: 48px 24px 24px;
+  text-align: center;
+  background: radial-gradient(ellipse at top, rgba(145, 70, 255, 0.15), transparent 70%);
+  border-bottom: 1px solid var(--border);
+}
+
+.games-header h1 {
+  margin: 0 0 10px;
+  font-size: 28px;
+  background: linear-gradient(135deg, var(--purple-bright), var(--purple-deep));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.games-header p { margin: 0; color: var(--text-dimmer); font-size: 13px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+  padding: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.card:hover { transform: translateY(-3px); border-color: rgba(145, 70, 255, 0.4); }
+
+.cover {
+  aspect-ratio: 2 / 3;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cover.no-cover img { display: none; }
+
+.info { padding: 12px 14px 14px; }
+
+.info h3 {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta { margin: 0 0 2px; font-size: 11px; color: var(--text-dimmer); }
+.credits {
+  margin: 0;
+  font-size: 10px;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

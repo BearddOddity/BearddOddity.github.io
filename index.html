@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BearddOddity — Software N More</title>
+<link rel="icon" href="assets/statusforge-icon.png">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .project-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .project-card:hover { border-color: rgba(145, 70, 255, 0.35); transform: translateY(-2px); }
+  .project-card .head { display: flex; align-items: center; gap: 14px; }
+  .project-card .head img { width: 44px; height: 44px; border-radius: 12px; }
+  .project-card .head h3 { margin: 0; font-size: 17px; }
+  .project-card p.desc { margin: 0; font-size: 13px; line-height: 1.55; color: var(--text-dimmer); }
+  .project-card .tags { display: flex; gap: 8px; flex-wrap: wrap; }
+  .project-card .actions { display: flex; gap: 10px; margin-top: 4px; }
+  .project-card .actions .btn { padding: 9px 18px; font-size: 13px; }
+  .more-soon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed var(--border);
+    border-radius: 18px;
+    padding: 28px;
+    color: var(--text-faint);
+    font-size: 13px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="index.html">
+    <img src="assets/statusforge-icon.png" alt="BearddOddity">
+    BearddOddity
+  </a>
+  <div class="links">
+    <a href="index.html" class="active">Home</a>
+    <a href="index.html#projects">Projects</a>
+    <a href="https://github.com/BearddOddity">GitHub</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <h1>Software N More</h1>
+  <p class="tagline">
+    Independent tools and apps, built solo. This page collects everything
+    that's public — what it does, and where to get it.
+  </p>
+</div>
+
+<section id="projects">
+  <h2>Projects</h2>
+  <p class="section-sub">What's shipped and downloadable right now.</p>
+  <div class="projects-grid">
+    <div class="project-card">
+      <div class="head">
+        <img src="assets/statusforge-icon.png" alt="StatusForge">
+        <h3>StatusForge</h3>
+      </div>
+      <p class="desc">
+        Native presence engine for streamers. Detects the game you're playing
+        and broadcasts live status to Twitch, Kick, and your overlay widgets —
+        pure Rust, no Python, no cloud dependency.
+      </p>
+      <div class="tags">
+        <span class="badge">🪟 Windows</span>
+        <span class="badge">🍎 macOS</span>
+        <span class="badge">🐧 Linux</span>
+      </div>
+      <div class="actions">
+        <a class="btn primary" href="statusforge/download.html">Download</a>
+        <a class="btn ghost" href="https://bearddoddity.github.io/StatusForge.io/">View Project</a>
+      </div>
+    </div>
+
+    <div class="more-soon">More projects coming as they're made public.</div>
+  </div>
+</section>
+
+<footer>
+  <a href="https://github.com/BearddOddity">github.com/BearddOddity</a>
+</footer>
+
+</body>
+</html>
