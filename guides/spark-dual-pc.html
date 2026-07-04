@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPARK Dual-PC Setup Guide — The Oddity Forge</title>
+<link rel="icon" href="../assets/statusforge-icon.png">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .guide-wrap { max-width: 720px; margin: 0 auto; padding: 56px 24px 80px; }
+  .guide-wrap h2 { font-size: 22px; margin: 40px 0 12px; }
+  .guide-wrap h2:first-of-type { margin-top: 0; }
+  .guide-wrap p { font-size: 14px; line-height: 1.7; color: var(--text-dim); margin: 0 0 14px; }
+  .guide-wrap ol, .guide-wrap ul { padding-left: 22px; margin: 0 0 18px; }
+  .guide-wrap li { font-size: 14px; line-height: 1.7; color: var(--text-dim); margin-bottom: 8px; }
+  .guide-wrap code {
+    background: rgba(255,255,255,0.06);
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+  .note {
+    background: rgba(145, 70, 255, 0.08);
+    border: 1px solid rgba(145, 70, 255, 0.25);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin: 20px 0;
+  }
+  .diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 28px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin: 24px 0;
+    font-size: 13px;
+    flex-wrap: wrap;
+  }
+  .diagram .box {
+    text-align: center;
+    padding: 16px 20px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.02);
+  }
+  .diagram .box .label { font-weight: 700; margin-bottom: 4px; }
+  .diagram .box .sub { color: var(--text-dimmer); font-size: 11px; }
+  .diagram .arrow { color: var(--purple-bright); font-size: 20px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="../index.html">
+    <img src="../assets/statusforge-icon.png" alt="The Oddity Forge">
+    The Oddity Forge
+  </a>
+  <div class="links">
+    <a href="../index.html">Home</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="index.html" class="active">Guides</a>
+    <a href="../blog/index.html">Blog</a>
+    <a href="../about.html">About</a>
+  </div>
+</nav>
+
+<div class="hero" style="padding-bottom: 30px;">
+  <span class="badge brand">StatusForge Guide</span>
+  <h1 style="font-size: 32px; margin-top: 16px;">SPARK Dual-PC Link Setup</h1>
+  <p class="tagline">Game on one PC, stream from another — no cloud relay, signed over your own LAN.</p>
+</div>
+
+<div class="guide-wrap">
+  <div class="diagram">
+    <div class="box">
+      <div class="label">Gaming PC</div>
+      <div class="sub">runs SPARK</div>
+    </div>
+    <div class="arrow">→ udp/53735 →</div>
+    <div class="box">
+      <div class="label">Streaming PC</div>
+      <div class="sub">runs StatusForge (Hub)</div>
+    </div>
+  </div>
+
+  <h2>1. Install on both machines</h2>
+  <ul>
+    <li><strong>SPARK</strong> on the PC that's actually running the game</li>
+    <li><strong>StatusForge</strong> on the PC that's streaming/broadcasting</li>
+  </ul>
+  <p>Both need to be on the same local network (LAN or same Wi-Fi).</p>
+
+  <h2>2. Set a matching PIN</h2>
+  <p>
+    Set the same 4-digit PIN in both apps:
+  </p>
+  <ul>
+    <li>SPARK: main window, PIN field</li>
+    <li>StatusForge: Settings → Detection Engine → SPARK Dual-PC Link</li>
+  </ul>
+  <p>
+    Optionally set a matching <strong>pairing key</strong> on both sides too
+    — it's mixed into the shared secret for a stronger signature than the
+    PIN alone.
+  </p>
+
+  <h2>3. Let them find each other</h2>
+  <p>
+    SPARK broadcasts signed heartbeats on <code>udp/53735</code>; the
+    StatusForge Hub announces itself on <code>udp/53736</code>. Packets
+    with the wrong PIN, missing signature, or a tampered payload are
+    rejected outright. Once paired, your overlays update exactly as they
+    would from local detection — same widgets, same behavior.
+  </p>
+
+  <div class="note">
+    Enabling the SPARK link on the StatusForge side stops that PC's own
+    local scanner from reporting detections, so you don't get two
+    conflicting game-state sources fighting each other.
+  </div>
+
+  <h2>Firewall notes</h2>
+  <ul>
+    <li><strong>Windows:</strong> the installer adds firewall allow rules automatically (and removes them on uninstall) — nothing to do manually.</li>
+    <li><strong>Linux:</strong> allow the two UDP ports if you run a firewall: <code>sudo ufw allow 53735/udp &amp;&amp; sudo ufw allow 53736/udp</code></li>
+    <li><strong>macOS:</strong> accept the incoming-connection prompt on first run, or add the app manually under System Settings → Network → Firewall → Options.</li>
+  </ul>
+</div>
+
+<footer>
+  <a href="https://github.com/BearddOddity/StatusForge.io">github.com/BearddOddity/StatusForge.io</a>
+</footer>
+
+</body>
+</html>

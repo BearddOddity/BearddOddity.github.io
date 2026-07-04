@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guides — The Oddity Forge</title>
+<link rel="icon" href="../assets/statusforge-icon.png">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .guides-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+  }
+  .guide-card {
+    display: block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    text-decoration: none;
+    color: var(--text);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .guide-card:hover { border-color: rgba(145, 70, 255, 0.35); transform: translateY(-2px); }
+  .guide-card .icon { font-size: 24px; margin-bottom: 12px; }
+  .guide-card h3 { margin: 0 0 8px; font-size: 15px; }
+  .guide-card p { margin: 0; font-size: 13px; color: var(--text-dimmer); line-height: 1.5; }
+  .guide-card .app-tag { font-size: 11px; color: var(--purple-bright); font-weight: 600; margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="../index.html">
+    <img src="../assets/statusforge-icon.png" alt="The Oddity Forge">
+    The Oddity Forge
+  </a>
+  <div class="links">
+    <a href="../index.html">Home</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="index.html" class="active">Guides</a>
+    <a href="../blog/index.html">Blog</a>
+    <a href="../about.html">About</a>
+  </div>
+</nav>
+
+<div class="hero" style="padding-bottom: 40px;">
+  <h1>Setup Guides</h1>
+  <p class="tagline">Step-by-step walkthroughs for getting the tools running.</p>
+</div>
+
+<section>
+  <div class="guides-grid">
+    <a class="guide-card" href="overlay-setup.html">
+      <div class="app-tag">STATUSFORGE</div>
+      <div class="icon">🖥️</div>
+      <h3>Adding Overlays to OBS / Streamlabs</h3>
+      <p>Grab your widget URL and add it as a Browser Source so your category/game info shows on screen.</p>
+    </a>
+    <a class="guide-card" href="spark-dual-pc.html">
+      <div class="app-tag">STATUSFORGE</div>
+      <div class="icon">🔗</div>
+      <h3>SPARK Dual-PC Link Setup</h3>
+      <p>Run your game on one PC and stream from another — pair them with SPARK over your LAN.</p>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <a href="https://github.com/BearddOddity">github.com/BearddOddity</a>
+</footer>
+
+</body>
+</html>

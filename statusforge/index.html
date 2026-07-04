@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StatusForge — The Oddity Forge</title>
+<link rel="icon" href="../assets/statusforge-icon.png">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+  }
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .feature-card .icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: rgba(145, 70, 255, 0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 14px;
+  }
+  .feature-card h3 { margin: 0 0 8px; font-size: 15px; }
+  .feature-card p { margin: 0; font-size: 13px; line-height: 1.55; color: var(--text-dimmer); }
+
+  .how-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .how-step {
+    text-align: center;
+    padding: 24px 16px;
+  }
+  .how-step .num {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(145, 70, 255, 0.15);
+    color: var(--purple-bright);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+    margin: 0 auto 14px;
+  }
+  .how-step h4 { margin: 0 0 8px; font-size: 14px; }
+  .how-step p { margin: 0; font-size: 12px; color: var(--text-dimmer); line-height: 1.5; }
+
+  @media (max-width: 640px) { .how-steps { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="../index.html">
+    <img src="../assets/statusforge-icon.png" alt="The Oddity Forge">
+    The Oddity Forge
+  </a>
+  <div class="links">
+    <a href="../index.html">Home</a>
+    <a href="../index.html#projects" class="active">Projects</a>
+    <a href="../guides/index.html">Guides</a>
+    <a href="../blog/index.html">Blog</a>
+    <a href="../about.html">About</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <span class="badge brand"><span class="dot"></span>v0.5.0</span>
+  <img class="logo" src="../assets/statusforge-icon.png" alt="StatusForge">
+  <h1>StatusForge</h1>
+  <p class="tagline">
+    A native presence engine for streamers. Detects the game you're playing
+    and broadcasts live status to Twitch, Kick, and your overlay widgets —
+    pure Rust, no Python, no cloud dependency.
+  </p>
+  <div class="cta">
+    <a class="btn primary" href="download.html">Download</a>
+    <a class="btn ghost" href="https://github.com/BearddOddity/StatusForge.io">View Source</a>
+  </div>
+  <div class="platforms">
+    <span class="badge">🪟 Windows</span>
+    <span class="badge">🍎 macOS</span>
+    <span class="badge">🐧 Linux</span>
+  </div>
+</div>
+
+<section>
+  <h2>How it works</h2>
+  <p class="section-sub">No account, no cloud relay — everything runs locally.</p>
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="num">1</div>
+      <h4>Detect</h4>
+      <p>A native scanner watches running processes and window titles to figure out what you're playing.</p>
+    </div>
+    <div class="how-step">
+      <div class="num">2</div>
+      <h4>Look up</h4>
+      <p>Matched against a local game database, merged from Steam, GOG, RAWG, IGDB, and SteamGridDB metadata.</p>
+    </div>
+    <div class="how-step">
+      <div class="num">3</div>
+      <h4>Broadcast</h4>
+      <p>Twitch/Kick category updates go out automatically, and your overlay widgets update in real time.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Features</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="icon">🎮</div>
+      <h3>Native Game Detection</h3>
+      <p>Pure Rust process/window-title scanner — no browser extensions, no manual game list to maintain.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">📡</div>
+      <h3>Twitch &amp; Kick Category Sync</h3>
+      <p>Automatic category updates on game change, with built-in cooldowns to stay well under platform rate limits.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🖥️</div>
+      <h3>Overlay Widgets</h3>
+      <p>Four layouts (horizontal left/right, vertical, logo-only) served locally as Browser Sources for OBS/Streamlabs.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔗</div>
+      <h3>SPARK Dual-PC Link</h3>
+      <p>Detect on your gaming PC, stream from another — signed heartbeats over your own LAN, no cloud in between.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🗂️</div>
+      <h3>Scraped Metadata Library</h3>
+      <p>Cover art and game info merged from multiple sources into a local, editable game database.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">🔒</div>
+      <h3>Local-First, No Telemetry</h3>
+      <p>OAuth tokens live in your OS keychain. Platform pushes can be toggled off entirely if you just want local overlays.</p>
+    </div>
+  </div>
+</section>
+
+<section style="text-align:center;">
+  <h2>Set it up</h2>
+  <p class="section-sub">Guides for getting overlays and dual-PC linking running.</p>
+  <div class="cta" style="justify-content:center;">
+    <a class="btn ghost" href="../guides/overlay-setup.html">Overlay Setup Guide</a>
+    <a class="btn ghost" href="../guides/spark-dual-pc.html">SPARK Dual-PC Guide</a>
+  </div>
+</section>
+
+<footer>
+  <a href="https://github.com/BearddOddity/StatusForge.io">github.com/BearddOddity/StatusForge.io</a>
+  &middot;
+  <a href="https://github.com/BearddOddity/StatusForge.io/releases/latest">Release Notes</a>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About — The Oddity Forge</title>
+<link rel="icon" href="assets/statusforge-icon.png">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .about-wrap { max-width: 720px; margin: 0 auto; padding: 64px 24px; }
+  .about-wrap h2 { font-size: 26px; margin: 0 0 20px; }
+  .about-wrap p { font-size: 14px; line-height: 1.75; color: var(--text-dim); margin: 0 0 18px; }
+  .social-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 28px 0 40px;
+  }
+  .social-row a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .social-row a:hover { border-color: rgba(145, 70, 255, 0.4); transform: translateY(-2px); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="index.html">
+    <img src="assets/statusforge-icon.png" alt="The Oddity Forge">
+    The Oddity Forge
+  </a>
+  <div class="links">
+    <a href="index.html">Home</a>
+    <a href="index.html#projects">Projects</a>
+    <a href="guides/index.html">Guides</a>
+    <a href="blog/index.html">Blog</a>
+    <a href="about.html" class="active">About</a>
+  </div>
+</nav>
+
+<div class="hero" style="padding-bottom: 40px;">
+  <img class="logo" src="assets/statusforge-icon.png" alt="BearddOddity">
+  <h1>BearddOddity</h1>
+  <p class="tagline">Variety streamer. Solo developer. Same person, same energy, different keyboard shortcuts.</p>
+</div>
+
+<div class="about-wrap">
+  <h2>What I'm about</h2>
+  <p>
+    I stream variety — whatever game's got my attention that week — on
+    Twitch and Kick as <strong>BearddOddity</strong>. Off stream (and
+    sometimes on it), I build the tools I actually use for streaming
+    myself, starting with <a href="statusforge/index.html">StatusForge</a>,
+    a native presence engine that keeps my channel's category accurate
+    without a browser extension or a subscription.
+  </p>
+  <p>
+    Everything here is built solo — no team, no VC, just whatever gets
+    the job done well enough to ship, then gets refined live in front of
+    chat. If you watch me stream, there's a decent chance you're watching
+    the next feature get built (or break).
+  </p>
+  <p>
+    This site is the home base for that: the tools, the guides for
+    setting them up, and the running log of what's changing.
+  </p>
+
+  <div class="social-row">
+    <a href="https://twitch.tv/bearddoddity">🟣 Twitch</a>
+    <a href="https://kick.com/bearddoddity">🟢 Kick</a>
+    <a href="https://github.com/BearddOddity">⚫ GitHub</a>
+  </div>
+</div>
+
+<footer>
+  <a href="https://github.com/BearddOddity">github.com/BearddOddity</a>
+</footer>
+
+</body>
+</html>

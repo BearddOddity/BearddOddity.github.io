@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Overlay Setup Guide — The Oddity Forge</title>
+<link rel="icon" href="../assets/statusforge-icon.png">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .guide-wrap { max-width: 720px; margin: 0 auto; padding: 56px 24px 80px; }
+  .guide-wrap h2 { font-size: 22px; margin: 40px 0 12px; }
+  .guide-wrap h2:first-of-type { margin-top: 0; }
+  .guide-wrap p { font-size: 14px; line-height: 1.7; color: var(--text-dim); margin: 0 0 14px; }
+  .guide-wrap ol, .guide-wrap ul { padding-left: 22px; margin: 0 0 18px; }
+  .guide-wrap li { font-size: 14px; line-height: 1.7; color: var(--text-dim); margin-bottom: 8px; }
+  .guide-wrap code {
+    background: rgba(255,255,255,0.06);
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+  .dim-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 20px;
+    font-size: 13px;
+  }
+  .dim-table th, .dim-table td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  .dim-table th { color: var(--text); font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .note {
+    background: rgba(145, 70, 255, 0.08);
+    border: 1px solid rgba(145, 70, 255, 0.25);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin: 20px 0;
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="../index.html">
+    <img src="../assets/statusforge-icon.png" alt="The Oddity Forge">
+    The Oddity Forge
+  </a>
+  <div class="links">
+    <a href="../index.html">Home</a>
+    <a href="../index.html#projects">Projects</a>
+    <a href="index.html" class="active">Guides</a>
+    <a href="../blog/index.html">Blog</a>
+    <a href="../about.html">About</a>
+  </div>
+</nav>
+
+<div class="hero" style="padding-bottom: 30px;">
+  <span class="badge brand">StatusForge Guide</span>
+  <h1 style="font-size: 32px; margin-top: 16px;">Adding Overlays to OBS / Streamlabs</h1>
+  <p class="tagline">Get your game/category info showing on screen in under a minute.</p>
+</div>
+
+<div class="guide-wrap">
+  <h2>1. Open the Dashboard</h2>
+  <p>
+    Launch StatusForge and make sure the engine is running (top of the
+    Dashboard shows the engine status). The overlay picker lives on the
+    Dashboard — pick from four layouts:
+  </p>
+  <ul>
+    <li><strong>Horizontal Left</strong> / <strong>Horizontal Right</strong> — game cover + title, anchored to one side</li>
+    <li><strong>Vertical</strong> — tall layout for side-panel placement</li>
+    <li><strong>Logo Only</strong> — just the game's logo, no cover art or text</li>
+  </ul>
+
+  <h2>2. Copy the widget URL</h2>
+  <p>
+    Each overlay is served locally by StatusForge itself — no external
+    hosting, no account needed. The URL follows this pattern:
+  </p>
+  <p><code>http://127.0.0.1:53735/forge-widget/&lt;your-widget-token&gt;/&lt;layout&gt;.html</code></p>
+  <p>
+    Your widget token is unique per install and shown (partially masked) on
+    the Dashboard. Copying a layout from the picker copies the full URL
+    with the token already filled in — you shouldn't need to type it by hand.
+  </p>
+
+  <h2>3. Add it as a Browser Source</h2>
+  <ol>
+    <li>In OBS/Streamlabs, add a new source → <strong>Browser</strong></li>
+    <li>Paste the widget URL into the URL field</li>
+    <li>Set the width/height to match your chosen layout (table below)</li>
+    <li>Leave <strong>Shutdown source when not visible</strong> unchecked, so it keeps polling in the background</li>
+  </ol>
+
+  <table class="dim-table">
+    <tr><th>Layout</th><th>Width</th><th>Height</th></tr>
+    <tr><td>Horizontal Left / Right</td><td>850</td><td>480</td></tr>
+    <tr><td>Vertical</td><td>360</td><td>620</td></tr>
+    <tr><td>Logo Only</td><td>560</td><td>280</td></tr>
+  </table>
+
+  <div class="note">
+    The overlay fades in automatically when a game is detected and fades
+    out after your configured fade timer (Settings → Detection Engine).
+    No game running = no overlay on screen, so it's safe to leave the
+    Browser Source active for your whole stream.
+  </div>
+
+  <h2>Troubleshooting</h2>
+  <ul>
+    <li>Blank overlay: confirm the engine is running (Dashboard status) and that <code>127.0.0.1:53735</code> isn't blocked by a firewall rule.</li>
+    <li>Wrong game showing: check Settings → Detection Engine for the scan interval/grace period — a very short grace period can flicker between games during alt-tabbing.</li>
+  </ul>
+</div>
+
+<footer>
+  <a href="https://github.com/BearddOddity/StatusForge.io">github.com/BearddOddity/StatusForge.io</a>
+</footer>
+
+</body>
+</html>
