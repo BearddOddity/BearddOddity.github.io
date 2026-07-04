@@ -29,13 +29,32 @@
   --text-faint: rgba(255, 255, 255, 0.25);
 }
 
+/* All font-size values on this site are in rem, scaled off this root size —
+   a 1440p+ landscape monitor has more physical pixels per inch of visible
+   text than a portrait/1080p one at the same CSS pixel count, so text reads
+   smaller even though nothing in the layout changed. Bumping the root size
+   for wide landscape viewports scales every rem-based size proportionally
+   without needing per-element breakpoints. */
+html { font-size: 100%; } /* 16px */
+
+@media (orientation: landscape) and (min-width: 1440px) {
+  html { font-size: 112.5%; } /* 18px */
+}
+
+@media (orientation: landscape) and (min-width: 1920px) {
+  html { font-size: 125%; } /* 20px */
+}
+
+@media (orientation: landscape) and (min-width: 2560px) {
+  html { font-size: 137.5%; } /* 22px */
+}
+
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-size: 17px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
@@ -50,7 +69,7 @@ a { color: inherit; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 32px;
+  padding: 1rem 2rem;
   background: rgba(10, 10, 18, 0.85);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
@@ -59,18 +78,18 @@ a { color: inherit; }
 .nav .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.625rem;
   font-weight: 700;
-  font-size: 18px;
+  font-size: 1.125rem;
   text-decoration: none;
 }
 
-.nav .brand img { width: 30px; height: 30px; border-radius: 8px; }
+.nav .brand img { width: 1.875rem; height: 1.875rem; border-radius: 8px; }
 
-.nav .links { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
+.nav .links { display: flex; align-items: center; gap: 1.75rem; flex-wrap: wrap; }
 
 .nav .links a {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: var(--text-dim);
   text-decoration: none;
@@ -86,9 +105,9 @@ a { color: inherit; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 0.375rem 0.875rem;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -112,22 +131,22 @@ a { color: inherit; }
 /* ─── Hero ────────────────────────────────────────────────────────────── */
 
 .hero {
-  padding: 90px 24px 80px;
+  padding: 5.625rem 1.5rem 5rem;
   text-align: center;
   background: radial-gradient(ellipse at top, rgba(145, 70, 255, 0.18), transparent 65%);
 }
 
 .hero img.logo {
-  width: 92px;
-  height: 92px;
+  width: 5.75rem;
+  height: 5.75rem;
   border-radius: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
   box-shadow: 0 20px 60px rgba(124, 58, 237, 0.35);
 }
 
 .hero h1 {
-  margin: 18px 0 18px;
-  font-size: 50px;
+  margin: 1.125rem 0 1.125rem;
+  font-size: 3.125rem;
   font-weight: 800;
   background: linear-gradient(135deg, var(--violet-twilight), var(--purple) 60%, var(--purple-deep));
   -webkit-background-clip: text;
@@ -136,16 +155,16 @@ a { color: inherit; }
 }
 
 .hero p.tagline {
-  margin: 0 auto 36px;
-  max-width: 640px;
-  font-size: 19px;
+  margin: 0 auto 2.25rem;
+  max-width: 40rem;
+  font-size: 1.1875rem;
   line-height: 1.65;
   color: var(--text-dim);
 }
 
 .hero .cta {
   display: flex;
-  gap: 14px;
+  gap: 0.875rem;
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -156,9 +175,9 @@ a { color: inherit; }
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 14px 28px;
+  padding: 0.875rem 1.75rem;
   border-radius: 999px;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   text-decoration: none;
   border: 1px solid transparent;
@@ -182,28 +201,28 @@ a { color: inherit; }
 .btn.ghost:hover { border-color: var(--border-hover); }
 
 .platforms {
-  margin-top: 24px;
+  margin-top: 1.5rem;
   display: flex;
-  gap: 10px;
+  gap: 0.625rem;
   justify-content: center;
   flex-wrap: wrap;
 }
 
 /* ─── Sections ────────────────────────────────────────────────────────── */
 
-section { padding: 68px 24px; max-width: 1100px; margin: 0 auto; }
+section { padding: 4.25rem 1.5rem; max-width: 68.75rem; margin: 0 auto; }
 
 section h2 {
   text-align: center;
-  font-size: 30px;
-  margin: 0 0 10px;
+  font-size: 1.875rem;
+  margin: 0 0 0.625rem;
 }
 
 section p.section-sub {
   text-align: center;
   color: var(--text-dimmer);
-  font-size: 16px;
-  margin: 0 0 44px;
+  font-size: 1rem;
+  margin: 0 0 2.75rem;
 }
 
 .features-grid {
@@ -216,7 +235,7 @@ section p.section-sub {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 26px;
+  padding: 1.625rem;
   transition: border-color 0.15s ease, transform 0.15s ease;
 }
 
@@ -226,25 +245,25 @@ section p.section-sub {
 }
 
 .feature-card .icon {
-  width: 44px;
-  height: 44px;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: 10px;
   background: rgba(145, 70, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
-  margin-bottom: 16px;
+  font-size: 1.375rem;
+  margin-bottom: 1rem;
 }
 
-.feature-card h3 { margin: 0 0 10px; font-size: 17px; }
-.feature-card p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--text-dimmer); }
+.feature-card h3 { margin: 0 0 0.625rem; font-size: 1.0625rem; }
+.feature-card p { margin: 0; font-size: 0.9375rem; line-height: 1.6; color: var(--text-dimmer); }
 
 footer {
   text-align: center;
-  padding: 36px 24px 44px;
+  padding: 2.25rem 1.5rem 2.75rem;
   color: var(--text-faint);
-  font-size: 14px;
+  font-size: 0.875rem;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -254,22 +273,22 @@ footer a:hover { color: var(--text-dim); }
 /* ─── Games grid (games.html) ────────────────────────────────────────── */
 
 .games-header {
-  padding: 48px 24px 24px;
+  padding: 3rem 1.5rem 1.5rem;
   text-align: center;
   background: radial-gradient(ellipse at top, rgba(145, 70, 255, 0.15), transparent 70%);
   border-bottom: 1px solid var(--border);
 }
 
 .games-header h1 {
-  margin: 0 0 10px;
-  font-size: 32px;
+  margin: 0 0 0.625rem;
+  font-size: 2rem;
   background: linear-gradient(135deg, var(--purple-bright), var(--purple-deep));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-.games-header p { margin: 0; color: var(--text-dimmer); font-size: 15px; }
+.games-header p { margin: 0; color: var(--text-dimmer); font-size: 0.9375rem; }
 
 .grid {
   display: grid;
@@ -301,21 +320,21 @@ footer a:hover { color: var(--text-dim); }
 .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .cover.no-cover img { display: none; }
 
-.info { padding: 14px 16px 16px; }
+.info { padding: 0.875rem 1rem 1rem; }
 
 .info h3 {
-  margin: 0 0 5px;
-  font-size: 15px;
+  margin: 0 0 0.3125rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.meta { margin: 0 0 3px; font-size: 13px; color: var(--text-dimmer); }
+.meta { margin: 0 0 0.1875rem; font-size: 0.8125rem; color: var(--text-dimmer); }
 .credits {
   margin: 0;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--text-faint);
   white-space: nowrap;
   overflow: hidden;
