@@ -1,92 +1,90 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>About — The Oddity Forge</title>
-<link rel="icon" href="assets/statusforge-icon.png">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="assets/logos/bearddoddity-mascot-head.png">
+<link rel="stylesheet" href="../styles.css">
 <style>
-  .about-wrap { max-width: 760px; margin: 0 auto; padding: 64px 24px; }
-  .about-wrap h2 { font-size: 1.75rem; margin: 0 0 20px; }
-  .about-wrap p { font-size: 1rem; line-height: 1.8; color: var(--text-dim); margin: 0 0 20px; }
-  .social-row {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin: 28px 0 40px;
-  }
-  .social-row a {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
-    border-radius: 999px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    text-decoration: none;
-    color: var(--text);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    transition: border-color 0.15s ease, transform 0.15s ease;
-  }
-  .social-row a:hover { border-color: rgba(145, 70, 255, 0.4); transform: translateY(-2px); }
+  body { margin: 0; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+  .about-wrap { max-width: 720px; margin: 0 auto; padding: 56px 24px 80px; }
+  .about-wrap p { font-size: 16px; line-height: 1.8; color: var(--text-body); margin: 0 0 20px; }
+  .social-row { display: flex; gap: 12px; flex-wrap: wrap; margin: 28px 0 0; }
+  .integrations-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 14px; }
+  .integrations-row .chip { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 108px; padding: 16px 8px; background: var(--surface-1); border: 1px solid var(--line-2); border-radius: 14px; }
+  .integrations-row .chip svg, .integrations-row .chip img { height: 26px; width: auto; display: block; }
+  .integrations-row .l { font-size: 10px; color: var(--text-faint); text-transform: uppercase; letter-spacing: .06em; }
 </style>
 </head>
 <body>
 
-<nav class="nav">
-  <a class="brand" href="index.html">
-    <img src="assets/statusforge-icon.png" alt="The Oddity Forge">
-    The Oddity Forge
-  </a>
-  <div class="links">
-    <a href="index.html">Home</a>
-    <a href="index.html#projects">Projects</a>
-    <a href="guides/index.html">Guides</a>
-    <a href="blog/index.html">Blog</a>
-    <a href="about.html" class="active">About</a>
-    <a href="disclosure.html">Disclosure</a>
+<header class="bd-header">
+  <div class="bd-container bd-header-inner">
+    <a href="index.html" class="bd-logo" style="display:flex;align-items:center;gap:10px;text-decoration:none;white-space:nowrap;">
+      <img src="assets/logos/bearddoddity-mascot-head.png" alt="" style="width:28px;height:28px;border-radius:8px;flex-shrink:0;object-fit:cover;">
+      The Oddity Forge
+    </a>
+    <nav class="bd-header-links" style="gap:20px;">
+      <a href="index.html" class="bd-header-link" style="text-decoration:none;">Home</a>
+      <a href="index.html#projects" class="bd-header-link" style="text-decoration:none;">Projects</a>
+      <a href="guides/index.html" class="bd-header-link" style="text-decoration:none;">Guides</a>
+      <a href="blog/index.html" class="bd-header-link" style="text-decoration:none;">Blog</a>
+      <a href="about.html" class="bd-header-link" style="text-decoration:none;color:var(--text-strong);">About</a>
+      <a href="disclosure.html" class="bd-header-link" style="text-decoration:none;">Disclosure</a>
+    </nav>
+    <div class="bd-header-actions">
+      <button class="bd-header-burger" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
   </div>
-</nav>
+  <div class="bd-header-mobile-panel" style="display:none;">
+    <a href="index.html" class="bd-header-link" style="text-decoration:none;">Home</a>
+    <a href="index.html#projects" class="bd-header-link" style="text-decoration:none;">Projects</a>
+    <a href="guides/index.html" class="bd-header-link" style="text-decoration:none;">Guides</a>
+    <a href="blog/index.html" class="bd-header-link" style="text-decoration:none;">Blog</a>
+    <a href="about.html" class="bd-header-link" style="text-decoration:none;">About</a>
+    <a href="disclosure.html" class="bd-header-link" style="text-decoration:none;">Disclosure</a>
+  </div>
+</header>
 
-<div class="hero" style="padding-bottom: 40px;">
-  <img class="logo" src="assets/statusforge-icon.png" alt="BearddOddity">
-  <h1>BearddOddity</h1>
-  <p class="tagline">Variety streamer. Solo developer. Same person, same energy, different keyboard shortcuts.</p>
-</div>
+<section class="bd-hero" style="padding-bottom:32px;">
+  <div class="bd-hero-glow"></div>
+  <div class="bd-container" style="text-align:center;">
+    <img src="assets/logos/bearddoddity-mascot-head.png" alt="BearddOddity" style="width:96px;height:96px;border-radius:22px;margin-bottom:16px;box-shadow:0 20px 60px rgba(124,58,237,.35);object-fit:cover;">
+    <h1 style="margin:0 auto;max-width:none;">BearddOddity</h1>
+    <p style="margin:16px auto 0;">Variety streamer. Solo developer. Same person, same energy, different keyboard shortcuts.</p>
+  </div>
+</section>
 
 <div class="about-wrap">
-  <h2>What I'm about</h2>
-  <p>
-    I stream variety — whatever game's got my attention that week — on
-    Twitch and Kick as <strong>BearddOddity</strong>. Off stream (and
-    sometimes on it), I build the tools I actually use for streaming
-    myself, starting with <a href="statusforge/index.html">StatusForge</a>,
-    a native presence engine that keeps my channel's category accurate
-    without a browser extension or a subscription.
-  </p>
-  <p>
-    Everything here is built solo — no team, no VC, just whatever gets
-    the job done well enough to ship, then gets refined live in front of
-    chat. If you watch me stream, there's a decent chance you're watching
-    the next feature get built (or break).
-  </p>
-  <p>
-    This site is the home base for that: the tools, the guides for
-    setting them up, and the running log of what's changing.
-  </p>
+  <div class="bd-h2" style="margin-bottom:18px;">What I'm about</div>
+  <p>I stream variety — whatever game's got my attention that week — on Twitch and Kick as <strong>BearddOddity</strong>. Off stream (and sometimes on it), I build the tools I actually use for streaming myself, starting with <a href="statusforge/index.html" class="bd-link">StatusForge</a>, a native presence engine that keeps my channel's category accurate without a browser extension or a subscription.</p>
+  <p>Everything here is built solo — no team, no VC, just whatever gets the job done well enough to ship, then gets refined live in front of chat. If you watch me stream, there's a decent chance you're watching the next feature get built (or break).</p>
+  <p>This site is the home base for that: the tools, the guides for setting them up, and the running log of what's changing.</p>
 
   <div class="social-row">
-    <a href="https://twitch.tv/bearddoddity">🟣 Twitch</a>
-    <a href="https://kick.com/bearddoddity">🟢 Kick</a>
-    <a href="https://github.com/BearddOddity">⚫ GitHub</a>
+    <a href="https://twitch.tv/bearddoddity" class="bd-btn bd-btn-primary" style="text-decoration:none;">
+      <svg width="16" height="16" style="color:#9146ff" viewBox="0 0 2400 2800" fill="currentColor"><path d="M500,0L0,500v1800h600v500l500-500h400l900-900V0H500z M2200,1300l-400,400h-400l-350,350v-350H600V200h1600 V1300z"></path><rect x="1700" y="550" width="200" height="600"></rect><rect x="1150" y="550" width="200" height="600"></rect></svg>
+      Twitch
+    </a>
+    <a href="https://kick.com/bearddoddity" class="bd-btn bd-btn-primary" style="text-decoration:none;">
+      <svg width="16" height="16" style="color:#53fc18" viewBox="0 0 453.9 510.6" fill="currentColor"><path d="M0,0h170.2v113.5h56.7v-56.7h56.7V0h170.2v170.2h-56.7v56.7h-56.7v56.7h56.7v56.7h56.7v170.2h-170.2v-56.7h-56.7v-56.7h-56.7v113.5H0V0Z"></path></svg>
+      Kick
+    </a>
+    <a href="https://github.com/BearddOddity" class="bd-btn bd-btn-primary" style="text-decoration:none;">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path></svg>
+      GitHub
+    </a>
+  </div>
+
+  <div class="integrations-row">
   </div>
 </div>
 
-<footer>
-  <a href="https://github.com/BearddOddity">github.com/BearddOddity</a>
+<footer style="text-align:center;padding:36px 24px 44px;border-top:1px solid var(--line-1);">
+  <a href="https://github.com/BearddOddity" class="bd-link">github.com/BearddOddity</a>
 </footer>
 
+<script src="assets/nav.js"></script>
 </body>
 </html>
