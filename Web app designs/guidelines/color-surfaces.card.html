@@ -1,0 +1,20 @@
+<!-- @dsCard group="Colors" viewport="700x170" name="Surfaces — Glass elevation" subtitle="Black-alpha fills over the canvas, hairline borders" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  body{margin:0;background:var(--bd-black);font-family:var(--font-ui);color:var(--text-body)}
+  .wrap{padding:18px;display:flex;gap:12px;flex-wrap:wrap;
+    background-image:radial-gradient(circle at 30% 20%, rgba(145,70,255,.18), transparent 60%);}
+  .sw{width:150px;height:110px;border-radius:16px;display:flex;flex-direction:column;justify-content:flex-end;padding:12px;box-sizing:border-box;backdrop-filter:blur(10px)}
+  .n{font-size:11px;font-weight:600;color:#fff}
+  .h{font-family:var(--font-mono);font-size:9px;color:var(--text-faint)}
+  .s1{background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.05)}
+  .s2{background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08);box-shadow:0 4px 16px rgba(0,0,0,.2)}
+  .s3{background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.12);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .sg{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.1);box-shadow:0 8px 32px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.04)}
+</style></head><body><div class="wrap">
+  <div class="sw s1"><div class="n">Surface 1</div><div class="h">black / .20</div></div>
+  <div class="sw s2"><div class="n">Surface 2</div><div class="h">black / .35</div></div>
+  <div class="sw s3"><div class="n">Surface 3</div><div class="h">black / .50</div></div>
+  <div class="sw sg"><div class="n">Glass</div><div class="h">.45 + blur + inset</div></div>
+</div></body></html>

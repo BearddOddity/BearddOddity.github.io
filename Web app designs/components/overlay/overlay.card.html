@@ -1,0 +1,58 @@
+<!-- @dsCard group="Components" viewport="700x360" name="Overlay — Modal, Drawer, Tooltip, Menu" subtitle="Glass dialog, slide-in panel, hover bubble, action dropdown" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; background: var(--bd-black); font-family: var(--font-ui); color: var(--text-body); }
+  .wrap { padding: 22px; display: flex; gap: 12px; align-items: center; }
+</style>
+</head>
+<body>
+<div id="root" class="wrap"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+const { Modal, Drawer, Tooltip, Menu, Button } = window.BearddOddityDesignSystem_726917;
+function Demo() {
+  const [modal, setModal] = React.useState(true);
+  const [drawer, setDrawer] = React.useState(false);
+  return (
+    <>
+      <Button variant="primary" size="sm" onClick={() => setModal(true)}>Open modal</Button>
+      <Button variant="primary" size="sm" onClick={() => setDrawer(true)}>Open drawer</Button>
+      <Tooltip label="Copy to clipboard">
+        <Button variant="ghost" size="sm">📋</Button>
+      </Tooltip>
+      <Menu
+        trigger={<Button variant="ghost" size="sm">⋯</Button>}
+        items={[
+          { label: "Rename", icon: "✏️", onClick: () => {} },
+          { label: "Duplicate", icon: "📋", onClick: () => {} },
+          { divider: true },
+          { label: "Delete", icon: "🗑️", danger: true, onClick: () => {} },
+        ]}
+      />
+      <Modal open={modal} onClose={() => setModal(false)} title="Remove channel"
+        footer={<>
+          <Button variant="ghost" onClick={() => setModal(false)}>Cancel</Button>
+          <Button variant="danger" onClick={() => setModal(false)}>Remove</Button>
+        </>}>
+        This disconnects the channel and deletes its saved overlays.
+      </Modal>
+      <Drawer open={drawer} onClose={() => setDrawer(false)} title="Filters">
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div className="bd-label">Platform</div>
+          <div>Twitch, Kick, YouTube</div>
+        </div>
+      </Drawer>
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script>
+</body>
+</html>

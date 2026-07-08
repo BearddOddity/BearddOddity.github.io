@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Alerts Hub" description="Follow, sub, bits, tips &amp; donation alert overlays" -->
+<helmet>
+  <script src="./ds-base.js"></script>
+  <style>
+    html, body { margin: 0; min-height: 100%; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 32px 48px; }
+    .top-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+    .channel-id { display: flex; align-items: center; gap: 12px; }
+    .ah-wordmark { font-family: var(--font-heading); font-weight: 800; font-size: 21px; color: var(--text-strong); letter-spacing: -.01em; }
+    .ah-wordmark span { color: var(--bd-accent); }
+
+    .main-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; align-items: start; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; row-gap: 8px; }
+    .panel-head .bd-h3 { margin: 0; flex: 1 1 auto; min-width: 140px; }
+    .config-card .panel-head { margin-bottom: 22px; }
+
+    /* preview canvas — simulated OBS transparent browser source */
+    .preview-card { padding: 18px 18px 20px; }
+    .preview-canvas {
+      position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-lg);
+      overflow: hidden; background-color: #0a0a0a;
+      background-image:
+        linear-gradient(45deg, rgba(255,255,255,0.045) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255,255,255,0.045) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.045) 75%),
+        linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.045) 75%);
+      background-size: 24px 24px; background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
+      border: 1px solid var(--line-2);
+    }
+    .preview-tag { position: absolute; top: 10px; left: 12px; font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); letter-spacing: .04em; }
+    .preview-stage { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 28px; }
+
+    .alert-card {
+      display: flex; align-items: center; gap: 14px; padding: 14px 22px 14px 16px;
+      background: rgba(8,8,10,0.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border-radius: var(--radius-xl); border: 1px solid var(--ac-line, var(--line-3));
+      box-shadow: 0 0 32px var(--ac-glow, var(--accent-glow)), var(--shadow-1);
+      max-width: 86%;
+    }
+    .alert-icon { width: 40px; height: 40px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; background: var(--ac-tint, var(--accent-glow)); }
+    .alert-title { font-size: 15px; font-weight: 700; color: var(--text-strong); line-height: 1.25; }
+    .alert-sub { font-size: 11px; color: var(--text-faint); font-family: var(--font-mono); margin-top: 2px; }
+    .alert-anim-slideUp { animation: ahSlideUp .45s cubic-bezier(0.16,1,0.3,1); }
+    .alert-anim-pop { animation: ahPop .4s cubic-bezier(0.16,1,0.3,1); }
+    .alert-anim-bounce { animation: ahBounce .6s cubic-bezier(0.16,1,0.3,1); }
+    .alert-anim-fade { animation: ahFade .45s ease; }
+    @keyframes ahSlideUp { from { transform: translateY(48px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes ahPop { from { transform: scale(0.72); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes ahBounce { 0% { transform: translateY(-36px); opacity: 0; } 55% { transform: translateY(8px); opacity: 1; } 100% { transform: translateY(0); } }
+    @keyframes ahFade { from { opacity: 0; } to { opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) {
+      .alert-anim-slideUp, .alert-anim-pop, .alert-anim-bounce, .alert-anim-fade { animation: none; }
+    }
+
+    /* fixed accent palette — keyed by data-accent, no runtime style needed */
+    [data-accent="purple"] { --ac-line: rgba(145,70,255,0.40); --ac-glow: rgba(145,70,255,0.25); --ac-tint: rgba(145,70,255,0.20); --tc-tint: rgba(145,70,255,0.12); --tc-line: rgba(145,70,255,0.35); }
+    [data-accent="green"]  { --ac-line: rgba(74,222,128,0.40); --ac-glow: rgba(74,222,128,0.25); --ac-tint: rgba(74,222,128,0.20); --tc-tint: rgba(74,222,128,0.12); --tc-line: rgba(74,222,128,0.35); }
+    [data-accent="amber"]  { --ac-line: rgba(250,204,21,0.40); --ac-glow: rgba(250,204,21,0.25); --ac-tint: rgba(250,204,21,0.20); --tc-tint: rgba(250,204,21,0.12); --tc-line: rgba(250,204,21,0.35); }
+    [data-accent="cyan"]   { --ac-line: rgba(34,211,238,0.40); --ac-glow: rgba(34,211,238,0.25); --ac-tint: rgba(34,211,238,0.20); --tc-tint: rgba(34,211,238,0.12); --tc-line: rgba(34,211,238,0.35); }
+    [data-accent="red"]    { --ac-line: rgba(248,113,113,0.40); --ac-glow: rgba(248,113,113,0.25); --ac-tint: rgba(248,113,113,0.20); --tc-tint: rgba(248,113,113,0.12); --tc-line: rgba(248,113,113,0.35); }
+    [data-accent="blue"]   { --ac-line: rgba(59,130,246,0.40); --ac-glow: rgba(59,130,246,0.25); --ac-tint: rgba(59,130,246,0.20); --tc-tint: rgba(59,130,246,0.12); --tc-line: rgba(59,130,246,0.35); }
+    .swatch-purple { background: #9146ff; } .swatch-purple[data-selected="true"] { box-shadow: 0 0 0 2px var(--bd-black), 0 0 10px rgba(145,70,255,0.6); }
+    .swatch-green  { background: #4ade80; } .swatch-green[data-selected="true"]  { box-shadow: 0 0 0 2px var(--bd-black), 0 0 10px rgba(74,222,128,0.6); }
+    .swatch-amber  { background: #facc15; } .swatch-amber[data-selected="true"]  { box-shadow: 0 0 0 2px var(--bd-black), 0 0 10px rgba(250,204,21,0.6); }
+    .swatch-cyan   { background: #22d3ee; } .swatch-cyan[data-selected="true"]   { box-shadow: 0 0 0 2px var(--bd-black), 0 0 10px rgba(34,211,238,0.6); }
+    .swatch-red    { background: #f87171; } .swatch-red[data-selected="true"]    { box-shadow: 0 0 0 2px var(--bd-black), 0 0 10px rgba(248,113,113,0.6); }
+    .swatch-blue   { background: #3b82f6; } .swatch-blue[data-selected="true"]   { box-shadow: 0 0 0 2px var(--bd-black), 0 0 10px rgba(59,130,246,0.6); }
+
+    /* trigger buttons */
+    .trigger-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .trigger-btn {
+      display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.03); border: 1px solid var(--line-2); color: var(--text-body);
+      cursor: pointer; transition: all var(--dur-base) ease; text-align: left; font-family: var(--font-ui); font-size: 13px;
+    }
+    .trigger-btn[data-accent] { background: var(--tc-tint, rgba(255,255,255,0.03)); }
+    .trigger-btn[data-accent]:hover { border-color: var(--tc-line, var(--line-strong)); transform: translateY(-1px); box-shadow: var(--shadow-1); }
+    .trigger-icon { width: 30px; height: 30px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; background: var(--tc-tint, var(--accent-glow)); }
+    .trigger-label { font-weight: 600; }
+    .trigger-desc { font-size: 11px; color: var(--text-faint); margin-top: 1px; }
+    /* recent activity */
+    .activity-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line-1); }
+    .activity-row:last-child { border-bottom: none; }
+    .activity-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; background: var(--tc-tint, var(--accent-glow)); }
+    .activity-meta { flex: 1; min-width: 0; }
+    .activity-title { font-size: 13px; color: var(--text-body); }
+    .activity-time { font-size: 11px; color: var(--text-faint); font-family: var(--font-mono); }
+
+    /* config */
+    .config-card { padding: 20px 22px 22px; }
+    .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; margin-top: 16px; }
+    .config-grid > .full { grid-column: 1 / -1; }
+    .swatch-row { display: flex; gap: 8px; align-items: center; }
+    .swatch {
+      width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;
+      transition: all var(--dur-base) ease; padding: 0;
+    }
+    .config-label { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; display: block; }
+    .enabled-row { display: flex; align-items: center; justify-content: space-between; }
+    .sound-row { display: flex; align-items: flex-end; gap: 12px; }
+    .sound-import-btn { flex-shrink: 0; margin-bottom: 1px; white-space: nowrap; }
+
+    @media (max-width: 860px) {
+      .wrap { padding: 20px 18px 36px; }
+      .main-grid { grid-template-columns: 1fr; }
+      .config-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</helmet>
+
+<div class="wrap" data-screen-label="Alerts Hub">
+
+  <div class="top-row">
+    <div class="channel-id">
+      <div class="ah-wordmark">Alerts<span>Hub</span></div>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.StatusDot" hint-size="140px,20px" status="on" label="Engine Online"></x-import>
+      <span style="font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">{{ historyCount }} alerts fired today</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <a href="../stream-stats/StreamStats.dc.html" class="bd-btn bd-btn-ghost" style="text-decoration:none;">Stream Stats</a>
+      <a href="../multi-chat-viewer/MultiChatViewer.dc.html" class="bd-btn bd-btn-ghost" style="text-decoration:none;">Multi-Chat</a>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div>
+      <div class="bd-card preview-card">
+        <div class="panel-head">
+          <div class="bd-h3">Overlay Preview</div>
+          <span class="bd-badge bd-badge-ghost">OBS Browser Source · transparent</span>
+        </div>
+        <div class="preview-canvas">
+          <span class="preview-tag">1920×1080 · alerts.html</span>
+          <div class="preview-stage">
+            <sc-if value="{{ hasActiveAlert }}" hint-placeholder-val="{{ false }}">
+              <div class="alert-card {{ activeAlertAnimClass }}" data-accent="{{ activeAlert.accent }}">
+                <div class="alert-icon">{{ activeAlert.icon }}</div>
+                <div>
+                  <div class="alert-title">{{ activeAlert.title }}</div>
+                  <div class="alert-sub">{{ activeAlert.sub }}</div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:18px"></div>
+
+      <div class="bd-card config-card">
+        <div class="panel-head">
+          <div class="bd-h3">Alert Settings</div>
+          <div class="enabled-row" style="gap:10px;">
+            <span class="config-label" style="margin-bottom:0;">Enabled</span>
+            <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Switch" hint-size="40px,22px" checked="{{ activeConfig.enabled }}" onChange="{{ setEnabled }}"></x-import>
+          </div>
+        </div>
+        <div>
+          
+        <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Select" hint-size="100%,58px" label="Alert Type" value="{{ activeType }}" onChange="{{ setActiveType }}" options="{{ typeOptions }}"></x-import></div>
+
+        <div class="config-grid">
+          <div>
+            <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Input" hint-size="100%,58px" label="Message Template" value="{{ activeConfig.template }}" onChange="{{ setTemplate }}" help="{{ activeConfig.placeholderHelp }}"></x-import>
+          </div>
+          <div>
+            <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Select" hint-size="100%,58px" label="Animation" value="{{ activeConfig.animation }}" onChange="{{ setAnimation }}" options="{{ animationOptions }}" style="height: 71px; width: 197px; position: absolute; left: 403px"></x-import>
+          </div>
+          <div class="full sound-row">
+            <div style="flex:1;">
+              <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Select" hint-size="100%,58px" label="Sound" value="{{ activeConfig.sound }}" onChange="{{ setSound }}" options="{{ soundOptions }}"></x-import>
+            </div>
+            <button class="bd-btn bd-btn-ghost bd-btn-sm sound-import-btn" onClick="{{ triggerImport }}" style="width: 91px; height: 48px">＋ Import Sound</button>
+            <input type="file" accept="audio/*" ref="{{ fileInputRef }}" style="display:none" onChange="{{ handleFileImport }}">
+          </div>
+          <div class="full">
+            <x-import component-from-global-scope="BearddOddityDesignSystem_726917.RangeSlider" hint-size="100%,50px" label="Display Duration (seconds)" value="{{ activeConfig.duration }}" min="{{ 2 }}" max="{{ 10 }}" step="{{ 1 }}" onChange="{{ setDuration }}"></x-import>
+          </div>
+          <div class="full">
+            <span class="config-label">Accent Color</span>
+            <div class="swatch-row">
+              <sc-for list="{{ colorOptions }}" as="c" hint-placeholder-count="5">
+                <button class="swatch swatch-{{ c.key }}" data-selected="{{ c.selected }}" onClick="{{ c.onClick }}" aria-label="{{ c.name }}"></button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="bd-card list-card" style="padding:18px 20px;">
+        <div class="panel-head">
+          <div class="bd-h3">Test Triggers</div>
+        </div>
+
+        <div class="trigger-grid">
+          <sc-for list="{{ allButtons }}" as="t" hint-placeholder-count="12">
+            <button class="trigger-btn" data-accent="{{ t.accent }}" onClick="{{ t.onClick }}">
+              <div class="trigger-icon">{{ t.icon }}</div>
+              <div>
+                <div class="trigger-label">{{ t.label }}</div>
+                <div class="trigger-desc">{{ t.desc }}</div>
+              </div>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="height:18px"></div>
+
+      <div class="bd-card list-card" style="padding:18px 20px;">
+        <div class="panel-head">
+          <div class="bd-h3">Recent Activity</div>
+          <span class="bd-badge bd-badge-ghost">last {{ historyCount }}</span>
+        </div>
+        <sc-if value="{{ hasHistory }}" hint-placeholder-val="{{ true }}">
+          <sc-for list="{{ history }}" as="h" hint-placeholder-count="6">
+            <div class="activity-row">
+              <div class="activity-icon" data-accent="{{ h.accent }}">{{ h.icon }}</div>
+              <div class="activity-meta">
+                <div class="activity-title">{{ h.text }}</div>
+                <div class="activity-time">{{ h.time }}</div>
+              </div>
+              <span class="bd-badge {{ h.badgeClass }}">{{ h.typeLabel }}</span>
+            </div>
+          </sc-for>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const ALERT_TYPES = {
+  follow: {
+    label: "Follow", icon: "✨", platform: "universal", accent: "purple",
+    template: "{name} just followed!", sub: "New follower",
+    placeholderHelp: "Placeholders: {name}",
+    sample: (n) => ({ name: n }),
+  },
+  donation: {
+    label: "Donation", icon: "💰", platform: "universal", accent: "amber",
+    template: "{name} donated ${amount}!", sub: "Donation received",
+    placeholderHelp: "Placeholders: {name}, {amount}",
+    sample: (n) => ({ name: n, amount: pick([5, 10, 20, 25, 50]) }),
+  },
+  raid: {
+    label: "Twitch · Raid", icon: "🚀", platform: "twitch", accent: "purple",
+    template: "{name} is raiding with {viewers} viewers!", sub: "Incoming raid",
+    placeholderHelp: "Placeholders: {name}, {viewers}",
+    sample: (n) => ({ name: n, viewers: pick([12, 48, 120, 340]) }),
+  },
+  twitchSub: {
+    label: "Twitch · Sub", icon: "💎", platform: "twitch", accent: "purple",
+    template: "{name} subscribed for {months} months!", sub: "New Twitch sub",
+    placeholderHelp: "Placeholders: {name}, {months}",
+    sample: (n) => ({ name: n, months: pick([1, 3, 6, 12]) }),
+  },
+  twitchBits: {
+    label: "Twitch · Cheer / Bits", icon: "🔥", platform: "twitch", accent: "purple",
+    template: "{name} cheered {bits} bits!", sub: "Bits cheered",
+    placeholderHelp: "Placeholders: {name}, {bits}",
+    sample: (n) => ({ name: n, bits: pick([100, 500, 1000, 5000]) }),
+  },
+  kickSub: {
+    label: "Kick · Sub", icon: "💎", platform: "kick", accent: "green",
+    template: "{name} subscribed for {months} months!", sub: "New Kick sub",
+    placeholderHelp: "Placeholders: {name}, {months}",
+    sample: (n) => ({ name: n, months: pick([1, 3, 6]) }),
+  },
+  kickKicks: {
+    label: "Kick · Kicks", icon: "🪙", platform: "kick", accent: "green",
+    template: "{name} sent {kicks} Kicks!", sub: "Kicks gifted",
+    placeholderHelp: "Placeholders: {name}, {kicks}",
+    sample: (n) => ({ name: n, kicks: pick([50, 100, 250, 500]) }),
+  },
+  ytMembership: {
+    label: "YouTube · Membership", icon: "💎", platform: "youtube", accent: "red",
+    template: "{name} joined as a member!", sub: "New YouTube member",
+    placeholderHelp: "Placeholders: {name}",
+    sample: (n) => ({ name: n }),
+  },
+  ytSuperchat: {
+    label: "YouTube · Super Chat", icon: "💬", platform: "youtube", accent: "red",
+    template: "{name} sent a Super Chat: ${amount}!", sub: "Super Chat",
+    placeholderHelp: "Placeholders: {name}, {amount}",
+    sample: (n) => ({ name: n, amount: pick([2, 5, 10, 20, 50]) }),
+  },
+  tiktokGift: {
+    label: "TikTok · Gift", icon: "🎁", platform: "tiktok", accent: "cyan",
+    template: "{name} sent a {gift} x{count}!", sub: "TikTok gift",
+    placeholderHelp: "Placeholders: {name}, {gift}, {count}",
+    sample: (n) => ({ name: n, gift: pick(["Rose", "Galaxy", "Lion", "TikTok Universe"]), count: pick([1, 5, 10, 50]) }),
+  },
+  rumbleRant: {
+    label: "Rumble · Rant", icon: "📣", platform: "rumble", accent: "green",
+    template: "{name} sent a Rant: ${amount}!", sub: "Rumble Rant",
+    placeholderHelp: "Placeholders: {name}, {amount}",
+    sample: (n) => ({ name: n, amount: pick([5, 10, 20]) }),
+  },
+  joystickTip: {
+    label: "Joystick.tv · Tip", icon: "💵", platform: "joystick", accent: "blue",
+    template: "{name} tipped ${amount}!", sub: "Joystick.tv tip",
+    placeholderHelp: "Placeholders: {name}, {amount}",
+    sample: (n) => ({ name: n, amount: pick([3, 5, 10, 25]) }),
+  },
+  casinoSpin: {
+    label: "Casino Spin", icon: "🎰", platform: "universal", accent: "amber",
+    template: "{name} spun and won: {reward}!", sub: "Casino Spin",
+    placeholderHelp: "Placeholders: {name}, {reward}",
+    sample: (n) => ({ name: n, reward: pick(["10% Off Sub", "Shoutout", "Free Emote Slot", "1 Free Month", "Mystery Box", "Try Again"]) }),
+  },
+};
+
+const SAMPLE_NAMES = ["nightowl22", "pixelfox", "quietstorm", "brk_", "waveform", "juno_plays", "reddotstudio", "milo_dev"];
+const COLOR_CHOICES = [
+  { key: "purple", label: "Purple" }, { key: "green", label: "Green" }, { key: "amber", label: "Amber" },
+  { key: "cyan", label: "Cyan" }, { key: "red", label: "Red" }, { key: "blue", label: "Blue" },
+];
+const BADGE_CLASS = { purple: "bd-badge-purple", green: "bd-badge-green", amber: "bd-badge-amber", red: "bd-badge-red", cyan: "bd-badge-cyan", blue: "bd-badge-cyan" };
+
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function fillTemplate(template, data) {
+  return template.replace(/\{(\w+)\}/g, (m, k) => (data[k] !== undefined ? data[k] : m));
+}
+
+let seq = 0;
+
+function defaultConfigs() {
+  const cfg = {};
+  const defaults = {
+    follow: { sound: "chime", animation: "slideUp", duration: 4 },
+    donation: { sound: "cash", animation: "bounce", duration: 6 },
+    raid: { sound: "horn", animation: "slideUp", duration: 5 },
+    twitchSub: { sound: "fanfare", animation: "pop", duration: 5 },
+    twitchBits: { sound: "chime", animation: "pop", duration: 4 },
+    kickSub: { sound: "fanfare", animation: "pop", duration: 5 },
+    kickKicks: { sound: "cash", animation: "bounce", duration: 4 },
+    ytMembership: { sound: "fanfare", animation: "pop", duration: 5 },
+    ytSuperchat: { sound: "cash", animation: "bounce", duration: 5 },
+    tiktokGift: { sound: "chime", animation: "slideUp", duration: 4 },
+    rumbleRant: { sound: "cash", animation: "bounce", duration: 5 },
+    joystickTip: { sound: "cash", animation: "slideUp", duration: 4 },
+    casinoSpin: { sound: "cash", animation: "bounce", duration: 5 },
+  };
+  Object.keys(ALERT_TYPES).forEach((k) => {
+    cfg[k] = { enabled: true, template: ALERT_TYPES[k].template, accent: ALERT_TYPES[k].accent, ...defaults[k] };
+  });
+  return cfg;
+}
+
+class Component extends DCLogic {
+  state = {
+    activeType: "follow",
+    configs: defaultConfigs(),
+    activeAlert: null,
+    customSounds: [],
+    history: [
+      { text: "pixelfox subscribed for 3 months!", time: "2 min ago", icon: "💎", accent: "purple", typeLabel: "Twitch Sub" },
+      { text: "quietstorm just followed!", time: "6 min ago", icon: "✨", accent: "purple", typeLabel: "Follow" },
+      { text: "brk_ sent a Super Chat: $20!", time: "14 min ago", icon: "💬", accent: "red", typeLabel: "Super Chat" },
+      { text: "waveform tipped $10!", time: "21 min ago", icon: "💵", accent: "blue", typeLabel: "Joystick Tip" },
+      { text: "juno_plays is raiding with 48 viewers!", time: "38 min ago", icon: "🚀", accent: "purple", typeLabel: "Raid" },
+      { text: "reddotstudio sent 250 Kicks!", time: "51 min ago", icon: "🪙", accent: "green", typeLabel: "Kicks" },
+    ],
+  };
+
+  clearTimer = null;
+  fileInputRef = React.createRef();
+
+  setActiveType = (v) => this.setState({ activeType: v });
+
+  updateActiveConfig(patch) {
+    this.setState((s) => ({
+      configs: { ...s.configs, [s.activeType]: { ...s.configs[s.activeType], ...patch } },
+    }));
+  }
+  setEnabled = (v) => this.updateActiveConfig({ enabled: v });
+  setTemplate = (v) => this.updateActiveConfig({ template: v });
+  setSound = (v) => this.updateActiveConfig({ sound: v });
+  setAnimation = (v) => this.updateActiveConfig({ animation: v });
+  setDuration = (v) => this.updateActiveConfig({ duration: v });
+
+  triggerImport = () => { if (this.fileInputRef.current) this.fileInputRef.current.click(); };
+  handleFileImport = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const name = file.name.replace(/\.[^/.]+$/, "");
+    const value = "custom-" + Date.now();
+    this.setState((s) => ({ customSounds: [...s.customSounds, { value, label: name }] }));
+    this.updateActiveConfig({ sound: value });
+    e.target.value = "";
+  };
+
+  showAlert(alert, durationSec, historyEntry) {
+    const id = ++seq;
+    if (this.clearTimer) clearTimeout(this.clearTimer);
+    this.setState((s) => ({
+      activeAlert: { ...alert, id },
+      history: [historyEntry, ...s.history].slice(0, 8),
+    }));
+    this.clearTimer = setTimeout(() => {
+      this.setState((s) => (s.activeAlert && s.activeAlert.id === id ? { activeAlert: null } : {}));
+    }, durationSec * 1000);
+  }
+
+  trigger(type) {
+    const def = ALERT_TYPES[type];
+    const cfg = this.state.configs[type];
+    const name = pick(SAMPLE_NAMES);
+    const data = def.sample(name);
+    const title = fillTemplate(cfg.template, data);
+    this.showAlert(
+      { icon: def.icon, accent: cfg.accent, animation: cfg.animation, title, sub: def.sub },
+      cfg.duration,
+      { text: title, time: "just now", icon: def.icon, accent: cfg.accent, typeLabel: def.label.split(" · ").pop() }
+    );
+  }
+
+  renderVals() {
+    const { activeType, configs, activeAlert, history } = this.state;
+    const activeConfig = configs[activeType];
+
+    const typeOptions = Object.keys(ALERT_TYPES).map((k) => ({ value: k, label: ALERT_TYPES[k].label }));
+
+    const soundOptions = [
+      { value: "chime", label: "Chime" }, { value: "fanfare", label: "Fanfare" },
+      { value: "cash", label: "Cash Register" }, { value: "horn", label: "Horn Blast" },
+      { value: "none", label: "None" }, ...this.state.customSounds,
+    ];
+    const animationOptions = [
+      { value: "slideUp", label: "Slide Up" }, { value: "pop", label: "Pop" },
+      { value: "bounce", label: "Bounce" }, { value: "fade", label: "Fade" },
+    ];
+
+    const colorOptions = COLOR_CHOICES.map((c) => ({
+      key: c.key, name: c.label, selected: c.key === activeConfig.accent,
+      onClick: () => this.updateActiveConfig({ accent: c.key }),
+    }));
+
+    const buildBtn = (k) => {
+      const def = ALERT_TYPES[k];
+      const cfg = configs[k];
+      return {
+        icon: def.icon,
+        label: def.label,
+        desc: cfg.enabled ? "enabled" : "muted",
+        accent: cfg.accent,
+        onClick: () => this.trigger(k),
+      };
+    };
+
+    const allButtons = Object.keys(ALERT_TYPES).map(buildBtn);
+
+    const historyRows = history.map((h) => ({ ...h, badgeClass: BADGE_CLASS[h.accent] || "bd-badge-ghost" }));
+
+    return {
+      historyCount: history.length,
+      activeType, typeOptions, setActiveType: this.setActiveType,
+      activeConfig,
+      setEnabled: this.setEnabled, setTemplate: this.setTemplate, setSound: this.setSound,
+      setAnimation: this.setAnimation, setDuration: this.setDuration,
+      soundOptions, animationOptions, colorOptions,
+      fileInputRef: this.fileInputRef, triggerImport: this.triggerImport, handleFileImport: this.handleFileImport,
+      allButtons,
+      hasHistory: historyRows.length > 0, history: historyRows,
+      hasActiveAlert: !!activeAlert, activeAlert,
+      activeAlertAnimClass: activeAlert ? `alert-anim-${activeAlert.animation}` : "",
+    };
+  }
+}
+
+</script>
+</body>
+</html>

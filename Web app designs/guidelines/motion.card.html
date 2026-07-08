@@ -1,0 +1,48 @@
+<!-- @dsCard group="Colors" viewport="700x300" name="Motion — breathe, glint, shimmer, pulse" subtitle="The four signature loops, plus interaction timing" -->
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  body{margin:0;background:var(--bd-black);font-family:var(--font-ui);color:var(--text-body)}
+  .wrap{padding:20px;display:flex;flex-direction:column;gap:18px}
+  .row{display:flex;gap:14px;flex-wrap:wrap}
+  .tile{width:140px;display:flex;flex-direction:column;gap:8px}
+  .art{height:96px;border-radius:12px;border:1px solid var(--line-2);background:linear-gradient(135deg,#1a1030,#0a0a14);display:flex;align-items:center;justify-content:center;font-size:28px}
+  .lbl{font-size:11px;font-weight:600;color:#fff}
+  .sub{font-family:var(--font-mono);font-size:10px;color:var(--text-faint)}
+  .skel{height:14px;border-radius:6px}
+  .timing{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:rgba(0,0,0,.3);border:1px solid var(--line-1);border-radius:12px}
+  .timing b{color:var(--text-strong);font-family:var(--font-ui)}
+</style></head><body><div class="wrap">
+  <div class="row">
+    <div class="tile">
+      <div class="art bd-anim-breathe">🎮</div>
+      <div class="lbl">Breathe</div>
+      <div class="sub">bd-anim-breathe · 3s</div>
+    </div>
+    <div class="tile">
+      <div class="art bd-glint-overlay">📚</div>
+      <div class="lbl">Glint</div>
+      <div class="sub">bd-glint-overlay · 3.2s</div>
+    </div>
+    <div class="tile">
+      <div class="art" style="align-items:flex-start;justify-content:flex-start;padding:16px;box-sizing:border-box">
+        <div class="skel bd-shimmer-bg" style="width:80%"></div>
+      </div>
+      <div class="lbl">Shimmer</div>
+      <div class="sub">bd-shimmer-bg · 2.2s</div>
+    </div>
+    <div class="tile">
+      <div class="art"><span class="bd-dot bd-dot-on bd-anim-pulse" style="width:14px;height:14px"></span></div>
+      <div class="lbl">Pulse (glow)</div>
+      <div class="sub">bd-anim-pulse · 1.8s</div>
+    </div>
+  </div>
+  <div class="timing">
+    <div><b>Breathe</b> — game/cover art while a stream or session is live (slow scale, near-imperceptible).</div>
+    <div><b>Glint</b> — a light sweep across active cover art; reads as "still working", not decorative.</div>
+    <div><b>Shimmer</b> — Skeleton loading placeholders only.</div>
+    <div><b>Pulse</b> — a status dot announcing live/connected state.</div>
+    <div style="margin-top:6px"><b>Interaction timing</b> — 0.15–0.2s ease for hover/press; cubic-bezier(0.16,1,0.3,1) for card/toast entrances; toasts slide in from the right.</div>
+    <div><b>Reduced motion</b> — every loop and transition collapses to a single 0.01ms frame under prefers-reduced-motion (global rule in effects.css) — nothing here needs a manual opt-out.</div>
+  </div>
+</div></body></html>

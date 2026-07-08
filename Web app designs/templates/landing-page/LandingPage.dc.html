@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Landing Page" description="Marketing landing page — sticky nav, hero, feature grid, testimonial, pricing, footer" -->
+<helmet>
+  <script src="./ds-base.js"></script>
+  <style>
+    body { margin: 0; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+    .section { padding: 72px 0; }
+    .section-head { text-align: center; max-width: 560px; margin: 0 auto 44px; }
+    .kicker { font-family: var(--font-mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--bd-accent-text); font-weight: 600; margin-bottom: 12px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+    .feature-card { padding: 24px; }
+    .feature-ico { width: 40px; height: 40px; border-radius: 10px; background: rgba(145,70,255,.15); display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 16px; }
+    .testimonial { max-width: 640px; margin: 0 auto; text-align: center; padding: 40px; }
+    .testimonial p { font-size: 20px; font-family: var(--font-heading); font-weight: 500; color: var(--text-strong); line-height: 1.4; margin: 0 0 20px; }
+    .testimonial-who { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 13px; color: var(--text-muted); }
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; }
+    @media (max-width: 640px) {
+      .section { padding: 48px 0; }
+      .bd-hero h1 { font-size: var(--fs-xl); }
+    }
+  </style>
+</helmet>
+
+<x-import component-from-global-scope="BearddOddityDesignSystem_726917.Header" hint-size="100%,68px"
+  logo="beardd//oddity">
+</x-import>
+
+<x-import component-from-global-scope="BearddOddityDesignSystem_726917.Hero" hint-size="100%,340px"
+  kicker="Ultimate Streaming Companion"
+  title="All the tools a streamer needs, in one place."
+  description="Chat, scenes, sound board, alerts, and presence — one dense, glassy control surface instead of a dozen browser tabs.">
+</x-import>
+
+<section class="section" data-screen-label="Features">
+  <div class="bd-container">
+    <div class="section-head">
+      <div class="kicker">Why StreamerSuite</div>
+      <div class="bd-h2">Built for the stream, not the demo</div>
+    </div>
+    <div class="feature-grid">
+      <div class="bd-card feature-card">
+        <div class="feature-ico">✨</div>
+        <div class="bd-h3">Auto overlays</div>
+        <p style="color:var(--text-muted); font-size:13px; margin-top:8px;">Presence detection pushes your game to Twitch/Kick overlays with zero setup.</p>
+      </div>
+      <div class="bd-card feature-card">
+        <div class="feature-ico">💬</div>
+        <div class="bd-h3">Multi-chat</div>
+        <p style="color:var(--text-muted); font-size:13px; margin-top:8px;">One box for Twitch, Kick, and YouTube chat — ChatConfluence merges them live.</p>
+      </div>
+      <div class="bd-card feature-card">
+        <div class="feature-ico">🎛️</div>
+        <div class="bd-h3">Sound board</div>
+        <p style="color:var(--text-muted); font-size:13px; margin-top:8px;">12 hotkey pads, instant playback, no dropped frames.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" data-screen-label="Testimonial" style="background: rgba(255,255,255,0.02);">
+  <div class="bd-container">
+    <div class="bd-card testimonial">
+      <p>"Switched three streamers on my team over in a weekend. It just stays out of the way."</p>
+      <div class="testimonial-who">
+        <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Avatar" hint-size="28px,28px" name="Jordan Beard" size="{{ 28 }}"></x-import>
+        <span>Jordan Beard · beardds</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" data-screen-label="Pricing">
+  <div class="bd-container">
+    <div class="section-head">
+      <div class="kicker">Pricing</div>
+      <div class="bd-h2">Free while in beta</div>
+    </div>
+    <div class="pricing-grid">
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.PricingCard" hint-size="100%,260px"
+        name="Starter" price="$0" features="{{ starterFeatures }}">
+        <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Button" hint-size="100%,40px" variant="primary">Get started</x-import>
+      </x-import>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.PricingCard" hint-size="100%,260px"
+        name="Pro" price="$12" highlight="{{ true }}" features="{{ proFeatures }}">
+        <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Button" hint-size="100%,40px" variant="cta">Start free trial</x-import>
+      </x-import>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.PricingCard" hint-size="100%,260px"
+        name="Team" price="$29" features="{{ teamFeatures }}">
+        <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Button" hint-size="100%,40px" variant="primary">Contact sales</x-import>
+      </x-import>
+    </div>
+  </div>
+</section>
+
+<x-import component-from-global-scope="BearddOddityDesignSystem_726917.Footer" hint-size="100%,220px"
+  dc-props="{{ footerProps }}">
+</x-import>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      starterFeatures: ["1 channel", "Basic overlays", "Community support"],
+      proFeatures: ["Unlimited channels", "Custom overlays", "Priority support"],
+      teamFeatures: ["Everything in Pro", "5 seats", "Shared sound board"],
+      footerProps: {
+        columns: [
+          { title: "Product", links: ["Overlays", "Chat", "Sound board"] },
+          { title: "Company", links: ["About", "Blog"] },
+          { title: "Legal", links: ["Privacy", "Terms"] },
+        ],
+        bottomLeft: "© 2026 BearddOddity",
+        bottomRight: "Twitch · Kick · Joystick.tv",
+      },
+    };
+  }
+}
+
+</script>
+</body>
+</html>

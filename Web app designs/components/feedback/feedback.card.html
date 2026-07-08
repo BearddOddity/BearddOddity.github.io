@@ -1,0 +1,62 @@
+<!-- @dsCard group="Components" viewport="700x420" name="Feedback — Toasts, Alerts, Skeletons, Empty states" subtitle="Notification pills, banners, loading & zero-state patterns" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; background: var(--bd-black); font-family: var(--font-ui); color: var(--text-body); }
+  .wrap { padding: 22px; display: flex; flex-direction: column; gap: 18px; }
+  .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-faint); font-weight: 600; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div id="root" class="wrap"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+const { Toast, ProgressBar, Alert, Skeleton, EmptyState, ToastManager, bdToast } = window.BearddOddityDesignSystem_726917;
+function Demo() {
+  return (
+    <>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <Toast variant="success">Overlay connected</Toast>
+        <Toast variant="info">Scanning library…</Toast>
+        <Toast variant="error">Auth expired</Toast>
+      </div>
+      <Alert variant="warn" title="Auth expiring soon">
+        Reconnect your Twitch account within 3 days to keep overlays syncing.
+      </Alert>
+      <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <Skeleton circle width={40} height={40} />
+        <div style={{ flex: 1, maxWidth: 220 }}>
+          <Skeleton height={13} width="60%" />
+          <div style={{ height: 8 }} />
+          <Skeleton height={11} width="90%" />
+        </div>
+      </div>
+      <div className="bd-card" style={{ padding: 0 }}>
+        <EmptyState icon="📡" title="No channels yet" description="Click + Add to connect your first channel."
+          action={<button className="bd-btn bd-btn-cta bd-btn-sm">+ Add channel</button>} />
+      </div>
+      <div>
+        <button className="bd-btn bd-btn-primary bd-btn-sm" onClick={() => bdToast.push("Overlay connected", "success")}>Queue a toast</button>
+        <ToastManager />
+      </div>
+      <div>
+        <div className="lbl">Reading progress · 42%</div>
+        <ProgressBar value={42} />
+      </div>
+      <div>
+        <div className="lbl">Volume 7 of 12</div>
+        <ProgressBar value={7} max={12} />
+      </div>
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script>
+</body>
+</html>

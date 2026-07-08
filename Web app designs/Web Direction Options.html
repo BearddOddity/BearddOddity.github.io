@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="design_doc_mode" content="canvas">
+<title>Web direction options</title>
+<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: var(--font-ui); }
+  .board { position: absolute; width: 860px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+  .badge { position: absolute; top: -34px; left: 0; font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    padding: 5px 12px; border-radius: 999px; background: #222; color: #fff; }
+  .label { position: absolute; top: -34px; left: 74px; font-family: var(--font-ui); font-size: 13px; color: #444; font-weight: 600; line-height: 34px; }
+
+  /* shared nav/hero structure pieces */
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px; }
+  .nav .logo { font-weight: 800; font-size: 18px; letter-spacing: -0.01em; }
+  .nav .links { display: flex; gap: 26px; font-size: 13px; font-weight: 500; }
+  .nav .cta { font-size: 13px; font-weight: 600; padding: 9px 18px; border-radius: 10px; }
+  .hero { padding: 64px 32px 56px; }
+  .hero h1 { font-size: 42px; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 14px; max-width: 520px; line-height: 1.08; }
+  .hero p { font-size: 15px; max-width: 440px; line-height: 1.5; margin: 0 0 26px; }
+  .hero .actions { display: flex; gap: 12px; }
+  .btn1 { font-size: 13px; font-weight: 600; padding: 12px 22px; border-radius: 10px; }
+  .btn2 { font-size: 13px; font-weight: 600; padding: 12px 22px; border-radius: 10px; border: 1px solid; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 0 32px 40px; }
+  .cardx { padding: 18px; border-radius: 14px; }
+  .cardx .ico { width: 30px; height: 30px; border-radius: 8px; margin-bottom: 10px; }
+  .cardx h3 { font-size: 14px; margin: 0 0 6px; font-weight: 700; }
+  .cardx p { font-size: 12px; margin: 0; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- A: Dark glass kept -->
+<div class="board" style="left: 40px; top: 80px; background: var(--bd-black); outline: 3px solid #9146ff; outline-offset: 6px;">
+  <div class="badge" style="left:40px; background:#9146ff;">A · SELECTED</div>
+  <div class="label" style="left:174px;">Built — dark glass kept, Montserrat added for headings (see Design System Overview.html, templates/)</div>
+  <div style="background: radial-gradient(circle at 30% 0%, rgba(145,70,255,.18), transparent 60%);">
+    <div class="nav" style="border-bottom:1px solid rgba(255,255,255,.08); color:#fff;">
+      <div class="logo">beardd//oddity</div>
+      <div class="links" style="color:rgba(255,255,255,.7);"><span>Product</span><span>Docs</span><span>Pricing</span></div>
+      <div class="cta" style="background:#9146ff; color:#fff;">Get started</div>
+    </div>
+    <div class="hero" style="color:#fff;">
+      <h1 style="font-family: 'Montserrat', sans-serif;">Ship streaming tools that feel like gear.</h1>
+      <p style="color:rgba(255,255,255,.6);">Dense, glassy, near-black UI with a single neon-purple accent. Built for creators who live in the app all day.</p>
+      <div class="actions">
+        <div class="btn1" style="background:linear-gradient(135deg,#9333ea,#4f46e5); color:#fff;">Start free</div>
+        <div class="btn2" style="border-color:rgba(255,255,255,.15); color:#fff;">View docs</div>
+      </div>
+    </div>
+    <div class="cards">
+      <div class="cardx" style="background:rgba(0,0,0,.45); border:1px solid rgba(255,255,255,.08); backdrop-filter:blur(10px);">
+        <div class="ico" style="background:rgba(145,70,255,.25);"></div>
+        <h3 style="color:#fff;">Overlays</h3><p style="color:rgba(255,255,255,.55);">Auto-generated, live-synced.</p>
+      </div>
+      <div class="cardx" style="background:rgba(0,0,0,.45); border:1px solid rgba(255,255,255,.08); backdrop-filter:blur(10px);">
+        <div class="ico" style="background:rgba(74,222,128,.2);"></div>
+        <h3 style="color:#fff;">Chat</h3><p style="color:rgba(255,255,255,.55);">One box, every platform.</p>
+      </div>
+      <div class="cardx" style="background:rgba(0,0,0,.45); border:1px solid rgba(255,255,255,.08); backdrop-filter:blur(10px);">
+        <div class="ico" style="background:rgba(34,211,238,.2);"></div>
+        <h3 style="color:#fff;">Stats</h3><p style="color:rgba(255,255,255,.55);">Presence, everywhere.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- B: Light web, Montserrat -->
+<div class="board" style="left: 980px; top: 80px; background: #fff; opacity: 0.45;">
+  <div class="badge" style="left:980px; background:#eee; color:#111;">B · not chosen</div>
+  <div class="label" style="left:1054px;">Light web — white surfaces, Montserrat headings</div>
+  <div>
+    <div class="nav" style="border-bottom:1px solid #ececec; color:#111;">
+      <div class="logo" style="font-family:'Montserrat',sans-serif;">beardd//oddity</div>
+      <div class="links" style="color:#555;"><span>Product</span><span>Docs</span><span>Pricing</span></div>
+      <div class="cta" style="background:#7c3aed; color:#fff;">Get started</div>
+    </div>
+    <div class="hero">
+      <h1 style="font-family:'Montserrat',sans-serif; color:#111;">Ship streaming tools that feel like gear.</h1>
+      <p style="color:#5b5b63; font-family: var(--font-sans);">Clean, light, high-contrast marketing surface. Same purple accent, reworked for readable web pages and long-form content.</p>
+      <div class="actions">
+        <div class="btn1" style="background:#7c3aed; color:#fff;">Start free</div>
+        <div class="btn2" style="border-color:#ddd; color:#111;">View docs</div>
+      </div>
+    </div>
+    <div class="cards">
+      <div class="cardx" style="background:#faf9fc; border:1px solid #ececf2;">
+        <div class="ico" style="background:#ede9fe;"></div>
+        <h3 style="color:#111; font-family:'Montserrat',sans-serif;">Overlays</h3><p style="color:#666;">Auto-generated, live-synced.</p>
+      </div>
+      <div class="cardx" style="background:#faf9fc; border:1px solid #ececf2;">
+        <div class="ico" style="background:#dcfce7;"></div>
+        <h3 style="color:#111; font-family:'Montserrat',sans-serif;">Chat</h3><p style="color:#666;">One box, every platform.</p>
+      </div>
+      <div class="cardx" style="background:#faf9fc; border:1px solid #ececf2;">
+        <div class="ico" style="background:#cffafe;"></div>
+        <h3 style="color:#111; font-family:'Montserrat',sans-serif;">Stats</h3><p style="color:#666;">Presence, everywhere.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- C: Hybrid — dark nav/hero, light content -->
+<div class="board" style="left: 40px; top: 780px; background: #fff; opacity: 0.45;">
+  <div class="badge" style="left:40px; background:#7c3aed;">C · not chosen</div>
+  <div class="label" style="left:114px;">Hybrid — dark hero band, light content below</div>
+  <div>
+    <div class="nav" style="background:var(--bd-black); border-bottom:1px solid rgba(255,255,255,.08); color:#fff;">
+      <div class="logo" style="font-family:'Montserrat',sans-serif;">beardd//oddity</div>
+      <div class="links" style="color:rgba(255,255,255,.7);"><span>Product</span><span>Docs</span><span>Pricing</span></div>
+      <div class="cta" style="background:#9146ff; color:#fff;">Get started</div>
+    </div>
+    <div class="hero" style="background:var(--bd-black); padding-bottom: 40px;">
+      <h1 style="font-family:'Montserrat',sans-serif; color:#fff;">Ship streaming tools that feel like gear.</h1>
+      <p style="color:rgba(255,255,255,.6); font-family: var(--font-sans);">Dark, glassy brand moment up top for hero/marketing impact — then drops into a light, dense app-like body for docs, pricing, dashboards.</p>
+      <div class="actions">
+        <div class="btn1" style="background:linear-gradient(135deg,#9333ea,#4f46e5); color:#fff;">Start free</div>
+        <div class="btn2" style="border-color:rgba(255,255,255,.15); color:#fff;">View docs</div>
+      </div>
+    </div>
+    <div class="cards" style="padding-top: 30px;">
+      <div class="cardx" style="background:#faf9fc; border:1px solid #ececf2;">
+        <div class="ico" style="background:#ede9fe;"></div>
+        <h3 style="color:#111; font-family:'Montserrat',sans-serif;">Overlays</h3><p style="color:#666;">Auto-generated, live-synced.</p>
+      </div>
+      <div class="cardx" style="background:#faf9fc; border:1px solid #ececf2;">
+        <div class="ico" style="background:#dcfce7;"></div>
+        <h3 style="color:#111; font-family:'Montserrat',sans-serif;">Chat</h3><p style="color:#666;">One box, every platform.</p>
+      </div>
+      <div class="cardx" style="background:#faf9fc; border:1px solid #ececf2;">
+        <div class="ico" style="background:#cffafe;"></div>
+        <h3 style="color:#111; font-family:'Montserrat',sans-serif;">Stats</h3><p style="color:#666;">Presence, everywhere.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- D: Same as B but denser, JetBrains mono data chrome kept -->
+<div class="board" style="left: 980px; top: 780px; background: #0f0f13; opacity: 0.45;">
+  <div class="badge" style="left:980px; background:#333;">D · not chosen</div>
+  <div class="label" style="left:1054px;">Dark web — near-black web (not app-dense), Montserrat display</div>
+  <div>
+    <div class="nav" style="border-bottom:1px solid rgba(255,255,255,.08); color:#fff;">
+      <div class="logo" style="font-family:'Montserrat',sans-serif;">beardd//oddity</div>
+      <div class="links" style="color:rgba(255,255,255,.65);"><span>Product</span><span>Docs</span><span>Pricing</span></div>
+      <div class="cta" style="background:#fff; color:#111;">Get started</div>
+    </div>
+    <div class="hero">
+      <h1 style="font-family:'Montserrat',sans-serif; color:#fff; font-weight:800;">Ship streaming tools that feel like gear.</h1>
+      <p style="color:rgba(255,255,255,.55); font-family: var(--font-sans);">Same near-black canvas as the apps, but generously spaced and Montserrat-led like a product marketing site rather than dense app chrome.</p>
+      <div class="actions">
+        <div class="btn1" style="background:#fff; color:#111;">Start free</div>
+        <div class="btn2" style="border-color:rgba(255,255,255,.2); color:#fff;">View docs</div>
+      </div>
+    </div>
+    <div class="cards">
+      <div class="cardx" style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);">
+        <div class="ico" style="background:rgba(145,70,255,.3);"></div>
+        <h3 style="color:#fff; font-family:'Montserrat',sans-serif;">Overlays</h3><p style="color:rgba(255,255,255,.5);">Auto-generated, live-synced.</p>
+      </div>
+      <div class="cardx" style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);">
+        <div class="ico" style="background:rgba(74,222,128,.25);"></div>
+        <h3 style="color:#fff; font-family:'Montserrat',sans-serif;">Chat</h3><p style="color:rgba(255,255,255,.5);">One box, every platform.</p>
+      </div>
+      <div class="cardx" style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);">
+        <div class="ico" style="background:rgba(34,211,238,.25);"></div>
+        <h3 style="color:#fff; font-family:'Montserrat',sans-serif;">Stats</h3><p style="color:rgba(255,255,255,.5);">Presence, everywhere.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

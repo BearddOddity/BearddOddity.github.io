@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    .cv-menu-btn { padding: 0; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cv-menu-btn[data-size="26"] { width: 26px; height: 26px; }
+    .cv-menu-btn[data-size="30"] { width: 30px; height: 30px; }
+    .cv-menu-btn[data-size="36"] { width: 36px; height: 36px; }
+    .cv-menu-btn[data-size="44"] { width: 44px; height: 44px; font-size: 18px; }
+    .bd-menu-list.cv-menu-up { top: auto; bottom: calc(100% + 6px); }
+    .bd-menu-list.cv-menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; min-width: 0; width: 168px; }
+    .cv-emote-bubble { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; font-size: 18px; border-radius: 50%; }
+    .cv-emote-item { padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
+    .cv-emote-item:hover .cv-emote-bubble, .cv-emote-item.focused .cv-emote-bubble { background: rgba(255,255,255,0.12); }
+  </style>
+</helmet>
+<div class="bd-menu-wrap" ref="{{ wrapRef }}" style="position:relative;display:inline-flex">
+  <button class="{{ btnClass }}" data-size="{{ width }}" onClick="{{ toggle }}" title="{{ title }}">{{ icon }}</button>
+  <ul class="{{ menuClass }}" role="menu">
+    <sc-for list="{{ items }}" as="it" hint-placeholder-count="3">
+      <sc-if value="{{ it.divider }}" hint-placeholder-val="{{ false }}">
+        <li class="bd-menu-divider" role="separator"></li>
+      </sc-if>
+      <sc-if value="{{ it.notDivider }}" hint-placeholder-val="{{ true }}">
+        <li class="{{ it.cls }}" role="menuitem" onMouseDown="{{ it.commit }}">
+          <sc-if value="{{ it.isBubble }}" hint-placeholder-val="{{ false }}">
+            <span class="cv-emote-bubble">{{ it.label }}</span>
+          </sc-if>
+          <sc-if value="{{ it.isRow }}" hint-placeholder-val="{{ true }}">
+            <span class="bd-menu-item-icon">{{ it.icon }}</span>
+            <span style="flex:1">{{ it.label }}</span>
+          </sc-if>
+        </li>
+      </sc-if>
+    </sc-for>
+  </ul>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  wrapRef = React.createRef();
+  state = { open: false };
+
+  componentDidMount() {
+    this._onDoc = (e) => {
+      if (this.wrapRef.current && !this.wrapRef.current.contains(e.target)) this.setState({ open: false });
+    };
+    document.addEventListener("mousedown", this._onDoc);
+  }
+  componentWillUnmount() {
+    document.removeEventListener("mousedown", this._onDoc);
+  }
+
+  commit(it) {
+    if (!it || it.disabled || it.divider) return;
+    if (it.onClick) it.onClick();
+    this.setState({ open: false });
+  }
+
+  renderVals() {
+    const items = this.props.items || [];
+    const align = this.props.align || "end";
+    const icon = this.props.icon || "⋯";
+    const variant = this.props.variant || "ghost";
+    const size = this.props.size || "sm";
+    const btnW = this.props.width || (size === "sm" ? 30 : 40);
+
+    const grid = !!this.props.grid;
+    const decorated = items.map((it) => ({
+      ...it,
+      notDivider: !it.divider,
+      isBubble: grid,
+      isRow: !grid,
+      cls: grid ? "cv-emote-item" : `glass-option bd-menu-item${it.danger ? " bd-menu-item-danger" : ""}`,
+      commit: (e) => { if (e) { e.preventDefault(); e.stopPropagation(); } this.commit(it); },
+    }));
+
+    return {
+      wrapRef: this.wrapRef,
+      icon,
+      title: this.props.title || "",
+      toggle: () => this.setState((s) => ({ open: !s.open })),
+      items: decorated,
+      btnClass: `bd-btn bd-btn-${variant} cv-menu-btn${size === "sm" ? " bd-btn-sm" : ""}`,
+      width: btnW,
+      menuClass: `glass-menu bd-menu-list bd-menu-${align}${this.props.up ? " cv-menu-up" : ""}${grid ? " cv-menu-grid" : ""}${this.state.open ? " open" : ""}`,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

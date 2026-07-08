@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Download StatusForge — BearddOddity</title>
+<link rel="icon" href="../assets/logos/bearddoddity-mascot-head.png">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+  .download-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+  .file-link { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--line-2); margin-bottom: 10px; text-decoration: none; color: var(--text-body); font-size: 14px; transition: border-color .15s ease; }
+  .file-link:hover { border-color: rgba(145,70,255,.4); }
+  .file-link .ext { color: var(--text-faint); font-size: 12px; }
+</style>
+</head>
+<body>
+
+<header class="bd-header">
+  <div class="bd-container bd-header-inner">
+    <a href="../index.html" class="bd-logo" style="display:flex;align-items:center;gap:10px;text-decoration:none;white-space:nowrap;">
+      <img src="../assets/logos/bearddoddity-mascot-head.png" alt="" style="width:28px;height:28px;border-radius:8px;flex-shrink:0;object-fit:cover;">
+      The Oddity Forge
+    </a>
+    <nav class="bd-header-links" style="gap:20px;">
+      <a href="../index.html" class="bd-header-link" style="text-decoration:none;">Home</a>
+      <a href="../index.html#projects" class="bd-header-link" style="text-decoration:none;color:var(--text-strong);">Projects</a>
+      <a href="../guides/index.html" class="bd-header-link" style="text-decoration:none;">Guides</a>
+      <a href="../blog/index.html" class="bd-header-link" style="text-decoration:none;">Blog</a>
+      <a href="../about.html" class="bd-header-link" style="text-decoration:none;">About</a>
+      <a href="../disclosure.html" class="bd-header-link" style="text-decoration:none;">Disclosure</a>
+    </nav>
+    <div class="bd-header-actions">
+      <button class="bd-header-burger" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+  <div class="bd-header-mobile-panel" style="display:none;">
+    <a href="../index.html" class="bd-header-link" style="text-decoration:none;">Home</a>
+    <a href="../index.html#projects" class="bd-header-link" style="text-decoration:none;">Projects</a>
+    <a href="../guides/index.html" class="bd-header-link" style="text-decoration:none;">Guides</a>
+    <a href="../blog/index.html" class="bd-header-link" style="text-decoration:none;">Blog</a>
+    <a href="../about.html" class="bd-header-link" style="text-decoration:none;">About</a>
+    <a href="../disclosure.html" class="bd-header-link" style="text-decoration:none;">Disclosure</a>
+  </div>
+</header>
+
+<div style="text-align:center;margin-top:20px;">
+  <a href="index.html" class="bd-link" style="font-size:13px;">← Back to StatusForge overview</a>
+</div>
+
+<section class="bd-hero" style="padding-bottom:32px;">
+  <div class="bd-container" style="text-align:center;">
+    <img src="../assets/statusforge-icon.png" alt="StatusForge" style="width:80px;height:80px;border-radius:20px;margin-bottom:16px;box-shadow:0 20px 60px rgba(124,58,237,.35);">
+    <h1 style="margin:0 auto;max-width:none;">Download StatusForge</h1>
+    <p style="margin:16px auto 0;">Pick your platform below. All installers are signed for auto-update and built by CI from source.</p>
+  </div>
+</section>
+
+<div class="bd-container" style="padding-bottom:56px;">
+  <div style="text-align:center;margin-bottom:8px;"><span class="bd-badge bd-badge-purple">v0.5.0</span></div>
+  <div class="download-grid" style="margin-top:24px;">
+    <div class="bd-card" style="padding:24px;">
+      <div style="font-size:28px;margin-bottom:10px;">🪟</div>
+      <div class="bd-h3">Windows</div>
+      <p style="font-size:13px;color:var(--text-faint);line-height:1.55;margin:6px 0 18px;">64-bit only. SmartScreen may warn on first run since the app is unsigned by a paid certificate — click "More info" → "Run anyway."</p>
+      <a class="file-link" href="https://github.com/BearddOddity/StatusForge.io/releases/download/v0.5.0/StatusForge.io_0.5.0_x64-setup.exe">Installer (NSIS) <span class="ext">.exe</span></a>
+      <a class="file-link" href="https://github.com/BearddOddity/StatusForge.io/releases/download/v0.5.0/StatusForge.io_0.5.0_x64_en-US.msi">Installer (MSI) <span class="ext">.msi</span></a>
+    </div>
+    <div class="bd-card" style="padding:24px;">
+      <div style="font-size:28px;margin-bottom:10px;">🍎</div>
+      <div class="bd-h3">macOS</div>
+      <p style="font-size:13px;color:var(--text-faint);line-height:1.55;margin:6px 0 18px;">Apple Silicon (M-series) only. Unsigned/un-notarized — right-click the app → Open, or run <code>xattr -dr com.apple.quarantine</code> on it.</p>
+      <a class="file-link" href="https://github.com/BearddOddity/StatusForge.io/releases/download/v0.5.0/StatusForge.io_0.5.0_aarch64.dmg">Disk Image <span class="ext">.dmg</span></a>
+    </div>
+    <div class="bd-card" style="padding:24px;">
+      <div style="font-size:28px;margin-bottom:10px;">🐧</div>
+      <div class="bd-h3">Linux</div>
+      <p style="font-size:13px;color:var(--text-faint);line-height:1.55;margin:6px 0 18px;">AppImage needs no install — just chmod +x and run. .deb and .rpm install via your package manager.</p>
+      <a class="file-link" href="https://github.com/BearddOddity/StatusForge.io/releases/download/v0.5.0/StatusForge.io_0.5.0_amd64.AppImage">AppImage <span class="ext">.AppImage</span></a>
+      <a class="file-link" href="https://github.com/BearddOddity/StatusForge.io/releases/download/v0.5.0/StatusForge.io_0.5.0_amd64.deb">Debian/Ubuntu <span class="ext">.deb</span></a>
+      <a class="file-link" href="https://github.com/BearddOddity/StatusForge.io/releases/download/v0.5.0/StatusForge.io-0.5.0-1.x86_64.rpm">Fedora/RHEL <span class="ext">.rpm</span></a>
+    </div>
+  </div>
+  <p style="text-align:center;margin-top:28px;">
+    <a class="bd-btn bd-btn-ghost" href="https://github.com/BearddOddity/StatusForge.io/releases/latest" style="text-decoration:none;">See all releases on GitHub</a>
+  </p>
+</div>
+
+<footer style="text-align:center;padding:36px 24px 44px;border-top:1px solid var(--line-1);">
+  <a href="https://github.com/BearddOddity/StatusForge.io" class="bd-link">github.com/BearddOddity/StatusForge.io</a>
+</footer>
+
+<script src="../assets/nav.js"></script>
+</body>
+</html>

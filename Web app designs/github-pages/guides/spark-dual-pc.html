@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPARK Dual-PC Setup Guide — The Oddity Forge</title>
+<link rel="icon" href="../assets/logos/bearddoddity-mascot-head.png">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+  .guide-wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 80px; }
+  .guide-wrap .bd-h2 { margin: 40px 0 14px; }
+  .guide-wrap .bd-h2:first-of-type { margin-top: 0; }
+  .guide-wrap p, .guide-wrap li { font-size: 15px; line-height: 1.75; color: var(--text-body); }
+  .guide-wrap ul { padding-left: 22px; margin: 0 0 18px; }
+  .guide-wrap li { margin-bottom: 8px; }
+  .guide-wrap code { background: rgba(255,255,255,0.06); padding: 2px 7px; border-radius: 6px; font-family: var(--font-mono); font-size: 13px; color: var(--bd-accent-soft); }
+  .diagram { display: flex; align-items: center; justify-content: center; gap: 20px; padding: 26px; flex-wrap: wrap; margin: 22px 0; }
+  .diagram .box { text-align: center; padding: 16px 20px; }
+  .diagram .box .label { font-weight: 700; margin-bottom: 4px; color: var(--text-strong); }
+  .diagram .box .sub { color: var(--text-faint); font-size: 12px; }
+  .diagram .arrow { color: var(--bd-accent-text); font-size: 20px; font-family: var(--font-mono); }
+</style>
+</head>
+<body>
+
+<header class="bd-header">
+  <div class="bd-container bd-header-inner">
+    <a href="../index.html" class="bd-logo" style="display:flex;align-items:center;gap:10px;text-decoration:none;white-space:nowrap;">
+      <img src="../assets/logos/bearddoddity-mascot-head.png" alt="" style="width:28px;height:28px;border-radius:8px;flex-shrink:0;object-fit:cover;">
+      The Oddity Forge
+    </a>
+    <nav class="bd-header-links" style="gap:20px;">
+      <a href="../index.html" class="bd-header-link" style="text-decoration:none;">Home</a>
+      <a href="../index.html#projects" class="bd-header-link" style="text-decoration:none;">Projects</a>
+      <a href="index.html" class="bd-header-link" style="text-decoration:none;color:var(--text-strong);">Guides</a>
+      <a href="../blog/index.html" class="bd-header-link" style="text-decoration:none;">Blog</a>
+      <a href="../about.html" class="bd-header-link" style="text-decoration:none;">About</a>
+      <a href="../disclosure.html" class="bd-header-link" style="text-decoration:none;">Disclosure</a>
+    </nav>
+    <div class="bd-header-actions">
+      <button class="bd-header-burger" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+  <div class="bd-header-mobile-panel" style="display:none;">
+    <a href="../index.html" class="bd-header-link" style="text-decoration:none;">Home</a>
+    <a href="../index.html#projects" class="bd-header-link" style="text-decoration:none;">Projects</a>
+    <a href="index.html" class="bd-header-link" style="text-decoration:none;">Guides</a>
+    <a href="../blog/index.html" class="bd-header-link" style="text-decoration:none;">Blog</a>
+    <a href="../about.html" class="bd-header-link" style="text-decoration:none;">About</a>
+    <a href="../disclosure.html" class="bd-header-link" style="text-decoration:none;">Disclosure</a>
+  </div>
+</header>
+
+<section class="bd-hero" style="padding-bottom:24px;">
+  <div class="bd-container" style="text-align:center;">
+    <span class="bd-badge bd-badge-purple">StatusForge Guide</span>
+    <h1 style="margin:16px auto 0;max-width:none;font-size:var(--fs-xl);">SPARK Dual-PC Link Setup</h1>
+    <p style="margin:14px auto 0;">Game on one PC, stream from another — no cloud relay, signed over your own LAN.</p>
+  </div>
+</section>
+
+<div class="guide-wrap">
+  <div class="bd-card diagram">
+    <div class="box"><div class="label">Gaming PC</div><div class="sub">runs SPARK</div></div>
+    <div class="arrow">→ udp/53735 →</div>
+    <div class="box"><div class="label">Streaming PC</div><div class="sub">runs StatusForge (Hub)</div></div>
+  </div>
+
+  <div class="bd-h2">1. Install on both machines</div>
+  <ul>
+    <li><strong>SPARK</strong> on the PC that's actually running the game</li>
+    <li><strong>StatusForge</strong> on the PC that's streaming/broadcasting</li>
+  </ul>
+  <p>Both need to be on the same local network (LAN or same Wi-Fi).</p>
+
+  <div class="bd-h2">2. Set a matching PIN</div>
+  <p>Set the same 4-digit PIN in both apps:</p>
+  <ul>
+    <li>SPARK: main window, PIN field</li>
+    <li>StatusForge: Settings → Detection Engine → SPARK Dual-PC Link</li>
+  </ul>
+  <p>Optionally set a matching <strong>pairing key</strong> on both sides too — it's mixed into the shared secret for a stronger signature than the PIN alone.</p>
+
+  <div class="bd-h2">3. Let them find each other</div>
+  <p>SPARK broadcasts signed heartbeats on <code>udp/53735</code>; the StatusForge Hub announces itself on <code>udp/53736</code>. Packets with the wrong PIN, missing signature, or a tampered payload are rejected outright. Once paired, your overlays update exactly as they would from local detection — same widgets, same behavior.</p>
+
+  <div class="bd-alert bd-alert-info" style="margin-bottom:20px;">
+    <span class="bd-alert-icon">ℹ️</span>
+    <div>Enabling the SPARK link on the StatusForge side stops that PC's own local scanner from reporting detections, so you don't get two conflicting game-state sources fighting each other.</div>
+  </div>
+
+  <div class="bd-h2">Firewall notes</div>
+  <ul>
+    <li><strong>Windows:</strong> the installer adds firewall allow rules automatically (and removes them on uninstall) — nothing to do manually.</li>
+    <li><strong>Linux:</strong> allow the two UDP ports if you run a firewall: <code>sudo ufw allow 53735/udp && sudo ufw allow 53736/udp</code></li>
+    <li><strong>macOS:</strong> accept the incoming-connection prompt on first run, or add the app manually under System Settings → Network → Firewall → Options.</li>
+  </ul>
+</div>
+
+<footer style="text-align:center;padding:36px 24px 44px;border-top:1px solid var(--line-1);">
+  <a href="https://github.com/BearddOddity/StatusForge.io" class="bd-link">github.com/BearddOddity/StatusForge.io</a>
+</footer>
+
+<script src="../assets/nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Docs / Article Page" description="Long-form docs page — sticky header, sidebar table of contents, prose body" -->
+<helmet>
+  <script src="./ds-base.js"></script>
+  <style>
+    body { margin: 0; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+    .docs-shell { display: grid; grid-template-columns: 220px 1fr; gap: 48px; max-width: 980px; margin: 0 auto; padding: 40px 32px 80px; }
+    .toc { position: sticky; top: 88px; align-self: start; display: flex; flex-direction: column; gap: 2px; }
+    .toc a { font-size: 13px; color: var(--text-muted); text-decoration: none; padding: 6px 10px; border-radius: 8px; border-left: 2px solid transparent; }
+    .toc a:hover { color: var(--text-strong); background: rgba(255,255,255,0.04); }
+    .toc a.active { color: #fff; border-left-color: var(--bd-accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+    .article h2 { font-family: var(--font-heading); font-size: 24px; font-weight: 700; color: var(--text-strong); margin: 40px 0 14px; scroll-margin-top: 90px; }
+    .article h2:first-child { margin-top: 0; }
+    .article p { font-size: 15px; line-height: 1.7; color: var(--text-body); margin: 0 0 16px; }
+    .article code { font-family: var(--font-mono); font-size: 13px; background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 4px; color: var(--bd-accent-soft); }
+    .article pre { background: rgba(0,0,0,0.35); border: 1px solid var(--line-2); border-radius: 12px; padding: 16px; overflow-x: auto; font-family: var(--font-mono); font-size: 12.5px; color: var(--text-body); }
+    @media (max-width: 760px) {
+      .docs-shell { grid-template-columns: 1fr; }
+      .toc { position: static; flex-direction: row; overflow-x: auto; padding-bottom: 8px; }
+    }
+  </style>
+</helmet>
+
+<x-import component-from-global-scope="BearddOddityDesignSystem_726917.Header" hint-size="100%,68px"
+  logo="beardd//oddity" links="{{ navLinks }}">
+</x-import>
+
+<div class="docs-shell" data-screen-label="Docs">
+  <nav class="toc">
+    <a href="#getting-started" class="active">Getting started</a>
+    <a href="#overlays">Configuring overlays</a>
+    <a href="#platforms">Connecting platforms</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+  <article class="article">
+    <h2 id="getting-started">Getting started</h2>
+    <p>Install StatusForge, sign in with Twitch or Kick, and the presence engine starts scanning running games automatically. No manual setup — overlays generate themselves from what you're already playing.</p>
+    <p>Drop the generated overlay URL into your broadcast software as a browser source, sized to <code>1920×280</code>, and it updates live as your game or activity changes.</p>
+
+    <h2 id="overlays">Configuring overlays</h2>
+    <p>Each overlay reads from the same presence state, so switching games updates every connected output at once. You can restyle position, scale, and which fields show per overlay.</p>
+    <pre>{"game": "Hollow Knight", "status": "Playing", "since": "2026-07-04T18:22:00Z"}</pre>
+
+    <h2 id="platforms">Connecting platforms</h2>
+    <p>Twitch, Kick, and Joystick.tv connect via OAuth from Settings → Integrations. Streamer.bot can subscribe as a relay for chat-triggered actions tied to presence changes.</p>
+
+    <h2 id="faq">FAQ</h2>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Accordion" hint-size="100%,200px" items="{{ faqItems }}"></x-import>
+  </article>
+</div>
+
+<x-import component-from-global-scope="BearddOddityDesignSystem_726917.Footer" hint-size="100%,180px" dc-props="{{ footerProps }}"></x-import>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      navLinks: ["Docs", "Pricing", "Changelog"],
+      faqItems: [
+        { title: "Does this work with Streamer.bot?", content: "Yes — connect it as a relay from Settings → Integrations to trigger actions off presence changes." },
+        { title: "Can I run overlays on multiple monitors?", content: "Each overlay is just a URL, so open as many browser sources as you like." },
+      ],
+      footerProps: {
+        columns: [
+          { title: "Docs", links: ["Getting started", "API"] },
+          { title: "Company", links: ["About", "Blog"] },
+        ],
+        bottomLeft: "© 2026 BearddOddity",
+        bottomRight: "Twitch · Kick · Joystick.tv",
+      },
+    };
+  }
+}
+
+</script>
+</body>
+</html>

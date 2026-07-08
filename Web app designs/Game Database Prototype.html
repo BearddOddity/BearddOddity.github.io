@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Game Database — BearddOddity</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); min-height: 100vh; }
+  #root { min-height: 100vh; }
+
+  /* variant switcher (dev/explore control, not part of the product UI) */
+  .variant-switcher { position: fixed; top: 14px; right: 14px; z-index: 200; display: flex; gap: 2px;
+    padding: 3px; background: rgba(10,10,12,0.85); backdrop-filter: blur(10px); border: 1px solid var(--line-3); border-radius: var(--radius-lg); }
+  .variant-switcher button { font-family: var(--font-mono); font-size: 10px; font-weight: 600; padding: 7px 12px;
+    border-radius: var(--radius-md); border: none; background: transparent; color: var(--text-faint); cursor: pointer; }
+  .variant-switcher button[data-on="1"] { background: color-mix(in srgb, var(--accent) 25%, transparent); color: #fff; }
+
+  /* shared */
+  .page-shell { min-height: 100vh; }
+  .grid-games { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+  .game-card { cursor: pointer; }
+  .game-card:hover .cover-wrap { transform: translateY(-3px); box-shadow: var(--shadow-2); }
+  .cover-wrap { transition: transform var(--dur-base) ease, box-shadow var(--dur-base) ease; border-radius: 16px; }
+  .chip-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { font-family: var(--font-ui); font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: 999px;
+    border: 1px solid var(--line-2); background: rgba(255,255,255,0.03); color: var(--text-muted); cursor: pointer; transition: all .15s ease; }
+  .chip[data-on="1"] { background: color-mix(in srgb, var(--accent) 22%, transparent); border-color: color-mix(in srgb, var(--accent) 40%, transparent); color: #fff; }
+
+  /* variant 1: sidebar */
+  .shell-sidebar { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+  .sidebar { border-right: 1px solid var(--line-2); padding: 20px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .sidebar-logo { font-family: var(--font-heading); font-weight: 700; font-size: 16px; color: var(--text-strong); padding: 8px 12px 18px; }
+  .sidebar-section-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-dim); font-weight: 600; padding: 16px 12px 6px; }
+  .main-1 { padding: 24px 32px 48px; }
+
+  /* variant 2: topnav */
+  .page-title { font-family: var(--font-heading); font-size: 32px; font-weight: 700; color: var(--text-strong); margin: 0 0 6px; }
+  .page-sub { color: var(--text-muted); font-size: 14px; margin: 0 0 24px; }
+
+  /* variant 3: dense admin browse */
+  .dense-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .dense-row { display: flex; align-items: center; gap: 14px; padding: 10px 14px; border-bottom: 1px solid var(--line-1); cursor: pointer; transition: background .15s ease; }
+  .dense-row:hover { background: var(--surface-hover); }
+  .mini-cover { width: 34px; height: 46px; border-radius: 6px; overflow: hidden; flex-shrink: 0; }
+
+  /* detail */
+  .detail-wrap { padding: 32px; max-width: 980px; margin: 0 auto; }
+  .detail-top { display: grid; grid-template-columns: 220px 1fr; gap: 32px; margin-bottom: 32px; }
+  .detail-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+  .stat-box { padding: 14px 16px; }
+  .stat-box .l { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-faint); margin-bottom: 6px; }
+  .stat-box .v { font-size: 20px; font-weight: 700; color: var(--text-strong); font-family: var(--font-heading); }
+
+  /* dashboard */
+  .dash-wrap { padding: 32px; max-width: 1100px; margin: 0 auto; }
+  .dash-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="_ds_bundle.js"></script>
+<script type="text/babel">
+const {
+  Button, Card, Badge, StatusDot, SectionHead, Divider,
+  Input, Select, RangeSlider,
+  Toast, ProgressBar, Alert,
+  NavItem, Toolbar, Breadcrumbs, Pagination,
+  CoverImage,
+  Container, Header, Footer,
+  Modal, Tooltip,
+  Tabs,
+  Table,
+  Avatar,
+} = window.BearddOddityDesignSystem_726917;
+
+const GENRES = ["Roguelike", "Platformer", "Metroidvania", "Simulation", "RPG", "Deckbuilder", "Adventure", "Puzzle"];
+const STATUSES = ["Playing", "Owned", "Wishlist", "Completed"];
+
+const INITIAL_GAMES = [
+  { id: 1, title: "Hades", genre: "Roguelike", year: 2020, rating: 9.6, hours: 62, status: "Completed", desc: "A rogue-lite dungeon crawler where you battle out of the Underworld as the immortal prince of the dead." },
+  { id: 2, title: "Celeste", genre: "Platformer", year: 2018, rating: 9.4, hours: 14, status: "Completed", desc: "A tight, punishing platformer about climbing a mountain — and a story about anxiety and self-acceptance." },
+  { id: 3, title: "Hollow Knight", genre: "Metroidvania", year: 2017, rating: 9.5, hours: 48, status: "Playing", desc: "A vast, hand-drawn insect kingdom to explore, full of secrets, bosses, and creeping dread." },
+  { id: 4, title: "Stardew Valley", genre: "Simulation", year: 2016, rating: 9.2, hours: 210, status: "Playing", desc: "Inherit a run-down farm and build a life — crops, mining, fishing, and a whole town to befriend." },
+  { id: 5, title: "Disco Elysium", genre: "RPG", year: 2019, rating: 9.7, hours: 38, status: "Owned", desc: "A detective RPG of pure conversation and internal monologue in a decaying city trying to forget its war." },
+  { id: 6, title: "Slay the Spire", genre: "Deckbuilder", year: 2019, rating: 9.1, hours: 90, status: "Playing", desc: "Climb a spire one card-battle at a time, building a deck that snowballs into absurd combos — or doesn't." },
+  { id: 7, title: "Outer Wilds", genre: "Adventure", year: 2019, rating: 9.6, hours: 22, status: "Completed", desc: "A solar system stuck in a 22-minute time loop, and a mystery only curiosity can solve." },
+  { id: 8, title: "Return of the Obra Dinn", genre: "Adventure", year: 2018, rating: 9.3, hours: 11, status: "Completed", desc: "Investigate the fate of a lost ship's crew using a pocket watch that replays moments of death." },
+  { id: 9, title: "Baba Is You", genre: "Puzzle", year: 2019, rating: 9.0, hours: 19, status: "Owned", desc: "A puzzle game where the rules are physical blocks you can push around — and rewrite." },
+  { id: 10, title: "Inside", genre: "Platformer", year: 2016, rating: 9.2, hours: 4, status: "Completed", desc: "A boy runs through a bleak, oppressive world in this cinematic side-scrolling puzzle-platformer." },
+  { id: 11, title: "Hades II", genre: "Roguelike", year: 2025, rating: 9.3, hours: 8, status: "Wishlist", desc: "Melinoë, princess of the Underworld, takes the fight to the Titan of Time himself." },
+  { id: 12, title: "Undertale", genre: "RPG", year: 2015, rating: 9.4, hours: 9, status: "Owned", desc: "A tiny RPG about a child and monsters, where you never have to hurt anyone — but you can." },
+];
+
+function statusVariant(s) {
+  return { Playing: "green", Owned: "cyan", Wishlist: "amber", Completed: "purple" }[s] || "ghost";
+}
+
+function GameCard({ game, onOpen }) {
+  return (
+    <div className="game-card" onClick={() => onOpen(game.id)}>
+      <div className="cover-wrap">
+        <CoverImage title={game.title} alt=" " badge={game.genre} width="100%" />
+      </div>
+      <div style={{ marginTop: 8, fontSize: 13, color: "var(--text-body)", fontWeight: 500 }}>{game.title}</div>
+      <div style={{ fontSize: 11, color: "var(--text-faint)", fontFamily: "var(--font-mono)" }}>{game.year} · ★ {game.rating}</div>
+    </div>
+  );
+}
+
+function Filters({ search, setSearch, genre, setGenre }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <Input placeholder="Search your library…" value={search} onChange={setSearch} style={{ width: 280 }} />
+      <div className="chip-row">
+        <button className="chip" data-on={genre === null ? "1" : "0"} onClick={() => setGenre(null)}>All</button>
+        {GENRES.map((g) => (
+          <button className="chip" key={g} data-on={genre === g ? "1" : "0"} onClick={() => setGenre(g)}>{g}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Variant 1 — sidebar library ────────────────────────────────────────── */
+function BrowseSidebar({ games, search, setSearch, genre, setGenre, onOpen, goDashboard }) {
+  return (
+    <div className="shell-sidebar">
+      <aside className="sidebar">
+        <div className="sidebar-logo">GameDex</div>
+        <NavItem icon="📚" label="Library" active />
+        <NavItem icon="🎯" label="Playing" />
+        <NavItem icon="✅" label="Completed" />
+        <NavItem icon="⭐" label="Wishlist" />
+        <div className="sidebar-section-lbl">Genres</div>
+        {GENRES.slice(0, 5).map((g) => <NavItem key={g} icon="🎮" label={g} onClick={() => setGenre(g)} active={genre === g} />)}
+        <div style={{ marginTop: "auto", paddingTop: 20 }}>
+          <NavItem icon="⚙️" label="Dashboard" onClick={goDashboard} />
+        </div>
+      </aside>
+      <main className="main-1">
+        <div style={{ marginBottom: 22 }}>
+          <div className="bd-h2">Library <span style={{ color: "var(--text-faint)", fontWeight: 400, fontSize: 16 }}>· {games.length} games</span></div>
+          <div style={{ marginTop: 14 }}>
+            <Input placeholder="Search…" value={search} onChange={setSearch} style={{ width: 260 }} />
+          </div>
+        </div>
+        <div className="chip-row" style={{ marginBottom: 20 }}>
+          <button className="chip" data-on={genre === null ? "1" : "0"} onClick={() => setGenre(null)}>All</button>
+          {GENRES.map((g) => <button className="chip" key={g} data-on={genre === g ? "1" : "0"} onClick={() => setGenre(g)}>{g}</button>)}
+        </div>
+        <div className="grid-games">
+          {games.map((g) => <GameCard key={g.id} game={g} onOpen={onOpen} />)}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+/* ── Variant 2 — top nav catalog ─────────────────────────────────────────── */
+function BrowseTopnav({ games, search, setSearch, genre, setGenre, onOpen, goDashboard }) {
+  return (
+    <div className="page-shell">
+      <Header logo="GameDex" links={["Library", "Wishlist", "Stats"]}
+        actions={<Button variant="cta" size="sm" onClick={goDashboard}>Dashboard</Button>} />
+      <Container>
+        <div style={{ padding: "40px 0 12px" }}>
+          <div className="page-title">Your library</div>
+          <div className="page-sub">{games.length} games tracked · hours logged across all platforms</div>
+          <Filters search={search} setSearch={setSearch} genre={genre} setGenre={setGenre} />
+        </div>
+        <div style={{ padding: "28px 0 60px" }}>
+          <div className="grid-games">
+            {games.map((g) => <GameCard key={g.id} game={g} onOpen={onOpen} />)}
+          </div>
+        </div>
+      </Container>
+    </div>
+  );
+}
+
+/* ── Variant 3 — dense admin-style browse ───────────────────────────────── */
+function BrowseDense({ games, search, setSearch, genre, setGenre, onOpen, goDashboard }) {
+  return (
+    <div className="dash-wrap">
+      <div className="dash-head">
+        <div>
+          <Breadcrumbs items={[{ label: "GameDex" }, { label: "Library" }]} />
+          <div className="bd-h2" style={{ marginTop: 8 }}>Library</div>
+        </div>
+        <Button variant="cta" size="sm" onClick={goDashboard}>Manage entries</Button>
+      </div>
+      <div className="dense-toolbar">
+        <Input placeholder="Search…" value={search} onChange={setSearch} style={{ width: 240 }} />
+        <Select value={genre || "All"} onChange={(v) => setGenre(v === "All" ? null : v)} options={["All", ...GENRES]} style={{ width: 170 }} />
+      </div>
+      <div className="bd-table-wrap">
+        {games.map((g) => (
+          <div className="dense-row" key={g.id} onClick={() => onOpen(g.id)}>
+            <div className="mini-cover"><CoverImage title="" alt=" " width={34} rounded={6} /></div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-strong)" }}>{g.title}</div>
+              <div style={{ fontSize: 11, color: "var(--text-faint)", fontFamily: "var(--font-mono)" }}>{g.genre} · {g.year}</div>
+            </div>
+            <Badge variant={statusVariant(g.status)}>{g.status}</Badge>
+            <div style={{ width: 60, textAlign: "right", fontFamily: "var(--font-mono)", fontSize: 12, color: "var(--text-muted)" }}>★ {g.rating}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Detail screen (shared across variants) ─────────────────────────────── */
+function DetailScreen({ game, onBack, onEdit, onDelete }) {
+  if (!game) return null;
+  return (
+    <div className="detail-wrap">
+      <Breadcrumbs items={[{ label: "Library" }, { label: game.genre }, { label: game.title }]} onNavigate={onBack} />
+      <div className="detail-top" style={{ marginTop: 18 }}>
+        <CoverImage title={game.title} alt=" " badge={game.genre} width={220} breathe />
+        <div>
+          <div className="bd-h1">{game.title}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "10px 0 16px" }}>
+            <Badge variant={statusVariant(game.status)}>{game.status}</Badge>
+            <StatusDot status={game.status === "Playing" ? "on" : "off"} label={`${game.year}`} />
+          </div>
+          <p className="bd-prose" style={{ maxWidth: 480 }}>{game.desc}</p>
+          <div className="detail-stats" style={{ maxWidth: 480 }}>
+            <div className="bd-card stat-box"><div className="l">Rating</div><div className="v">★ {game.rating}</div></div>
+            <div className="bd-card stat-box"><div className="l">Hours</div><div className="v">{game.hours}h</div></div>
+            <div className="bd-card stat-box"><div className="l">Genre</div><div className="v" style={{ fontSize: 14 }}>{game.genre}</div></div>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <Button variant="primary" onClick={() => onEdit(game)}>Edit entry</Button>
+            <Button variant="danger" onClick={() => onDelete(game.id)}>Remove</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Dashboard / admin screen (shared) ──────────────────────────────────── */
+function DashboardScreen({ games, onBack, onAdd, onEdit, onDelete }) {
+  return (
+    <div className="dash-wrap">
+      <div className="dash-head">
+        <div>
+          <Breadcrumbs items={[{ label: "GameDex" }, { label: "Dashboard" }]} onNavigate={onBack} />
+          <div className="bd-h2" style={{ marginTop: 8 }}>Manage entries</div>
+        </div>
+        <Button variant="cta" onClick={onAdd}>+ Add game</Button>
+      </div>
+      <Table
+        columns={[
+          { key: "title", label: "Title" },
+          { key: "genre", label: "Genre" },
+          { key: "year", label: "Year" },
+          { key: "rating", label: "Rating", render: (r) => `★ ${r.rating}` },
+          { key: "status", label: "Status", render: (r) => <Badge variant={statusVariant(r.status)}>{r.status}</Badge> },
+          { key: "actions", label: "", render: (r) => (
+            <div style={{ display: "flex", gap: 8 }}>
+              <Button variant="ghost" size="sm" onClick={() => onEdit(r)}>Edit</Button>
+              <Button variant="danger" size="sm" onClick={() => onDelete(r.id)}>Delete</Button>
+            </div>
+          ) },
+        ]}
+        rows={games}
+      />
+    </div>
+  );
+}
+
+/* ── Add/Edit modal form ─────────────────────────────────────────────────── */
+function GameForm({ open, onClose, onSave, initial }) {
+  const [title, setTitle] = React.useState(initial?.title || "");
+  const [genre, setGenre] = React.useState(initial?.genre || GENRES[0]);
+  const [status, setStatus] = React.useState(initial?.status || STATUSES[0]);
+  const [rating, setRating] = React.useState(initial?.rating ?? 8);
+
+  React.useEffect(() => {
+    setTitle(initial?.title || "");
+    setGenre(initial?.genre || GENRES[0]);
+    setStatus(initial?.status || STATUSES[0]);
+    setRating(initial?.rating ?? 8);
+  }, [initial, open]);
+
+  return (
+    <Modal open={open} onClose={onClose} title={initial ? "Edit game" : "Add game"}
+      footer={<>
+        <Button variant="ghost" onClick={onClose}>Cancel</Button>
+        <Button variant="cta" onClick={() => onSave({ ...initial, title, genre, status, rating })}>Save</Button>
+      </>}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <Input label="Title" value={title} onChange={setTitle} placeholder="Game title" />
+        <Select label="Genre" value={genre} onChange={setGenre} options={GENRES} />
+        <Select label="Status" value={status} onChange={setStatus} options={STATUSES} />
+        <RangeSlider label={`Rating · ${rating}`} value={rating} onChange={setRating} min={0} max={10} />
+      </div>
+    </Modal>
+  );
+}
+
+/* ── App ─────────────────────────────────────────────────────────────────── */
+function App() {
+  const [variant, setVariant] = React.useState(1);
+  const [screen, setScreen] = React.useState("browse");
+  const [games, setGames] = React.useState(INITIAL_GAMES);
+  const [search, setSearch] = React.useState("");
+  const [genre, setGenre] = React.useState(null);
+  const [selectedId, setSelectedId] = React.useState(null);
+  const [formOpen, setFormOpen] = React.useState(false);
+  const [editing, setEditing] = React.useState(null);
+
+  const filtered = games.filter((g) =>
+    (!genre || g.genre === genre) && g.title.toLowerCase().includes(search.toLowerCase())
+  );
+  const selected = games.find((g) => g.id === selectedId);
+
+  const openGame = (id) => { setSelectedId(id); setScreen("detail"); };
+  const goBack = () => setScreen("browse");
+  const goDashboard = () => setScreen("dashboard");
+  const openAdd = () => { setEditing(null); setFormOpen(true); };
+  const openEdit = (g) => { setEditing(g); setFormOpen(true); };
+  const saveGame = (g) => {
+    if (g.id) {
+      setGames((prev) => prev.map((x) => (x.id === g.id ? { ...x, ...g } : x)));
+    } else {
+      setGames((prev) => [...prev, { ...g, id: Math.max(...prev.map((p) => p.id)) + 1, year: 2026, hours: 0, desc: "No description yet." }]);
+    }
+    setFormOpen(false);
+  };
+  const deleteGame = (id) => {
+    setGames((prev) => prev.filter((g) => g.id !== id));
+    if (screen === "detail") setScreen("browse");
+  };
+
+  const BrowseComp = variant === 1 ? BrowseSidebar : variant === 2 ? BrowseTopnav : BrowseDense;
+
+  return (
+    <>
+      <div className="variant-switcher">
+        <button data-on={variant === 1 ? "1" : "0"} onClick={() => setVariant(1)}>Sidebar</button>
+        <button data-on={variant === 2 ? "1" : "0"} onClick={() => setVariant(2)}>Top nav</button>
+        <button data-on={variant === 3 ? "1" : "0"} onClick={() => setVariant(3)}>Dense</button>
+      </div>
+
+      {screen === "browse" && (
+        <BrowseComp games={filtered} search={search} setSearch={setSearch} genre={genre} setGenre={setGenre}
+          onOpen={openGame} goDashboard={goDashboard} />
+      )}
+      {screen === "detail" && (
+        <DetailScreen game={selected} onBack={goBack} onEdit={openEdit} onDelete={deleteGame} />
+      )}
+      {screen === "dashboard" && (
+        <DashboardScreen games={games} onBack={goBack} onAdd={openAdd} onEdit={openEdit} onDelete={deleteGame} />
+      )}
+
+      <GameForm open={formOpen} onClose={() => setFormOpen(false)} onSave={saveGame} initial={editing} />
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

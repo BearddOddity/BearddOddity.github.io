@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BearddOddity — Design System Overview</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+  .glow { position: fixed; top: -200px; left: 50%; transform: translateX(-50%); width: 900px; height: 500px;
+    background: radial-gradient(circle, var(--accent-glow), transparent 70%); pointer-events: none; z-index: 0; }
+  .page { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 56px 32px 120px; }
+
+  .hero { margin-bottom: 64px; }
+  .hero .kicker { font-family: var(--font-mono); font-size: var(--fs-micro); letter-spacing: var(--tracking-wider);
+    text-transform: uppercase; color: var(--bd-accent-text); font-weight: var(--fw-semibold); }
+  .hero h1 { font-size: var(--fs-3xl); font-weight: var(--fw-bold); letter-spacing: var(--tracking-tight);
+    color: var(--text-strong); margin: 10px 0 12px; }
+  .hero p { font-size: var(--fs-lg); color: var(--text-muted); max-width: 700px; line-height: var(--lh-normal); margin: 0; }
+
+  section.block { margin-bottom: 72px; }
+  .block-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 22px;
+    border-bottom: 1px solid var(--line-2); padding-bottom: 14px; }
+  .block-head h2 { font-size: var(--fs-xl); font-weight: var(--fw-semibold); color: var(--text-strong); margin: 0; }
+  .block-head span { font-family: var(--font-mono); font-size: var(--fs-mini); color: var(--text-faint); }
+
+  .swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .swatch { border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--line-2); background: var(--surface-1); }
+  .swatch .chip { height: 64px; }
+  .swatch .meta { padding: 8px 10px; }
+  .swatch .name { font-size: var(--fs-xs); color: var(--text-body); font-weight: var(--fw-medium); }
+  .swatch .val { font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); margin-top: 2px; }
+
+  .type-row { display: flex; align-items: baseline; gap: 18px; padding: 14px 0; border-bottom: 1px solid var(--line-1); }
+  .type-row .tag { font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); width: 130px; flex-shrink: 0; }
+  .type-row .sample { color: var(--text-strong); }
+
+  .family-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .family-card { border: 1px solid var(--line-2); background: var(--surface-1); border-radius: var(--radius-2xl); padding: 20px; }
+  .family-card .fname { font-size: 10px; text-transform: uppercase; letter-spacing: var(--tracking-wider); color: var(--text-faint); font-weight: var(--fw-semibold); margin-bottom: 8px; }
+  .family-card .fsample { font-size: 22px; color: var(--text-strong); }
+
+  .space-row { display: flex; align-items: center; gap: 14px; padding: 7px 0; }
+  .space-row .lbl { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); width: 90px; flex-shrink: 0; }
+  .space-row .bar { height: 10px; background: var(--bd-accent); border-radius: 3px; }
+  .space-row .px { font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); }
+
+  .radius-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+  .radius-item { text-align: center; }
+  .radius-item .box { width: 64px; height: 64px; background: var(--surface-2); border: 1px solid var(--line-3); margin-bottom: 6px; }
+  .radius-item .lbl { font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); }
+
+  .demo-card { border: 1px solid var(--line-2); background: var(--surface-glass); backdrop-filter: blur(12px);
+    border-radius: var(--radius-2xl); overflow: hidden; margin-bottom: 18px; }
+  .demo-live { padding: 22px; }
+  .demo-code { border-top: 1px solid var(--line-2); background: rgba(0,0,0,0.35); }
+  .demo-code summary { cursor: pointer; list-style: none; padding: 10px 18px; font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: var(--tracking-wide); text-transform: uppercase; color: var(--text-faint); user-select: none; }
+  .demo-code summary::-webkit-details-marker { display: none; }
+  .demo-code summary::before { content: "▸ "; }
+  .demo-code[open] summary::before { content: "▾ "; }
+  .demo-code pre { margin: 0; padding: 0 18px 18px; overflow-x: auto; }
+  .demo-code code { font-family: var(--font-mono); font-size: 12px; line-height: var(--lh-normal); color: var(--bd-accent-soft); white-space: pre; }
+  .demo-code code .tag { color: #7fd8ff; }
+  .demo-code code .str { color: #a4e0a0; }
+
+  .comp-title { font-size: var(--fs-lg); font-weight: var(--fw-semibold); color: var(--text-strong); margin: 30px 0 4px; }
+  .comp-sub { font-size: var(--fs-mini); color: var(--text-faint); margin-bottom: 14px; }
+
+  .kit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .kit-card { border: 1px solid var(--line-2); border-radius: var(--radius-2xl); background: var(--surface-1); padding: 20px; }
+  .kit-card h3 { margin: 0 0 6px; font-size: var(--fs-sm); color: var(--text-strong); }
+  .kit-card p { margin: 0; font-size: var(--fs-mini); color: var(--text-muted); line-height: var(--lh-normal); }
+  .kit-card code { display: block; margin-top: 10px; font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); }
+</style>
+</head>
+<body>
+<div class="glow"></div>
+<div class="page" id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="_ds_bundle.js"></script>
+<script type="text/babel">
+const {
+  Button, Card, Badge, StatusDot, SectionHead, Divider,
+  Input, Select, RangeSlider, FieldSection, Checkbox, RadioGroup, Switch,
+  Toast, ProgressBar, Alert, Skeleton, EmptyState, ToastManager, bdToast,
+  NavItem, Toolbar, Breadcrumbs, Pagination,
+  CoverImage,
+  Container, Header, Footer, Hero,
+  Modal, Drawer, Tooltip,
+  Tabs, Accordion,
+  Table,
+  Avatar, AvatarGroup, StatCard, PricingCard,
+} = window.BearddOddityDesignSystem_726917;
+
+function Code({ children }) {
+  return (
+    <details className="demo-code">
+      <summary>Code</summary>
+      <pre><code>{children}</code></pre>
+    </details>
+  );
+}
+function Demo({ title, sub, children, code }) {
+  return (
+    <div>
+      {title && <div className="comp-title">{title}</div>}
+      {sub && <div className="comp-sub">{sub}</div>}
+      <div className="demo-card">
+        <div className="demo-live">{children}</div>
+        <Code>{code}</Code>
+      </div>
+    </div>
+  );
+}
+
+const CANVAS = [
+  ["App canvas", "--bd-black", "#050505"],
+  ["Panel (option/dropdown)", "--bd-panel-solid", "#111118"],
+];
+const ACCENT = [
+  ["Accent (Twitch purple)", "--bd-accent", "#9146ff"],
+  ["Accent dark", "--bd-accent-dark", "#6b2cff"],
+  ["Accent text", "--bd-accent-text", "#c084fc"],
+];
+const SEMANTIC = [
+  ["Success", "--bd-green", "#4ade80"],
+  ["Error", "--bd-red", "#f87171"],
+  ["Warn", "--bd-amber", "#facc15"],
+  ["Info", "--bd-cyan", "#22d3ee"],
+  ["Blue", "--bd-blue", "#3b82f6"],
+];
+const BRAND = [
+  ["Twitch", "--brand-twitch", "#9146ff"],
+  ["Kick", "--brand-kick", "#53fc18"],
+  ["Streamer.bot", "--brand-streamerbot-gradient", "#a257ed"],
+  ["Joystick.tv", "--brand-joystick-gradient", "#06899c"],
+];
+const TEXT = [
+  ["Strong · 92%", "--text-strong", "rgba(255,255,255,.92)"],
+  ["Body · 80%", "--text-body", "rgba(255,255,255,.80)"],
+  ["Muted · 55%", "--text-muted", "rgba(255,255,255,.55)"],
+  ["Faint · 38%", "--text-faint", "rgba(255,255,255,.38)"],
+  ["Dim · 28%", "--text-dim", "rgba(255,255,255,.28)"],
+];
+const SURFACES = [
+  ["Surface 1", "--surface-1", "rgba(0,0,0,.20)"],
+  ["Surface 2", "--surface-2", "rgba(0,0,0,.35)"],
+  ["Surface 3", "--surface-3", "rgba(0,0,0,.50)"],
+  ["Glass", "--surface-glass", "rgba(0,0,0,.45)"],
+  ["Hover", "--surface-hover", "rgba(255,255,255,.06)"],
+];
+
+function SwatchGrid({ items }) {
+  return (
+    <div className="swatch-grid">
+      {items.map(([name, varName, val]) => (
+        <div className="swatch" key={varName}>
+          <div className="chip" style={{ background: `var(${varName})` }} />
+          <div className="meta">
+            <div className="name">{name}</div>
+            <div className="val">{varName}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const SPACE = [2,4,6,8,10,12,14,16,20,24,32,40];
+const RADII = [
+  ["xs", 6], ["sm", 8], ["md", 10], ["lg", 12], ["xl", 14], ["2xl", 16], ["3xl", 24], ["4xl", 32], ["pill", 999],
+];
+
+function ModalDrawerDemo() {
+  const [modal, setModal] = React.useState(false);
+  const [drawer, setDrawer] = React.useState(false);
+  return (
+    <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+      <Button variant="primary" size="sm" onClick={() => setModal(true)} style={{ width: 80, height: 40 }}>Open modal</Button>
+      <Button variant="primary" size="sm" onClick={() => setDrawer(true)} style={{ width: 77, height: 37 }}>Open drawer</Button>
+      <Tooltip label="Copy to clipboard"><Button variant="ghost" size="sm" style={{ width: 39, height: 36 }}>📋</Button></Tooltip>
+      <Modal open={modal} onClose={() => setModal(false)} title="Remove channel"
+        footer={<><Button variant="ghost" onClick={() => setModal(false)}>Cancel</Button><Button variant="danger" onClick={() => setModal(false)}>Remove</Button></>}>
+        This disconnects the channel and deletes its saved overlays.
+      </Modal>
+      <Drawer open={drawer} onClose={() => setDrawer(false)} title="Filters">
+        <div className="bd-label" style={{ marginBottom: 8 }}>Platform</div>
+        <div style={{ fontSize: 13 }}>Twitch, Kick, YouTube</div>
+      </Drawer>
+    </div>
+  );
+}
+function TabsAccordionDemo() {
+  const [tab, setTab] = React.useState("overview");
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+      <div>
+        <Tabs tabs={[{ value: "overview", label: "Overview" }, { value: "activity", label: "Activity" }]} value={tab} onChange={setTab} />
+        <div className="bd-tab-panel" style={{ fontSize: 13, color: "var(--text-muted)" }}>{tab === "overview" ? "Engine running · 3 sources connected." : "12 events today."}</div>
+      </div>
+      <Accordion items={[
+        { title: "How does presence detection work?", content: "The engine watches running processes and window titles and pushes the result to your overlay." },
+        { title: "Which platforms are supported?", content: "Twitch, Kick, and Joystick.tv today." },
+      ]} />
+    </div>
+  );
+}
+
+function FormControlsDemo() {
+  const [on, setOn] = React.useState(true);
+  const [q, setQ] = React.useState("1080p");
+  const [auto, setAuto] = React.useState(false);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 18, maxWidth: 280 }}>
+      <Checkbox checked={on} onChange={setOn} label="Enable hotkeys" />
+      <RadioGroup value={q} onChange={setQ} options={["720p", "1080p", "4K"]} />
+      <Switch checked={auto} onChange={setAuto} label="Auto-start on login" />
+      <Input label="Webhook URL" placeholder="https://…" error="Must be a valid https URL" />
+    </div>
+  );
+}
+function FeedbackPatternsDemo() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+      <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <Skeleton circle width={40} height={40} />
+        <div style={{ flex: 1, maxWidth: 220 }}>
+          <Skeleton height={13} width="60%" />
+          <div style={{ height: 8 }} />
+          <Skeleton height={11} width="90%" />
+        </div>
+      </div>
+      <div className="bd-card" style={{ padding: 0 }}>
+        <EmptyState icon="📡" title="No channels yet" description="Click + Add to connect your first channel."
+          action={<Button variant="cta" size="sm">+ Add channel</Button>} />
+      </div>
+      <div>
+        <Button variant="primary" size="sm" onClick={() => bdToast.push("Overlay connected", "success")}>Queue a toast</Button>
+        <ToastManager />
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <>
+      <div className="hero">
+        <div className="kicker">Design System · v1</div>
+        <h1>BearddOddity</h1>
+        <p>Dark glassmorphism with a neon-purple pulse — one shared token surface and component
+        library behind StreamerSuite, StatusForge, and PanelForge. This page is a live specimen:
+        every swatch and control below renders from the actual tokens and components in this project.</p>
+      </div>
+
+      <section className="block">
+        <div className="block-head"><h2>Color</h2><span>tokens/colors.css</span></div>
+        <div className="comp-sub">Canvas</div>
+        <SwatchGrid items={CANVAS} />
+        <div className="comp-sub" style={{ marginTop: 18 }}>Accent</div>
+        <SwatchGrid items={ACCENT} />
+        <div className="comp-sub" style={{ marginTop: 18 }}>Semantic</div>
+        <SwatchGrid items={SEMANTIC} />
+        <div className="comp-sub" style={{ marginTop: 18 }}>Platform brand</div>
+        <SwatchGrid items={BRAND} />
+        <div className="comp-sub" style={{ marginTop: 18 }}>Text ladder (white alpha)</div>
+        <SwatchGrid items={TEXT} />
+        <div className="comp-sub" style={{ marginTop: 18 }}>Glass surfaces</div>
+        <SwatchGrid items={SURFACES} />
+      </section>
+
+      <section className="block">
+        <div className="block-head"><h2>Type</h2><span>tokens/typography.css</span></div>
+        <div className="family-cards">
+          <div className="family-card">
+            <div className="fname">--font-ui (system, app chrome)</div>
+            <div className="fsample" style={{ fontFamily: "var(--font-ui)" }}>Start Engine</div>
+          </div>
+          <div className="family-card">
+            <div className="fname">--font-sans (Inter, PanelForge)</div>
+            <div className="fsample" style={{ fontFamily: "var(--font-sans)" }}>Browse Overlays</div>
+          </div>
+          <div className="family-card">
+            <div className="fname">--font-mono (JetBrains Mono, data)</div>
+            <div className="fsample" style={{ fontFamily: "var(--font-mono)" }}>12 / 40 · LIVE</div>
+          </div>
+          <div className="family-card">
+            <div className="fname">--font-heading (Montserrat, new — web/marketing)</div>
+            <div className="fsample" style={{ fontFamily: "var(--font-heading)", fontWeight: 700 }}>Ship streaming tools</div>
+          </div>
+        </div>
+        <div style={{ marginTop: 22 }}>
+          {[
+            ["--fs-3xl / 56px", 56, 700], ["--fs-2xl / 40px", 40, 700], ["--fs-xl / 28px", 28, 600],
+            ["--fs-lg / 20px", 20, 600], ["--fs-base / 16px", 16, 500], ["--fs-sm / 13px", 13, 400],
+            ["--fs-xs / 12px", 12, 400], ["--fs-mini / 11px", 11, 400], ["--fs-micro / 10px", 10, 600],
+          ].map(([tag, size, weight]) => (
+            <div className="type-row" key={tag}>
+              <div className="tag">{tag}</div>
+              <div className="sample" style={{ fontSize: size, fontWeight: weight }}>Engine Online</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="block">
+        <div className="block-head"><h2>Spacing &amp; radii</h2><span>tokens/spacing.css</span></div>
+        <div className="comp-sub">Spacing scale (px)</div>
+        {SPACE.map(px => (
+          <div className="space-row" key={px}>
+            <div className="lbl">{px}px</div>
+            <div className="bar" style={{ width: px * 4 }} />
+            <div className="px" style={{ opacity: 0 }}>·</div>
+          </div>
+        ))}
+        <div className="comp-sub" style={{ marginTop: 22 }}>Radii</div>
+        <div className="radius-grid">
+          {RADII.map(([name, px]) => (
+            <div className="radius-item" key={name}>
+              <div className="box" style={{ borderRadius: Math.min(px, 32) }} />
+              <div className="lbl">{name} · {px}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="block">
+        <div className="block-head"><h2>Components</h2><span>components/*</span></div>
+        <div className="comp-sub">Original app primitives (core, forms, feedback, navigation, media) plus new web/marketing additions (layout, overlay, disclosure, data) — same tokens, Direction A kept as-is.</div>
+
+        <Demo title="Button" sub="core/Button — variants: cta, primary, success, danger, ghost"
+          code={`<Button variant="cta">Connect</Button>
+<Button variant="primary">Cancel</Button>
+<Button variant="success">Save</Button>
+<Button variant="danger">Remove</Button>
+<Button variant="ghost">Skip</Button>
+<Button variant="primary" size="sm">Small</Button>`}>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <Button variant="cta" style={{ width: 91, height: 46 }}>Connect</Button>
+            <Button variant="primary">Cancel</Button>
+            <Button variant="success">Save</Button>
+            <Button variant="danger">Remove</Button>
+            <Button variant="ghost">Skip</Button>
+            <Button variant="primary" size="sm">Small</Button>
+            <Button variant="cta" disabled>Disabled</Button>
+          </div>
+        </Demo>
+
+        <Demo title="Badge / StatusDot / Divider" sub="core/Badge, core/StatusDot, core/Divider"
+          code={`<Badge variant="purple">Twitch</Badge>
+<Badge variant="green" dot>Live</Badge>
+<Badge variant="cyan">Completed</Badge>
+<Badge variant="amber">Hiatus</Badge>
+<StatusDot status="on" label="Connected" />
+<StatusDot status="warn" label="Reconnecting" />
+<StatusDot status="off" label="Offline" />`}>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+            <Badge variant="purple">Twitch</Badge>
+            <Badge variant="green" dot>Live</Badge>
+            <Badge variant="cyan">Completed</Badge>
+            <Badge variant="amber">Hiatus</Badge>
+            <Badge variant="red">Error</Badge>
+            <Badge variant="ghost">Draft</Badge>
+            <Divider vertical style={{ height: 20 }} />
+            <StatusDot status="on" label="Connected" />
+            <StatusDot status="warn" label="Reconnecting" />
+            <StatusDot status="off" label="Offline" />
+          </div>
+        </Demo>
+
+        <Demo title="Card / SectionHead" sub="core/Card, core/SectionHead"
+          code={`<Card>
+  <SectionHead icon="⚙️" title="Presence Engine" desc="Scanner running · 3 sources" />
+</Card>`}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <Card><SectionHead icon="⚙️" title="Presence Engine" desc="Scanner running · 3 sources" /></Card>
+            <Card><SectionHead icon="🎛️" title="Sound Board" desc="12 pads · hotkeys on" right={<Badge variant="green" dot>On</Badge>} /></Card>
+          </div>
+        </Demo>
+
+        <Demo title="Input / Select / RangeSlider" sub="forms/Input, forms/Select, forms/RangeSlider"
+          code={`<Input label="Channel name" placeholder="beardds" />
+<Select label="Platform" options={["Twitch","Kick","YouTube"]} />
+<RangeSlider label="Alert volume" value={65} />`}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16, maxWidth: 280, width: 416, height: 242 }}>
+            <Input label="Channel name" placeholder="beardds" style={{ width: 261, height: 45 }} />
+            <Select label="Platform" value="Twitch" onChange={() => {}} options={["Twitch", "Kick", "YouTube", "Joystick.tv"]}
+              style={{ width: 155, height: 43 }} />
+            <RangeSlider label="Alert volume" value={65} onChange={() => {}} />
+          </div>
+        </Demo>
+
+        <Demo title="FieldSection" sub="forms/FieldSection — collapsible group"
+          code={`<FieldSection title="Advanced" icon="⚙️" defaultOpen>
+  <Input label="Webhook URL" placeholder="https://…" />
+</FieldSection>`}>
+          <FieldSection title="Advanced" icon="⚙️" defaultOpen>
+            <Input label="Webhook URL" placeholder="https://…" />
+          </FieldSection>
+        </Demo>
+
+        <Demo title="Toast / ProgressBar" sub="feedback/Toast, feedback/ProgressBar"
+          code={`<Toast variant="success">Overlay connected</Toast>
+<Toast variant="info">Scanning library…</Toast>
+<Toast variant="error">Auth expired</Toast>
+<ProgressBar value={42} />`}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <Toast variant="success">Overlay connected</Toast>
+              <Toast variant="info">Scanning library…</Toast>
+              <Toast variant="error">Auth expired</Toast>
+            </div>
+            <ProgressBar value={42} />
+          </div>
+        </Demo>
+
+        <Demo title="NavItem / Toolbar" sub="navigation/NavItem, navigation/Toolbar"
+          code={`<NavItem icon="📊" label="Dashboard" active />
+<NavItem icon="💬" label="Chat" badge="3" />
+<Toolbar>
+  <Input placeholder="Search library…" />
+  <Button size="sm" variant="cta">New</Button>
+</Toolbar>`}>
+          <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 18 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <NavItem icon="📊" label="Dashboard" active />
+              <NavItem icon="💬" label="Chat" badge="3" />
+              <NavItem icon="🎛️" label="Sound Board" />
+              <NavItem icon="✨" label="Overlays" />
+            </div>
+            <Toolbar>
+              <Input placeholder="Search library…" />
+              <Button size="sm" variant="primary" style={{ width: 52, height: 37 }}>Filter</Button>
+              <Button size="sm" variant="cta" style={{ width: 52, height: 37 }}>New</Button>
+            </Toolbar>
+          </div>
+        </Demo>
+
+        <Demo title="CoverImage" sub="media/CoverImage — 2:3 cover tile with fallback"
+          code={`<CoverImage title="Celeste" badge="Platformer" width={150} src="…" />
+<CoverImage alt="Untitled Series" title="No cover art" width={150} />`}>
+          <div style={{ display: "flex", gap: 16 }}>
+            <CoverImage title="Celeste" badge="Platformer" width={150}
+              src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='300'><rect width='200' height='300' fill='%23243b6b'/><circle cx='100' cy='120' r='55' fill='%237aa2ff'/><rect y='210' width='200' height='90' fill='%231a2a4d'/></svg>" />
+            <CoverImage alt="Untitled Series" title="No cover art" width={150} />
+          </div>
+        </Demo>
+
+        <div className="comp-sub" style={{ marginTop: 30, fontSize: 12, color: "var(--bd-accent-text)", textTransform: "uppercase", letterSpacing: ".06em", fontWeight: 600 }}>New — for websites &amp; web apps</div>
+
+        <Demo title="Header / Hero / Footer" sub="layout/Header, layout/Hero, layout/Footer — site structure, Montserrat headline"
+          code={`<Header logo="beardd//oddity" links={["Product","Docs","Pricing"]}
+  actions={<Button variant="cta" size="sm">Get started</Button>} />
+<Hero kicker="..." title="Ship streaming tools that feel like gear." description="..."
+  actions={<Button variant="cta">Start free</Button>} />
+<Footer columns={[...]} bottomLeft="© 2026" bottomRight="..." />`}>
+          <div style={{ border: "1px solid var(--line-2)", borderRadius: 16, overflow: "hidden" }}>
+            <Header logo="beardd//oddity" links={["Product", "Docs", "Pricing"]}
+              actions={<Button variant="cta" size="sm" style={{ width: 77, height: 41 }}>Get started</Button>} />
+            <Hero kicker="Design system · v1" title="Ship streaming tools that feel like gear."
+              description="Dense, glassy, near-black UI with a single neon-purple accent."
+              actions={<><Button variant="cta" style={{ width: 82, height: 47 }}>Start free</Button><Button variant="ghost">View docs</Button></>} />
+            <Footer columns={[{ title: "Product", links: ["Overlays", "Chat"] }, { title: "Legal", links: ["Privacy", "Terms"] }]}
+              bottomLeft="© 2026 BearddOddity" bottomRight="Twitch · Kick" />
+          </div>
+        </Demo>
+
+        <Demo title="Modal / Drawer / Tooltip" sub="overlay/Modal, overlay/Drawer, overlay/Tooltip"
+          code={`<Modal open={open} onClose={close} title="Remove channel" footer={...}>…</Modal>
+<Drawer open={open} onClose={close} side="right" title="Filters">…</Drawer>
+<Tooltip label="Copy to clipboard"><Button>📋</Button></Tooltip>`}>
+          <ModalDrawerDemo />
+        </Demo>
+
+        <Demo title="Tabs / Accordion" sub="disclosure/Tabs, disclosure/Accordion"
+          code={`<Tabs tabs={[{value:"a",label:"Overview"},{value:"b",label:"Activity"}]} value={tab} onChange={setTab} />
+<Accordion items={[{title:"How does presence detection work?", content:"…"}]} />`}>
+          <TabsAccordionDemo />
+        </Demo>
+
+        <Demo title="Breadcrumbs / Pagination" sub="navigation/Breadcrumbs, navigation/Pagination"
+          code={`<Breadcrumbs items={[{label:"Library"},{label:"Sci-Fi"},{label:"Celeste"}]} />
+<Pagination page={4} pageCount={12} onChange={setPage} />`}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <Breadcrumbs items={[{ label: "Library" }, { label: "Sci-Fi" }, { label: "Celeste" }]} />
+            <Pagination page={4} pageCount={12} onChange={() => {}} />
+          </div>
+        </Demo>
+
+        <Demo title="Table" sub="data/Table — glass data table with cell renderers"
+          code={`<Table columns={[{key:"user",label:"Channel"},{key:"status",label:"Status"}]}
+  rows={[{id:1,user:"beardds",status:"Live"}]} />`}>
+          <Table
+            columns={[
+              { key: "user", label: "Channel", render: (r) => <div style={{ display: "flex", alignItems: "center", gap: 10 }}><Avatar name={r.user} size={26} /><span>{r.user}</span></div> },
+              { key: "status", label: "Status", render: (r) => <StatusDot status={r.status === "live" ? "on" : "off"} label={r.status === "live" ? "Live" : "Offline"} /> },
+              { key: "viewers", label: "Viewers" },
+            ]}
+            rows={[{ id: 1, user: "beardds", status: "live", viewers: "1,204" }, { id: 2, user: "nightowl", status: "off", viewers: "—" }]}
+          />
+        </Demo>
+
+        <Demo title="Avatar / Alert" sub="core/Avatar, core/AvatarGroup, feedback/Alert — persistent banner"
+          code={`<Avatar name="Jordan Beard" size={36} />
+<AvatarGroup><Avatar name="Jordan Beard" /><Avatar name="Ana Cruz" /></AvatarGroup>
+<Alert variant="warn" title="Auth expiring soon">Reconnect within 3 days…</Alert>`}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+              <Avatar name="Jordan Beard" size={36} />
+              <AvatarGroup><Avatar name="Jordan Beard" /><Avatar name="Ana Cruz" /><Avatar name="Sam Lee" /></AvatarGroup>
+            </div>
+            <Alert variant="warn" title="Auth expiring soon">Reconnect your Twitch account within 3 days to keep overlays syncing.</Alert>
+          </div>
+        </Demo>
+
+        <Demo title="Checkbox / RadioGroup / Switch" sub="forms/Checkbox, forms/RadioGroup, forms/Switch — plus Input/Select error states"
+          code={`<Checkbox checked={on} onChange={setOn} label="Enable hotkeys" />
+<RadioGroup value={q} onChange={setQ} options={["720p","1080p","4K"]} />
+<Switch checked={auto} onChange={setAuto} label="Auto-start on login" />
+<Input label="Webhook URL" error="Must be a valid https URL" />`}>
+          <FormControlsDemo />
+        </Demo>
+
+        <Demo title="Skeleton / EmptyState / ToastManager" sub="feedback/Skeleton, feedback/EmptyState, feedback/ToastManager — loading, zero-state, stacking toasts"
+          code={`<Skeleton circle width={40} height={40} />
+<EmptyState icon="📡" title="No channels yet" description="Click + Add to connect." />
+// anywhere:
+bdToast.push("Overlay connected", "success");`}>
+          <FeedbackPatternsDemo />
+        </Demo>
+
+        <Demo title="StatCard / PricingCard" sub="core/StatCard, core/PricingCard — promoted from the templates"
+          code={`<StatCard label="Viewers now" value="1,516" delta="+12% today" />
+<PricingCard name="Pro" price="$12" features={["Unlimited channels"]} highlight
+  action={<Button variant="cta">Start free trial</Button>} />`}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            <StatCard label="Viewers now" value="1,516" delta="+12% today" />
+            <PricingCard name="Pro" price="$12" features={["Unlimited channels", "Custom overlays"]} highlight
+              action={<Button variant="cta" size="sm">Start free trial</Button>} />
+          </div>
+        </Demo>
+      </section>
+
+      <section className="block">
+        <div className="block-head"><h2>Templates</h2><span>templates/*</span></div>
+        <div className="kit-grid">
+          <div className="kit-card" style={{ width: 552, height: 138 }}>
+            <h3>Landing Page</h3>
+            <p>Sticky nav, hero, feature grid, testimonial, pricing, footer — full marketing page built from the components above.</p>
+            <code>templates/landing-page/LandingPage.dc.html</code>
+          </div>
+          <div className="kit-card">
+            <h3>App Dashboard</h3>
+            <p>Sidebar shell, toolbar, stat cards, tabs, table, pagination, modal — a web-app starting point.</p>
+            <code>templates/app-dashboard/AppDashboard.dc.html</code>
+          </div>
+          <div className="kit-card">
+            <h3>Docs / Article</h3>
+            <p>Sticky header, sidebar table of contents, prose body, FAQ accordion.</p>
+            <code>templates/docs-page/DocsPage.dc.html</code>
+          </div>
+          <div className="kit-card">
+            <h3>Login / Auth</h3>
+            <p>Centered card — platform OAuth buttons over an email/password fallback.</p>
+            <code>templates/login/LoginPage.dc.html</code>
+          </div>
+          <div className="kit-card">
+            <h3>404 / Error</h3>
+            <p>Centered not-found page — gradient code, message, action.</p>
+            <code>templates/error-404/Error404.dc.html</code>
+          </div>
+        </div>
+      </section>
+
+      <section className="block">
+        <div className="block-head"><h2>UI kits</h2><span>ui_kits/*</span></div>
+        <div className="kit-grid">
+          <div className="kit-card" style={{ width: 363, height: 134 }}>
+            <h3>StatusForge</h3>
+            <p>Status Room dashboard — start/stop engine, browse overlays, expand metadata. The most developed surface.</p>
+            <code>ui_kits/statusforge/index.html</code>
+          </div>
+          <div className="kit-card">
+            <h3>StreamerSuite</h3>
+            <p>App launcher → ChatConfluence multi-platform chat.</p>
+            <code>ui_kits/streamersuite/index.html</code>
+          </div>
+          <div className="kit-card">
+            <h3>PanelForge</h3>
+            <p>Comic-reader — library → detail → fullscreen reader.</p>
+            <code>ui_kits/panelforge/index.html</code>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

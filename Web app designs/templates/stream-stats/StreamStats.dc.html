@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Stream Stats" description="Live viewer, chat & follower metrics dashboard" -->
+<helmet>
+  <script src="./ds-base.js"></script>
+  <style>
+    html, body { margin: 0; min-height: 100%; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 32px 48px; }
+    .top-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+    .channel-id { display: flex; align-items: center; gap: 12px; }
+    .ss-wordmark { font-family: var(--font-heading); font-weight: 800; font-size: 21px; color: var(--text-strong); letter-spacing: -.01em; }
+    .ss-wordmark span { color: var(--bd-accent); }
+    .ss-viewers { font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    .platform-icon { display: inline-block; width: auto; height: 15px; object-fit: contain; flex-shrink: 0; }
+    .platform-line[data-platform="twitch"] { --p: var(--brand-twitch); }
+    .platform-line[data-platform="kick"] { --p: var(--brand-kick); }
+    .platform-line[data-platform="youtube"] { --p: var(--brand-youtube); }
+    .platform-line[data-platform="tiktok"] { --p: var(--brand-tiktok); }
+    .platform-line[data-platform="rumble"] { --p: var(--brand-rumble); }
+    .platform-line[data-platform="joystick"] { --p: var(--brand-joystick); }
+    .platform-line-head { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+    .platform-line-name { display: flex; align-items: center; gap: 8px; color: var(--p, var(--text-body)); font-weight: 600; }
+    .chatter-user { display: flex; align-items: center; gap: 8px; }
+    .follower-platform { display: flex; align-items: center; gap: 6px; }
+    .main-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; align-items: start; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .panel-head .bd-h3 { margin: 0; }
+    .chart-card { padding: 22px 24px 18px; }
+    .chart-foot { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-dim); font-family: var(--font-mono); margin-top: 6px; }
+    .list-card { padding: 18px 20px; }
+    .follower-row { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line-1); }
+    .follower-row:last-child { border-bottom: none; }
+    .follower-meta { flex: 1; min-width: 0; }
+    .follower-name { font-size: 13px; color: var(--text-body); }
+    .follower-time { font-size: 11px; color: var(--text-faint); font-family: var(--font-mono); }
+    @media (max-width: 860px) {
+      .wrap { padding: 20px 18px 36px; }
+      .main-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</helmet>
+
+<div class="wrap" data-screen-label="Stream Stats">
+
+  <div class="top-row">
+    <div class="channel-id">
+      <div class="ss-wordmark">Stream<span>Stats</span></div>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.StatusDot" hint-size="80px,20px" status="on" label="LIVE"></x-import>
+      <span class="ss-viewers">👁 {{ stats.viewersNow }} viewers</span>
+      <span style="font-size:12px;color:var(--text-faint);font-family:var(--font-mono);">up {{ uptime }}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Tabs" hint-size="220px,40px"
+        tabs="{{ rangeTabs }}" value="{{ range }}" onChange="{{ setRange }}">
+      </x-import>
+      <a href="../multi-chat-viewer/MultiChatViewer.dc.html" class="bd-btn bd-btn-ghost" style="text-decoration:none;">Open Multi-Chat</a>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.StatCard" hint-size="100%,90px" label="Viewers now" value="{{ stats.viewersNow }}" delta="{{ stats.viewersDelta }}"></x-import>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.StatCard" hint-size="100%,90px" label="Peak viewers" value="{{ stats.peakViewers }}"></x-import>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.StatCard" hint-size="100%,90px" label="Followers" value="{{ stats.followers }}" delta="{{ stats.followersDelta }}"></x-import>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.StatCard" hint-size="100%,90px" label="Chat msgs / min" value="{{ stats.chatRate }}"></x-import>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.StatCard" hint-size="100%,90px" label="Avg watch time" value="{{ stats.avgWatch }}"></x-import>
+  </div>
+
+  <div class="main-grid">
+    <div>
+      <div class="bd-card chart-card">
+        <div class="panel-head">
+          <div class="bd-h3">Viewers over time</div>
+          <span class="bd-badge bd-badge-ghost">{{ rangeLabel }}</span>
+        </div>
+        <svg viewBox="0 0 640 160" width="100%" height="160" preserveAspectRatio="none">
+          <polygon points="{{ chart.areaPoints }}" fill="var(--accent-glow)"></polygon>
+          <polyline points="{{ chart.linePoints }}" fill="none" stroke="var(--bd-accent)" stroke-width="2.5"></polyline>
+        </svg>
+        <div class="chart-foot">
+          <span>{{ chart.startLabel }}</span>
+          <span>{{ chart.endLabel }}</span>
+        </div>
+      </div>
+
+      <div style="height:18px"></div>
+
+      <div class="bd-card list-card">
+        <div class="panel-head">
+          <div class="bd-h3">Top chatters</div>
+          <span class="bd-badge bd-badge-ghost">{{ stats.chatRate }} msgs/min</span>
+        </div>
+        <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Table" hint-size="100%,180px"
+          columns="{{ chatterColumns }}" rows="{{ topChattersRows }}">
+        </x-import>
+      </div>
+    </div>
+
+    <div>
+      <div class="bd-card list-card">
+        <div class="panel-head">
+          <div class="bd-h3">Recent followers</div>
+          <span class="bd-badge bd-badge-green">+{{ stats.followersDeltaCount }} today</span>
+        </div>
+        <sc-for list="{{ recentFollowers }}" as="f" hint-placeholder-count="6">
+          <div class="follower-row">
+            <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Avatar" hint-size="32px,32px" name="{{ f.name }}" size="{{ 32 }}"></x-import>
+            <div class="follower-meta">
+              <div class="follower-name">{{ f.name }}</div>
+              <div class="follower-time">{{ f.time }}</div>
+            </div>
+            <span class="follower-platform">
+              <img class="platform-icon" src="{{ f.platformIcon }}" alt="{{ f.platformLabel }}" title="{{ f.platformLabel }}" />
+            </span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="height:18px"></div>
+
+      <div class="bd-card list-card">
+        <div class="bd-h3" style="margin-bottom:12px;">Viewers by platform</div>
+        <sc-for list="{{ platformBreakdown }}" as="p" hint-placeholder-count="6">
+          <div class="platform-line" data-platform="{{ p.id }}">
+            <div class="platform-line-head">
+              <span class="platform-line-name"><img class="platform-icon" src="{{ p.icon }}" alt="{{ p.name }}" />{{ p.name }}</span>
+              <span style="font-family:var(--font-mono);color:var(--text-faint);">{{ p.viewers }}</span>
+            </div>
+            <x-import component-from-global-scope="BearddOddityDesignSystem_726917.ProgressBar" hint-size="100%,6px" value="{{ p.viewers }}" max="{{ maxPlatformViewers }}"></x-import>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const PLATFORMS = {
+  twitch: { label: "Twitch", icon: "../../assets/logos/chip-twitch.svg" },
+  kick: { label: "Kick", icon: "../../assets/logos/chip-kick.svg" },
+  youtube: { label: "YouTube", icon: "../../assets/logos/youtube-mark.svg" },
+  tiktok: { label: "TikTok", icon: "../../assets/logos/tiktok-mark-white.svg" },
+  rumble: { label: "Rumble", icon: "../../assets/logos/rumble-mark.svg" },
+  joystick: { label: "Joystick.tv", icon: "../../assets/logos/joystick-mark.svg" },
+};
+
+class Component extends DCLogic {
+  state = { range: "24h" };
+
+  buildChart(values, w, h) {
+    const max = Math.max(...values);
+    const min = Math.min(...values);
+    const span = Math.max(1, max - min);
+    const stepX = w / (values.length - 1);
+    const pts = values.map((v, i) => {
+      const x = Math.round(i * stepX);
+      const y = Math.round(h - ((v - min) / span) * (h - 20) - 10);
+      return `${x},${y}`;
+    });
+    const linePoints = pts.join(" ");
+    const areaPoints = `0,${h} ${linePoints} ${w},${h}`;
+    return { linePoints, areaPoints };
+  }
+
+  renderVals() {
+    const ranges = {
+      "1h": { values: [820,860,910,940,905,960,1010,1040,1080,1120,1160,1204], startLabel: "-1h", endLabel: "now", label: "Last hour" },
+      "24h": { values: [340,410,380,520,610,700,860,940,1020,1180,1516,1490,1420,1516], startLabel: "24h ago", endLabel: "now", label: "Last 24h" },
+      "7d": { values: [980,1120,1340,1210,1490,1516,1600], startLabel: "7d ago", endLabel: "today", label: "Last 7 days" },
+    };
+    const r = ranges[this.state.range];
+    const chart = { ...this.buildChart(r.values, 640, 160), startLabel: r.startLabel, endLabel: r.endLabel };
+
+    const topChatters = [
+      { id: 1, user: "nightowl22", messages: 148, badge: "Mod", platform: "twitch" },
+      { id: 2, user: "pixelfox", messages: 112, badge: "Sub", platform: "kick" },
+      { id: 3, user: "quietstorm", messages: 97, badge: "Sub", platform: "twitch" },
+      { id: 4, user: "brk_", messages: 74, badge: "", platform: "tiktok" },
+      { id: 5, user: "waveform", messages: 61, badge: "VIP", platform: "youtube" },
+    ];
+    const topChattersRows = topChatters.map((c) => ({ ...c, platformLabel: PLATFORMS[c.platform].label }));
+
+    const recentFollowers = [
+      { name: "juno_plays", time: "2 min ago", platform: "twitch" },
+      { name: "reddotstudio", time: "8 min ago", platform: "kick" },
+      { name: "ash.codes", time: "14 min ago", platform: "twitch" },
+      { name: "milo_dev", time: "22 min ago", platform: "youtube" },
+      { name: "vv_stream", time: "31 min ago", platform: "tiktok" },
+      { name: "kepler9", time: "48 min ago", platform: "rumble" },
+    ].map((f) => ({ ...f, platformLabel: PLATFORMS[f.platform].label, platformIcon: PLATFORMS[f.platform].icon }));
+
+    const platformBreakdown = [
+      { id: "twitch", viewers: 1204 },
+      { id: "kick", viewers: 218 },
+      { id: "youtube", viewers: 94 },
+      { id: "tiktok", viewers: 431 },
+      { id: "rumble", viewers: 127 },
+      { id: "joystick", viewers: 64 },
+    ].map((p) => ({ ...p, name: PLATFORMS[p.id].label, icon: PLATFORMS[p.id].icon }));
+
+    return {
+      uptime: "3h 12m",
+      range: this.state.range,
+      rangeLabel: r.label,
+      rangeTabs: [
+        { value: "1h", label: "1h" },
+        { value: "24h", label: "24h" },
+        { value: "7d", label: "7d" },
+      ],
+      setRange: (v) => this.setState({ range: v }),
+      chart,
+      stats: {
+        viewersNow: "1,516",
+        viewersDelta: "+12% today",
+        peakViewers: "1,600",
+        followers: "24,308",
+        followersDelta: "+37 today",
+        followersDeltaCount: 37,
+        chatRate: "42",
+        avgWatch: "26m",
+      },
+      chatterColumns: [
+        { key: "user", label: "Chatter" },
+        { key: "platformLabel", label: "Platform" },
+        { key: "messages", label: "Messages" },
+        { key: "badge", label: "Role" },
+      ],
+      topChattersRows,
+      recentFollowers,
+      platformBreakdown,
+      maxPlatformViewers: Math.max(...platformBreakdown.map((p) => p.viewers)),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

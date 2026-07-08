@@ -1,0 +1,187 @@
+<!-- @dsCard group="Components" viewport="700x420" name="Forms — Inputs, Select, Slider, Checkbox, Radio, Switch" subtitle="Glass fields, dropdown, range, checkbox/radio/switch, error states" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../../styles.css">
+<template id="__bundler_thumbnail" data-bg-color="#0a0a0c">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#0a0a0c"/>
+    <rect x="120" y="160" width="420" height="70" rx="18" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.25)"/>
+    <rect x="120" y="270" width="420" height="70" rx="18" fill="rgba(255,255,255,0.18)" stroke="rgba(255,255,255,0.3)"/>
+    <rect x="120" y="380" width="420" height="24" rx="12" fill="rgba(145,70,255,0.6)"/>
+    <rect x="660" y="160" width="420" height="380" rx="24" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.15)"/>
+  </svg>
+</template>
+<style>
+  body { margin: 0; background: var(--bd-black); font-family: var(--font-ui); color: var(--text-body); }
+  .wrap { padding: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: start; }
+</style>
+</head>
+<body>
+<div id="root" class="wrap"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+const { Input, Select, RangeSlider, FieldSection, Checkbox, RadioGroup, Switch } = window.BearddOddityDesignSystem_726917;
+
+// ── Minimal inline tweaks panel (host protocol + segmented control) ─────────
+const __TWK_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:260px;
+    background:rgba(250,249,247,.9);color:#29261b;-webkit-backdrop-filter:blur(24px) saturate(160%);
+    backdrop-filter:blur(24px) saturate(160%);border:.5px solid rgba(255,255,255,.6);border-radius:14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.25);
+    font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 8px 14px}
+  .twk-hd b{font-size:12px;font-weight:600}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);width:22px;height:22px;
+    border-radius:6px;cursor:pointer;font-size:13px}
+  .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px}
+  .twk-lbl{color:rgba(41,38,27,.72);font-weight:500}
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;background:rgba(0,0,0,.06)}
+  .twk-seg button{appearance:none;flex:1;border:0;background:transparent;color:inherit;font:inherit;
+    font-weight:500;padding:5px 4px;border-radius:6px;cursor:pointer;position:relative;z-index:1}
+  .twk-seg button[data-on="1"]{background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+`;
+function TweakRadioInline({ label, value, options, onChange }) {
+  return (
+    <div>
+      <div className="twk-lbl" style={{ marginBottom: 5 }}>{label}</div>
+      <div className="twk-seg" role="radiogroup">
+        {options.map((o) => (
+          <button key={o} type="button" role="radio" aria-checked={o === value}
+                  data-on={o === value ? "1" : "0"} onClick={() => onChange(o)}>{o}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+function TweaksPanelInline({ children }) {
+  const [open, setOpen] = React.useState(false);
+  React.useEffect(() => {
+    const onMsg = (e) => {
+      const t = e?.data?.type;
+      if (t === "__activate_edit_mode") setOpen(true);
+      else if (t === "__deactivate_edit_mode") setOpen(false);
+    };
+    window.addEventListener("message", onMsg);
+    window.parent.postMessage({ type: "__edit_mode_available" }, "*");
+    return () => window.removeEventListener("message", onMsg);
+  }, []);
+  if (!open) return null;
+  return (
+    <>
+      <style>{__TWK_STYLE}</style>
+      <div className="twk-panel">
+        <div className="twk-hd">
+          <b>Tweaks</b>
+          <button className="twk-x" aria-label="Close tweaks"
+                  onClick={() => { setOpen(false); window.parent.postMessage({ type: "__edit_mode_dismissed" }, "*"); }}>✕</button>
+        </div>
+        <div className="twk-body">{children}</div>
+      </div>
+    </>
+  );
+}
+
+// Three "feel" presets per axis — each one reshapes several properties together
+// rather than exposing a single raw slider.
+const GLASS_PRESETS = {
+  subtle:  { "--glass-blur": "blur(6px) saturate(120%)", "--glass-bg": "rgba(10,10,12,0.35)",
+             "--glass-border": "rgba(255,255,255,0.08)", "--glass-shadow": "0 2px 12px rgba(0,0,0,0.25)",
+             "--dropdown-bg": "rgba(20,20,25,0.7)", "--glass-text": "#f0f0f0",
+             "--bd-panel-bg": "rgba(0,0,0,0.12)", "--bd-panel-bg-strong": "rgba(0,0,0,0.2)",
+             "--bd-panel-border": "rgba(255,255,255,0.05)", "--bd-panel-border-strong": "rgba(255,255,255,0.1)" },
+  frosted: { "--glass-blur": "blur(12px) saturate(150%) brightness(1.05)", "--glass-bg": "rgba(10,10,12,0.65)",
+             "--glass-border": "rgba(255,255,255,0.15)", "--glass-shadow": "0 8px 40px rgba(0,0,0,0.6)",
+             "--dropdown-bg": "rgba(20,20,25,0.9)", "--glass-text": "#f0f0f0",
+             "--bd-panel-bg": "rgba(0,0,0,0.2)", "--bd-panel-bg-strong": "rgba(0,0,0,0.45)",
+             "--bd-panel-border": "var(--line-1)", "--bd-panel-border-strong": "var(--line-strong)" },
+  deep:    { "--glass-blur": "blur(26px) saturate(170%) brightness(1.08)", "--glass-bg": "rgba(10,10,12,0.82)",
+             "--glass-border": "rgba(255,255,255,0.25)", "--glass-shadow": "0 14px 60px rgba(0,0,0,0.75)",
+             "--dropdown-bg": "rgba(14,14,17,0.96)", "--glass-text": "#f5f5f5",
+             "--bd-panel-bg": "rgba(0,0,0,0.35)", "--bd-panel-bg-strong": "rgba(0,0,0,0.65)",
+             "--bd-panel-border": "rgba(255,255,255,0.16)", "--bd-panel-border-strong": "rgba(255,255,255,0.3)" },
+};
+const DENSITY_PRESETS = {
+  compact: { "--bd-field-pad-v": "6px",  "--bd-field-pad-h": "10px", "--bd-field-fs": "13px", "--bd-panel-pad": "12px", gap: 10 },
+  cozy:    { "--bd-field-pad-v": "10px", "--bd-field-pad-h": "14px", "--bd-field-fs": "14px", "--bd-panel-pad": "18px", gap: 16 },
+  roomy:   { "--bd-field-pad-v": "16px", "--bd-field-pad-h": "20px", "--bd-field-fs": "16px", "--bd-panel-pad": "26px", gap: 24 },
+};
+const SHAPE_PRESETS = {
+  sharp:   { "--radius-lg": "4px",   "--radius-2xl": "6px" },
+  rounded: { "--radius-lg": "12px",  "--radius-2xl": "18px" },
+  pill:    { "--radius-lg": "999px", "--radius-2xl": "28px" },
+};
+
+function Demo() {
+  const [t, setTweak] = React.useState({ glass: "frosted", density: "cozy", shape: "rounded" });
+  const [accent, setAccent] = React.useState("#9146ff");
+  const [platformOptions, setPlatformOptions] = React.useState("Twitch, Kick, YouTube, Joystick.tv");
+  const [v, setV] = React.useState("");
+  const [vol, setVol] = React.useState(65);
+  const [p, setP] = React.useState("Twitch");
+  const [hotkeys, setHotkeys] = React.useState(true);
+  const [quality, setQuality] = React.useState("1080p");
+  const [autoStart, setAutoStart] = React.useState(false);
+  const platforms = platformOptions.split(",").map(s => s.trim()).filter(Boolean);
+
+  React.useEffect(() => {
+    document.documentElement.style.setProperty("--bd-accent", accent);
+  }, [accent]);
+
+  const density = DENSITY_PRESETS[t.density] || DENSITY_PRESETS.cozy;
+  const scopeVars = {
+    ...GLASS_PRESETS[t.glass],
+    ...density,
+    ...SHAPE_PRESETS[t.shape],
+  };
+
+  return (
+    <div style={{ ...scopeVars, display: "contents" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: density.gap }}>
+        <Input label="Channel name" placeholder="beardds" value={v} onChange={setV} style={{ width: 240, height: 20 }} />
+        {/* Platform dropdown — follows StatusForge's .select-glass: black-alpha glass fill,
+            hairline border, brand chevron, purple focus ring (see tokens/components.css .bd-select) */}
+        <Select label="Platform" value={p} onChange={setP} options={platforms}
+                style={{ width: 155, height: 43 }}
+                menuStyle={{ width: 136, height: 161, top: 42 }} />
+        <RangeSlider label="Alert volume" value={vol} onChange={setVol} />
+        <Checkbox checked={hotkeys} onChange={setHotkeys} label="Enable hotkeys" />
+        <RadioGroup value={quality} onChange={setQuality} options={["720p", "1080p", "4K"]} />
+        <Switch checked={autoStart} onChange={setAutoStart} label="Auto-start on login" />
+        <Input label="Webhook URL" placeholder="https://…" error="Must be a valid https URL" />
+      </div>
+      <FieldSection title="Advanced" icon="⚙️" defaultOpen>
+        <Input label="Webhook URL" placeholder="https://…" />
+        <div style={{ marginTop: 16 }}>
+          <div className="bd-label" style={{ marginBottom: 6 }}>Accent (focus ring)</div>
+          <div style={{ display: "flex", gap: 8 }}>
+            {["#9146ff", "#53fc18", "#22d3ee"].map(c => (
+              <button key={c} onClick={() => setAccent(c)} title={c}
+                style={{ width: 24, height: 24, borderRadius: 999, background: c, cursor: "pointer",
+                  border: accent === c ? "2px solid #fff" : "2px solid transparent" }} />
+            ))}
+          </div>
+          <div className="bd-label" style={{ margin: "14px 0 6px" }}>Platform options (comma-separated)</div>
+          <Input value={platformOptions} onChange={setPlatformOptions} />
+        </div>
+      </FieldSection>
+      <TweaksPanelInline>
+        <TweakRadioInline label="Glass depth" value={t.glass} options={["subtle", "frosted", "deep"]}
+                    onChange={(val) => setTweak((prev) => ({ ...prev, glass: val }))} />
+        <TweakRadioInline label="Density" value={t.density} options={["compact", "cozy", "roomy"]}
+                    onChange={(val) => setTweak((prev) => ({ ...prev, density: val }))} />
+        <TweakRadioInline label="Shape" value={t.shape} options={["sharp", "rounded", "pill"]}
+                    onChange={(val) => setTweak((prev) => ({ ...prev, shape: val }))} />
+      </TweaksPanelInline>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script>
+</body>
+</html>
