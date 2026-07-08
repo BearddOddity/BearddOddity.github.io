@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="App Dashboard" description="Web-app shell — sidebar nav, toolbar, stat cards, data table, modal" -->
+<helmet>
+  <script src="./ds-base.js"></script>
+  <style>
+    html, body { margin: 0; height: 100%; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+    .shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    .sidebar { border-right: 1px solid var(--line-2); padding: 20px 14px; display: flex; flex-direction: column; gap: 4px; }
+    .sidebar-logo { font-family: var(--font-heading); font-weight: 700; font-size: 16px; color: var(--text-strong); padding: 8px 12px 20px; }
+    .main { padding: 24px 32px 40px; }
+    .top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; gap: 16px; flex-wrap: wrap; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 28px; }
+    .table-head-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    @media (max-width: 860px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { border-right: none; border-bottom: 1px solid var(--line-2); flex-direction: row; overflow-x: auto; padding: 12px; }
+      .sidebar-logo { display: none; }
+      .main { padding: 20px 18px 32px; }
+    }
+  </style>
+</helmet>
+
+<div class="shell" data-screen-label="Dashboard">
+  <aside class="sidebar">
+    <div class="sidebar-logo">beardd//oddity</div>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.NavItem" hint-size="100%,44px" icon="📊" label="Dashboard" active="{{ true }}"></x-import>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.NavItem" hint-size="100%,44px" icon="💬" label="Chat" badge="3"></x-import>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.NavItem" hint-size="100%,44px" icon="🎛️" label="Sound Board"></x-import>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.NavItem" hint-size="100%,44px" icon="✨" label="Overlays"></x-import>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.NavItem" hint-size="100%,44px" icon="⚙️" label="Settings"></x-import>
+  </aside>
+
+  <main class="main">
+    <div class="top-row">
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Breadcrumbs" hint-size="300px,20px"
+        items="{{ crumbs }}"></x-import>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Toolbar" hint-size="360px,50px">
+        <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Input" hint-size="200px,36px" placeholder="Search library…"></x-import>
+        <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Button" hint-size="70px,37px" size="sm" variant="cta" onClick="{{ openModal }}">New</x-import>
+      </x-import>
+    </div>
+
+    <div class="stat-grid">
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.StatCard" hint-size="100%,90px" label="Channels" value="3"></x-import>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.StatCard" hint-size="100%,90px" label="Viewers now" value="1,516" delta="+12% today"></x-import>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.StatCard" hint-size="100%,90px" label="Overlays synced" value="12"></x-import>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.StatCard" hint-size="100%,90px" label="Uptime" value="99.8%"></x-import>
+    </div>
+
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Alert" hint-size="100%,60px" variant="warn" title="Auth expiring soon">
+      Reconnect your Twitch account within 3 days to keep overlays syncing.
+    </x-import>
+
+    <div style="height:20px"></div>
+
+    <div class="table-head-row">
+      <div class="bd-h3">Channels</div>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Tabs" hint-size="240px,40px"
+        tabs="{{ tabs }}" value="{{ tab }}" onChange="{{ setTab }}"></x-import>
+    </div>
+
+    <sc-if value="{{ hasRows }}" hint-placeholder-val="{{ true }}">
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Table" hint-size="100%,220px"
+        columns="{{ columns }}" rows="{{ rows }}"></x-import>
+    </sc-if>
+    <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}">
+      <div class="bd-card">
+        <x-import component-from-global-scope="BearddOddityDesignSystem_726917.EmptyState" hint-size="100%,220px"
+          icon="📡" title="No channels yet" description="Click + Add to connect your first channel.">
+          <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Button" hint-size="140px,40px" variant="cta" size="sm" onClick="{{ openModal }}">+ Add channel</x-import>
+        </x-import>
+      </div>
+    </sc-if>
+
+    <div style="height:20px"></div>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Pagination" hint-size="200px,32px"
+      page="{{ page }}" pageCount="{{ 6 }}" onChange="{{ setPage }}"></x-import>
+  </main>
+</div>
+
+<x-import component-from-global-scope="BearddOddityDesignSystem_726917.Modal" hint-size="0,0"
+  open="{{ modalOpen }}" onClose="{{ closeModal }}" title="Add channel">
+  <p style="margin: 0 0 18px;">Connect a Twitch, Kick, or Joystick.tv channel to start syncing overlays.</p>
+  <div style="display:flex; justify-content:flex-end; gap:10px;">
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Button" hint-size="80px,37px" variant="ghost" onClick="{{ closeModal }}">Cancel</x-import>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Button" hint-size="90px,37px" variant="cta" onClick="{{ closeModal }}">Connect</x-import>
+  </div>
+</x-import>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { tab: "live", page: 2, modalOpen: false };
+
+  renderVals() {
+    const rows = [
+      { id: 1, user: "beardds", status: "Live", viewers: "1,204" },
+      { id: 2, user: "nightowl", status: "Offline", viewers: "—" },
+      { id: 3, user: "pixelfox", status: "Live", viewers: "312" },
+    ];
+    const filtered = this.state.tab === "live" ? rows.filter((r) => r.status === "Live") : rows;
+
+    return {
+      crumbs: [{ label: "Home" }, { label: "Dashboard" }],
+      tabs: [{ value: "all", label: "All" }, { value: "live", label: "Live" }],
+      tab: this.state.tab,
+      setTab: (v) => this.setState({ tab: v }),
+      page: this.state.page,
+      setPage: (p) => this.setState({ page: p }),
+      columns: [
+        { key: "user", label: "Channel" },
+        { key: "status", label: "Status" },
+        { key: "viewers", label: "Viewers" },
+      ],
+      rows: filtered,
+      hasRows: filtered.length > 0,
+      noRows: filtered.length === 0,
+      modalOpen: this.state.modalOpen,
+      openModal: () => this.setState({ modalOpen: true }),
+      closeModal: () => this.setState({ modalOpen: false }),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>StreamerSuite — Redesign</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { background: #050505; color: var(--text-body); font-family: var(--font-ui); }
+  #root { min-height: 100vh; display: flex; flex-direction: column; }
+  .scroll::-webkit-scrollbar { width: 6px; }
+  .scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 3px; }
+  .launcher-main { flex: 1; overflow-y: auto; padding: 0 32px 32px; }
+  .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+  .chat-shell { display: flex; height: 100%; }
+  .chat-sidebar { width: 260px; flex-shrink: 0; background: var(--surface-1); border-right: 1px solid var(--line-2); display: flex; flex-direction: column; }
+  .chat-panel { flex: 1; display: flex; flex-direction: column; background: #050505; min-width: 0; }
+  .msg-row:hover { background: rgba(255,255,255,.02); }
+  .chan-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 12px; cursor: pointer; }
+  .chan-row[data-active="1"] { background: rgba(255,255,255,.06); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../_ds_bundle.js"></script>
+<script type="text/babel">
+const {
+  Button, Card, Badge, StatusDot, SectionHead, Divider,
+  Header, Tabs, Input, Toolbar, Breadcrumbs,
+  Avatar, EmptyState, ToastManager, bdToast, Select,
+} = window.BearddOddityDesignSystem_726917;
+
+const APPS = [
+  { id: "chat", name: "ChatConfluence", icon: "💬", category: "chat", featured: true, description: "Every platform's chat unified in one live window." },
+  { id: "status", name: "StatusForge", icon: "⏳", category: "tools", featured: true, description: "Rich game-presence engine → Twitch, Kick & overlays." },
+  { id: "scene", name: "Scene Switcher", icon: "🎬", category: "tools", description: "obs-websocket scene & source control with hotkeys." },
+  { id: "sound", name: "Sound Board", icon: "🎛️", category: "media", description: "Hotkey-triggered audio pads with routing." },
+  { id: "alerts", name: "Alerts Hub", icon: "✨", category: "alerts", description: "Follow, sub & donation alert overlays." },
+  { id: "stats", name: "Stream Stats", icon: "📊", category: "utilities", description: "Live viewer, chat & follower metrics." },
+  { id: "timer", name: "Stream Timer", icon: "⏱️", category: "utilities", description: "Countdown, BRB and marathon timers." },
+  { id: "notes", name: "Notes & Commands", icon: "📝", category: "tools", description: "Manage chat commands and run-of-show notes." },
+];
+const CATS = [
+  { value: "all", label: "All" }, { value: "chat", label: "Chat" }, { value: "tools", label: "Tools" },
+  { value: "alerts", label: "Alerts" }, { value: "media", label: "Media" }, { value: "utilities", label: "Utilities" },
+];
+const PLATFORMS = {
+  twitch: { label: "Twitch", color: "var(--brand-twitch)", badge: "purple" },
+  kick: { label: "Kick", color: "var(--brand-kick)", badge: "green" },
+  joystick: { label: "JoystickTV", color: "var(--brand-joystick)", badge: "cyan" },
+};
+const CHATTERS = [
+  { platform: "twitch", name: "pixelwitch", text: "that clutch was insane 😭" },
+  { platform: "kick", name: "greenrunner", text: "GG go next" },
+  { platform: "twitch", name: "vodwatcher", text: "what's the overlay you're using?" },
+  { platform: "joystick", name: "latenite", text: "just followed, love the vibe here" },
+  { platform: "kick", name: "bitcrusher", text: "chat is so fast today lmao" },
+];
+
+function AppCard({ app, onLaunch }) {
+  return (
+    <Card onClick={() => onLaunch(app.id)} style={{ cursor: "pointer" }}>
+      <SectionHead icon={app.icon} title={app.name} desc={app.description}
+        right={app.featured ? <Badge variant="purple">Featured</Badge> : null} />
+      <Badge variant="ghost" style={{ marginTop: 12 }}>{app.category}</Badge>
+    </Card>
+  );
+}
+
+function Launcher({ onLaunch }) {
+  const [cat, setCat] = React.useState("all");
+  const [q, setQ] = React.useState("");
+  let list = APPS.filter((a) => cat === "all" || a.category === cat);
+  if (q.trim()) list = list.filter((a) => (a.name + a.description).toLowerCase().includes(q.toLowerCase()));
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <div style={{ padding: "24px 32px 16px" }}>
+        <div className="bd-h1">Ultimate Streaming Companion</div>
+        <div style={{ fontSize: 13, color: "var(--text-faint)", marginTop: 4 }}>All the tools a streamer needs, in one place</div>
+        <div style={{ display: "flex", gap: 12, marginTop: 18, flexWrap: "wrap", alignItems: "center" }}>
+          <Input placeholder="Search apps…" value={q} onChange={setQ} style={{ width: 240 }} />
+          <Tabs tabs={CATS} value={cat} onChange={setCat} />
+        </div>
+      </div>
+      <div className="launcher-main scroll">
+        {list.length ? (
+          <div className="app-grid">{list.map((a) => <AppCard key={a.id} app={a} onLaunch={onLaunch} />)}</div>
+        ) : (
+          <EmptyState icon="🔍" title="No apps match your search" description={`Nothing found for "${q}".`} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ChatApp() {
+  const [channels, setChannels] = React.useState([
+    { platform: "twitch", name: "beardds", connected: true },
+    { platform: "kick", name: "beardds", connected: true },
+  ]);
+  const [multi, setMulti] = React.useState(true);
+  const [active, setActive] = React.useState("twitch:beardds");
+  const [msgs, setMsgs] = React.useState(() => CHATTERS.map((c, i) => ({ ...c, id: i })));
+  const [input, setInput] = React.useState("");
+  const [sendAs, setSendAs] = React.useState("twitch");
+  const bottomRef = React.useRef(null);
+  React.useEffect(() => { bottomRef.current?.parentElement.scrollTo(0, 1e6); }, [msgs.length]);
+
+  const send = (e) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+    setMsgs((m) => [...m, { id: Date.now(), platform: sendAs, name: "beardds", text: input.trim() }]);
+    setInput("");
+  };
+  const addChannel = () => {
+    const opts = ["joystick", "twitch", "kick"].filter((p) => !channels.some((c) => c.platform === p));
+    const p = opts[0] || "twitch";
+    setChannels((c) => [...c, { platform: p, name: "newchannel", connected: true }]);
+    bdToast.push(`${PLATFORMS[p].label} channel connected`, "success");
+  };
+  const connectedCount = channels.filter((c) => c.connected).length;
+
+  return (
+    <div className="chat-shell">
+      <div className="chat-sidebar">
+        <div style={{ padding: "20px 16px 16px" }}>
+          <SectionHead icon="⚡" title="ChatConfluence" desc="Multi-platform chat" />
+        </div>
+        <div style={{ padding: "0 12px 12px" }}>
+          <Button variant={multi ? "cta" : "ghost"} style={{ width: "100%", justifyContent: "space-between" }} onClick={() => setMulti((m) => !m)}>
+            🔀 Multi-Chat <Badge variant={multi ? "purple" : "ghost"}>{multi ? "ON" : "OFF"}</Badge>
+          </Button>
+        </div>
+        <div className="scroll" style={{ flex: 1, overflowY: "auto", padding: "0 12px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "0 4px", marginBottom: 8 }}>
+            <span className="bd-label">Channels</span>
+            <Button variant="ghost" size="sm" onClick={addChannel}>+ Add</Button>
+          </div>
+          {channels.map((ch) => {
+            const key = `${ch.platform}:${ch.name}`;
+            return (
+              <div key={key} className="chan-row" data-active={multi || active === key ? "1" : "0"} onClick={() => setActive(key)}>
+                <Avatar name={ch.name} size={28} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: "var(--text-body)" }}>{ch.name}</div>
+                  <Badge variant={PLATFORMS[ch.platform].badge} style={{ marginTop: 4 }}>{PLATFORMS[ch.platform].label}</Badge>
+                </div>
+                <StatusDot status={ch.connected ? "on" : "off"} />
+              </div>
+            );
+          })}
+        </div>
+        <div style={{ padding: "12px 16px", borderTop: "1px solid var(--line-1)", display: "flex", justifyContent: "space-between", fontSize: 10, color: "var(--text-dim)" }}>
+          <span>{channels.length} channels</span>
+          <StatusDot status={connectedCount ? "on" : "off"} label={`${connectedCount} connected`} />
+        </div>
+      </div>
+
+      <div className="chat-panel">
+        <Toolbar style={{ margin: 12, marginBottom: 0 }}>
+          <span style={{ padding: "0 8px", fontSize: 14, fontWeight: 700, color: "var(--bd-accent-text)" }}>{multi ? "Multi-Chat" : active.split(":")[1]}</span>
+          {multi && channels.map((c) => <Badge key={c.platform} variant={PLATFORMS[c.platform].badge}>{c.platform}</Badge>)}
+          <span style={{ marginLeft: "auto", paddingRight: 8 }}><StatusDot status="on" label="LIVE" /></span>
+        </Toolbar>
+        <div className="scroll" style={{ flex: 1, overflowY: "auto", padding: "12px 0" }}>
+          {msgs.map((msg) => (
+            <div key={msg.id} className="msg-row" style={{ padding: "6px 16px", fontSize: 13, lineHeight: 1.6, display: "flex", gap: 10, alignItems: "flex-start" }}>
+              {multi && <Badge variant={PLATFORMS[msg.platform].badge} style={{ marginTop: 2, flexShrink: 0 }}>{msg.platform}</Badge>}
+              <div style={{ minWidth: 0 }}>
+                <span style={{ fontWeight: 600, color: PLATFORMS[msg.platform].color }}>{msg.name}</span>
+                <span style={{ color: "var(--text-dim)" }}>: </span>
+                <span style={{ color: "var(--text-muted)", wordBreak: "break-word" }}>{msg.text}</span>
+              </div>
+            </div>
+          ))}
+          <div ref={bottomRef} />
+        </div>
+        <form onSubmit={send} style={{ padding: "12px 16px", borderTop: "1px solid var(--line-2)", display: "flex", gap: 8 }}>
+          {multi && (
+            <Select value={sendAs} onChange={setSendAs} options={channels.map((c) => ({ value: c.platform, label: PLATFORMS[c.platform].label }))} style={{ width: 130 }} />
+          )}
+          <Input style={{ flex: 1 }} value={input} onChange={setInput} placeholder={`Send to ${multi ? PLATFORMS[sendAs].label : active.split(":")[1]}…`} />
+          <Button variant="cta" type="submit" disabled={!input.trim()}>Send</Button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function Placeholder({ app }) {
+  return <EmptyState icon={app.icon} title={app.name} description={app.description} action={<Badge variant="purple">{app.category}</Badge>} />;
+}
+
+function App() {
+  const [active, setActive] = React.useState(null);
+  const app = APPS.find((a) => a.id === active);
+  return (
+    <>
+      <Header logo="StreamerSuite" links={active ? [] : ["Docs", "Settings"]}
+        actions={active ? <Button variant="ghost" size="sm" onClick={() => setActive(null)}>← Launcher</Button> : <Button variant="ghost" size="sm">⚙️</Button>} />
+      <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
+        {!active ? <Launcher onLaunch={setActive} /> : active === "chat" ? <ChatApp /> : <Placeholder app={app} />}
+      </div>
+      <ToastManager />
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

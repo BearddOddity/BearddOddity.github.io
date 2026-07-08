@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PanelForge — Redesign</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bg-app); color: var(--text-body); font-family: var(--font-sans); }
+  #root { min-height: 100vh; display: flex; flex-direction: column; }
+  .scroll::-webkit-scrollbar { width: 6px; }
+  .scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.06); border-radius: 3px; }
+  .main { flex: 1; overflow-y: auto; padding: 28px 32px 48px; }
+  .lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 18px; }
+  .comic-card { cursor: pointer; }
+  .comic-card:hover .cover-wrap { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,.4); }
+  .cover-wrap { transition: transform .25s ease, box-shadow .25s ease; border-radius: 16px; }
+  .num-pill { display: flex; flex-direction: column; align-items: center; padding: 8px 16px; border-radius: 10px; background: var(--surface-glass); border: 1px solid rgba(255,255,255,.08); gap: 2px; min-width: 64px; }
+  .num-pill .l { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
+  .num-pill .v { font-size: 16px; font-weight: 700; color: var(--bd-accent); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../_ds_bundle.js"></script>
+<script type="text/babel">
+const {
+  Button, Card, Badge, Divider, CoverImage, Header, Tabs, Input, Select,
+  Breadcrumbs, EmptyState, ProgressBar,
+} = window.BearddOddityDesignSystem_726917;
+
+function cover(a, b, glyph) {
+  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23${a}'/%3E%3Cstop offset='1' stop-color='%23${b}'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='200' height='300'/%3E%3Ctext x='100' y='160' text-anchor='middle' font-size='64' opacity='.85'%3E${glyph}%3C/text%3E%3C/svg%3E`;
+}
+const COMICS = [
+  { id: 1, title: "Neon Requiem", format: "cbz", status: "ongoing", rating: 9.2, pages: 24, progress: .4, cover: cover("312e81", "0a0a14", "🌃") },
+  { id: 2, title: "Hollow Tide", format: "cbr", status: "completed", rating: 8.7, pages: 40, progress: 1, cover: cover("134e4a", "0a0a14", "🌊") },
+  { id: 3, title: "Ashfall", format: "pdf", status: "hiatus", rating: 7.9, pages: 18, progress: 0, cover: cover("7c2d12", "0a0a14", "🔥") },
+  { id: 4, title: "Starbound Kids", format: "cbz", status: "ongoing", rating: 8.4, pages: 30, progress: .7, cover: cover("1e3a8a", "0a0a14", "🚀") },
+  { id: 5, title: "Verdant", format: "cbz", status: "completed", rating: 9.0, pages: 52, progress: 1, cover: cover("14532d", "0a0a14", "🌿") },
+  { id: 6, title: "Crimson Vow", format: "cbr", status: "ongoing", rating: 8.1, pages: 22, progress: .15, cover: cover("4c0519", "0a0a14", "🗡️") },
+];
+const STATUS_VARIANT = { ongoing: "green", completed: "cyan", hiatus: "amber" };
+
+function ComicCard({ c, onOpen }) {
+  return (
+    <div className="comic-card" onClick={() => onOpen(c)}>
+      <div className="cover-wrap">
+        <CoverImage src={c.cover} title={c.title} badge={c.format} width="100%" />
+      </div>
+      <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+        <Badge variant={STATUS_VARIANT[c.status]}>{c.status}</Badge>
+        <Badge variant="amber">★ {c.rating}</Badge>
+      </div>
+      <ProgressBar value={c.progress * 100} style={{ marginTop: 8 }} />
+    </div>
+  );
+}
+
+function Library({ onOpen }) {
+  const [sort, setSort] = React.useState("title");
+  const [q, setQ] = React.useState("");
+  let list = COMICS.filter((c) => c.title.toLowerCase().includes(q.toLowerCase()));
+  list = [...list].sort((a, b) => (sort === "rating" ? b.rating - a.rating : a.title.localeCompare(b.title)));
+  return (
+    <div className="main scroll">
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
+        <div className="bd-h1">Library</div>
+        <Badge variant="ghost">{list.length} titles</Badge>
+        <div style={{ marginLeft: "auto", display: "flex", gap: 10 }}>
+          <Input placeholder="Search…" value={q} onChange={setQ} style={{ width: 200 }} />
+          <Select value={sort} onChange={setSort} options={[{ value: "title", label: "Sort: Title" }, { value: "rating", label: "Sort: Rating" }]} style={{ width: 150 }} />
+        </div>
+      </div>
+      {list.length ? (
+        <div className="lib-grid">{list.map((c) => <ComicCard key={c.id} c={c} onOpen={onOpen} />)}</div>
+      ) : (
+        <EmptyState icon="📚" title="No titles match" description={`Nothing found for "${q}".`} />
+      )}
+    </div>
+  );
+}
+
+function Detail({ comic, onBack, onRead }) {
+  return (
+    <div className="main scroll">
+      <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+        <Breadcrumbs items={[{ label: "Library" }, { label: comic.title }]} onNavigate={onBack} />
+        <div style={{ display: "flex", gap: 28, flexWrap: "wrap", alignItems: "flex-start", marginTop: 18 }}>
+          <CoverImage src={comic.cover} title={comic.title} badge={comic.format} width={240} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 14, flex: 1, minWidth: 260 }}>
+            <div className="bd-h1">{comic.title}</div>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <div className="num-pill"><span className="l">Volume</span><span className="v">#3</span></div>
+              <div className="num-pill"><span className="l">Issue</span><span className="v">#12</span></div>
+              <div className="num-pill"><span className="l">Pages</span><span className="v">{comic.pages}</span></div>
+            </div>
+            <Card>
+              <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
+                <Badge variant={STATUS_VARIANT[comic.status]}>{comic.status}</Badge>
+                <Badge variant="amber">★ {comic.rating}</Badge>
+                <Badge variant="ghost">Sci-Fi</Badge>
+                <Badge variant="ghost">Cyberpunk</Badge>
+              </div>
+              {[["Author", "R. Vantablack"], ["Publisher", "Panel Press"], ["Released", "2024"], ["Language", "English"]].map(([l, v]) => (
+                <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
+                  <span className="bd-label">{l}</span>
+                  <span style={{ fontSize: 13, color: "var(--text-body)", fontWeight: 500 }}>{v}</span>
+                </div>
+              ))}
+              <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6, marginTop: 14, marginBottom: 0 }}>A rain-soaked megacity, a courier with a stolen memory, and a countdown nobody can stop. The definitive neon-noir serial.</p>
+            </Card>
+            <Button variant="cta" onClick={onRead} style={{ alignSelf: "flex-start" }}>📖 Read</Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Reader({ comic, onClose }) {
+  const [page, setPage] = React.useState(1);
+  const total = comic.pages;
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 60, background: "var(--bd-black)", display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,.06)", background: "rgba(0,0,0,.4)" }}>
+        <Button variant="ghost" size="sm" onClick={onClose}>✕</Button>
+        <span style={{ fontSize: 14, fontWeight: 600, color: "#fff" }}>{comic.title}</span>
+        <span style={{ marginLeft: "auto", fontSize: 12, color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>{page} / {total}</span>
+      </div>
+      <div className="scroll" style={{ flex: 1, overflowY: "auto", display: "flex", justifyContent: "center", padding: 24 }}>
+        <div style={{ width: "100%", maxWidth: 560 }}>
+          <CoverImage src={comic.cover} width="100%" rounded={16} />
+        </div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 20, padding: "16px 20px", borderTop: "1px solid rgba(255,255,255,.06)", background: "rgba(0,0,0,.4)" }}>
+        <Button variant="ghost" size="sm" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>‹</Button>
+        <div style={{ width: 260 }}><ProgressBar value={(page / total) * 100} /></div>
+        <Button variant="ghost" size="sm" disabled={page >= total} onClick={() => setPage((p) => Math.min(total, p + 1))}>›</Button>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [route, setRoute] = React.useState("library");
+  const [comic, setComic] = React.useState(null);
+  const [reading, setReading] = React.useState(false);
+  return (
+    <>
+      <Header logo="PanelForge" links={["Library", "Browse & Download"]}
+        actions={<Button variant="ghost" size="sm">⚙️</Button>} />
+      <div style={{ padding: "10px 32px 0" }}>
+        <Tabs tabs={[{ value: "library", label: "Library" }, { value: "browse", label: "Browse & Download" }]}
+          value={route} onChange={(v) => setRoute(v === "detail" ? "detail" : v)} />
+      </div>
+      {route === "library" && <Library onOpen={(c) => { setComic(c); setRoute("detail"); }} />}
+      {route === "detail" && comic && <Detail comic={comic} onBack={() => setRoute("library")} onRead={() => setReading(true)} />}
+      {route === "browse" && (
+        <div className="main">
+          <EmptyState icon="⬇️" title="Browse & Download" description="Search connected sources and pull new issues straight into your library." />
+        </div>
+      )}
+      {reading && comic && <Reader comic={comic} onClose={() => setReading(false)} />}
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

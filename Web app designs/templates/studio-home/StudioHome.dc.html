@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Studio Home" description="Solo-dev/small-studio homepage — hero, project cards, quick links, minimal footer" -->
+<helmet>
+  <script src="./ds-base.js"></script>
+  <style>
+    body { margin: 0; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+    .more-soon { display: flex; align-items: center; justify-content: center; border: 1px dashed var(--line-3); border-radius: 18px; padding: 28px; color: var(--text-faint); font-size: 14px; text-align: center; }
+    .quick-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+    .section { padding: 56px 0; }
+    .section-head { text-align: center; margin-bottom: 36px; }
+    .section-head p { color: var(--text-faint); margin: 8px 0 0; }
+  </style>
+</helmet>
+
+<x-import component-from-global-scope="BearddOddityDesignSystem_726917.Header" hint-size="100%,68px"
+  logo="Studio Name" links="{{ navLinks }}">
+</x-import>
+
+<section class="bd-hero">
+  <div class="bd-hero-glow"></div>
+  <div class="bd-container" style="text-align:center;">
+    <span class="bd-badge bd-badge-purple"><span class="bd-dot bd-dot-on"></span>&nbsp;Live &amp; Building</span>
+    <h1 style="margin:18px auto 0;max-width:none;">Your Studio Name</h1>
+    <p style="margin-left:auto;margin-right:auto;">One-line description of who you are and what you build — a solo dev, a small team, a creator with real shipped tools.</p>
+    <div class="bd-hero-actions" style="justify-content:center;">
+      <a href="#projects" class="bd-btn bd-btn-cta" style="text-decoration:none;">See the Tools</a>
+      <a href="#" class="bd-btn bd-btn-ghost" style="text-decoration:none;">About Me</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="projects">
+  <div class="bd-container">
+    <div class="section-head">
+      <div class="bd-h2">Projects</div>
+      <p>What's shipped and downloadable right now.</p>
+    </div>
+    <div class="projects-grid">
+      <div class="bd-card" style="padding:26px;">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;">
+          <div style="width:44px;height:44px;border-radius:12px;background:rgba(145,70,255,.15);"></div>
+          <div class="bd-h3">Product Name</div>
+        </div>
+        <p style="font-size:14px;color:var(--text-faint);line-height:1.6;margin:0 0 14px;">A short, plain description of what this product does and who it's for.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+          <span class="bd-badge bd-badge-ghost">🪟 Windows</span>
+          <span class="bd-badge bd-badge-ghost">🍎 macOS</span>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <a href="#" class="bd-btn bd-btn-cta" style="text-decoration:none;">Download</a>
+          <a href="#" class="bd-btn bd-btn-ghost" style="text-decoration:none;">Learn More</a>
+        </div>
+      </div>
+      <div class="more-soon">More projects coming as they're made public.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:rgba(255,255,255,0.015);">
+  <div class="bd-container">
+    <div class="section-head"><div class="bd-h2">Get Around</div></div>
+    <div class="quick-links">
+      <a href="#" class="bd-card" style="padding:24px;text-decoration:none;color:inherit;display:block;">
+        <div style="font-size:26px;margin-bottom:12px;">📘</div>
+        <div class="bd-h3">Setup Guides</div>
+        <p style="font-size:13px;color:var(--text-faint);margin:8px 0 0;">Step-by-step walkthroughs for getting set up.</p>
+      </a>
+      <a href="#" class="bd-card" style="padding:24px;text-decoration:none;color:inherit;display:block;">
+        <div style="font-size:26px;margin-bottom:12px;">📝</div>
+        <div class="bd-h3">Devlog</div>
+        <p style="font-size:13px;color:var(--text-faint);margin:8px 0 0;">Notes on what's being built, broken, and fixed.</p>
+      </a>
+      <a href="#" class="bd-card" style="padding:24px;text-decoration:none;color:inherit;display:block;">
+        <div style="font-size:26px;margin-bottom:12px;">🎥</div>
+        <div class="bd-h3">About</div>
+        <p style="font-size:13px;color:var(--text-faint);margin:8px 0 0;">Who's behind this and where to find them live.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer style="text-align:center;padding:36px 24px 44px;border-top:1px solid var(--line-1);">
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:13px;">
+    <a href="#" class="bd-link">github.com/you</a>
+    <span style="color:var(--text-dim)">·</span>
+    <a href="#" class="bd-link">twitch.tv/you</a>
+  </div>
+</footer>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      navLinks: ["Projects", "Guides", "Blog", "About"],
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<!-- @template name="Multi-Chat Viewer" description="Replaces ChatConfluence — modern unified multi-platform chat: live feed, split columns, focus rail, pinning, moderation, send-as" -->
+<helmet>
+  <script src="./ds-base.js"></script>
+  <style>
+    html, body { margin: 0; height: 100%; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+    .cv-shell { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+    .cv-top { display: flex; align-items: center; gap: 18px; padding: 16px 24px; border-bottom: 1px solid var(--line-2); flex-shrink: 0; }
+    .cv-wordmark { font-family: var(--font-heading); font-weight: 800; font-size: 21px; color: var(--text-strong); letter-spacing: -.01em; }
+    .cv-wordmark span { color: var(--bd-accent); }
+    .cv-viewers { font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+    .cv-presence { display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: var(--radius-pill); background: var(--surface-glass); border: 1px solid var(--line-2); }
+    .cv-presence-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--bd-accent); animation: cv-pulse 2.2s ease-in-out infinite; }
+    .cv-presence-text { font-size: 13px; color: var(--text-body); }
+    .cv-presence-game { font-weight: 700; color: var(--text-strong); }
+    @keyframes cv-pulse { 0%, 100% { opacity: .35; box-shadow: 0 0 0 0 color-mix(in oklch, var(--bd-accent) 50%, transparent); } 50% { opacity: 1; box-shadow: 0 0 6px 2px color-mix(in oklch, var(--bd-accent) 50%, transparent); } }
+    .cv-spacer { flex: 1; }
+    .cv-filters { display: flex; align-items: center; gap: 10px; padding: 14px 24px; flex-wrap: wrap; border-bottom: 1px solid var(--line-1); flex-shrink: 0; }
+    .cv-filters-label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--text-faint); font-weight: 600; margin-right: 4px; }
+    .cv-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+    .cv-pinned { display: flex; gap: 10px; padding: 12px 24px; overflow-x: auto; border-bottom: 1px solid var(--line-1); background: var(--surface-1); flex-shrink: 0; }
+    .cv-pin-card { flex-shrink: 0; min-width: 220px; max-width: 280px; background: var(--surface-glass); border: 1px solid var(--line-2); border-left: 3px solid var(--p, var(--bd-accent)); border-radius: var(--radius-lg); padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; }
+    .cv-pin-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .cv-pin-user { font-size: 13px; font-weight: 700; color: var(--p, var(--text-strong)); }
+    .cv-pin-unpin { cursor: pointer; color: var(--text-faint); font-size: 12px; flex-shrink: 0; }
+    .cv-pin-unpin:hover { color: var(--text-strong); }
+    .cv-pin-text { font-size: 13px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cv-main { flex: 1; min-height: 0; display: flex; overflow: hidden; }
+    .cv-feed { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 28px; }
+    .cv-focus-rail { width: 76px; flex-shrink: 0; border-right: 1px solid var(--line-1); display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px 0; overflow-y: auto; }
+    .cv-focus-item { width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; font-weight: 800; border: 1px solid var(--line-2); background: var(--surface-1); color: var(--p, var(--text-muted)); transition: all .2s ease; }
+    .cv-focus-item:hover { background: var(--surface-hover); }
+    .cv-focus-item[data-active="true"] { background: var(--surface-hover); box-shadow: inset 0 0 0 2px currentColor; }
+    .cv-msg-row[data-platform="twitch"], .cv-pin-card[data-platform="twitch"], .cv-col[data-platform="twitch"], .cv-focus-item[data-platform="twitch"] { --p: var(--brand-twitch); }
+    .cv-msg-row[data-platform="kick"], .cv-pin-card[data-platform="kick"], .cv-col[data-platform="kick"], .cv-focus-item[data-platform="kick"] { --p: var(--brand-kick); }
+    .cv-msg-row[data-platform="joystick"], .cv-pin-card[data-platform="joystick"], .cv-col[data-platform="joystick"], .cv-focus-item[data-platform="joystick"] { --p: var(--brand-joystick); }
+    .cv-msg-row[data-platform="youtube"], .cv-pin-card[data-platform="youtube"], .cv-col[data-platform="youtube"], .cv-focus-item[data-platform="youtube"] { --p: var(--brand-youtube); }
+    .cv-msg-row[data-platform="tiktok"], .cv-pin-card[data-platform="tiktok"], .cv-col[data-platform="tiktok"], .cv-focus-item[data-platform="tiktok"] { --p: var(--brand-tiktok); }
+    .cv-msg-row[data-platform="rumble"], .cv-pin-card[data-platform="rumble"], .cv-col[data-platform="rumble"], .cv-focus-item[data-platform="rumble"] { --p: var(--brand-rumble); }
+    .cv-msg-row[data-platform="crossplatform"], .cv-pin-card[data-platform="crossplatform"] { --p: var(--bd-accent); }
+    .cv-col { flex: 1; min-width: 0; display: flex; flex-direction: column; border-right: 1px solid var(--line-1); }
+    .cv-col:last-child { border-right: none; }
+    .cv-col-head { padding: 12px 18px; font-size: 13px; font-weight: 700; letter-spacing: .01em; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--line-1); flex-shrink: 0; color: var(--p, var(--text-strong)); }
+    .cv-col-head .cv-dot { background: var(--p, var(--bd-accent)); }
+    .cv-col-feed { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 16px; }
+    .cv-msg { display: flex; gap: 12px; align-items: flex-start; }
+    .cv-msg-body { flex: 0 1 auto; min-width: 0; max-width: 480px; }
+    .cv-platform-icon { display: inline-block; flex-shrink: 0; width: auto; height: 17px; object-fit: contain; }
+    .cv-chip-icon { display: inline-block; flex-shrink: 0; width: auto; height: 15px; object-fit: contain; vertical-align: -3px; }
+    .cv-platform-toggle { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 36px; background: transparent; border: none; border-radius: var(--radius-md); cursor: pointer; opacity: 1; transition: opacity .2s ease, background .2s ease; }
+    .cv-platform-toggle:hover { background: var(--surface-hover); }
+    .cv-platform-toggle[data-active="false"] { opacity: .3; }
+    .cv-platform-toggle[data-dragging="true"] { opacity: .4; }
+    .cv-health-dot { position: absolute; top: 3px; right: 3px; width: 8px; height: 8px; border-radius: 50%; background: #3ddc74; box-shadow: 0 0 0 2px var(--surface-1); }
+    .cv-health-dot[data-status="reconnecting"] { background: #f5a623; animation: cv-pulse 1.1s ease-in-out infinite; }
+    .cv-health-dot[data-status="down"] { background: #ef4444; }
+    .cv-health-badge { font-size: 11px; font-weight: 700; color: #f5a623; background: color-mix(in oklch, #f5a623 16%, transparent); padding: 2px 8px; border-radius: var(--radius-pill); margin-left: 4px; }
+    .cv-mode-badge { color: var(--bd-accent); background: color-mix(in oklch, var(--bd-accent) 16%, transparent); }
+    .cv-mode-tag { position: absolute; bottom: -9px; left: 50%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 3px; font-size: 9px; font-weight: 800; letter-spacing: .04em;
+      padding: 2px 7px; border-radius: var(--radius-pill); color: #fff; background: var(--bd-accent); box-shadow: 0 0 0 2px var(--bd-black), 0 2px 6px rgba(0,0,0,.5); white-space: nowrap; z-index: 2; }
+    .cv-mode-tag[data-mode="subs"] { background: #f5a623; }
+    .cv-mode-tag::before { content: "😀"; font-size: 9px; line-height: 1; }
+    .cv-mode-tag[data-mode="subs"]::before { content: "🔒"; }
+    .cv-focus-item { position: relative; }
+    .cv-focus-item .cv-health-dot { top: 2px; right: 2px; }
+    .cv-msg-row[data-platform="twitch"] .cv-platform-icon, img.cv-chip-icon[data-platform="twitch"] { height: 24px; }
+    .cv-msg-row[data-platform="youtube"] .cv-platform-icon, img.cv-chip-icon[data-platform="youtube"] { height: 26px; }
+    .cv-msg-row[data-platform="tiktok"] .cv-platform-icon, img.cv-chip-icon[data-platform="tiktok"] { height: 30px; }
+    .cv-msg-row[data-platform="rumble"] .cv-platform-icon, img.cv-chip-icon[data-platform="rumble"] { height: 22px; }
+    .cv-msg-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .cv-msg-user { font-weight: 700; font-size: var(--chat-font-size, 15px); color: var(--p, var(--text-strong)); font-family: var(--chat-font-family, var(--font-ui)); }
+    .cv-msg-pronouns { font-size: 11px; color: var(--text-faint); font-weight: 500; }
+    .cv-msg-text { font-size: var(--chat-font-size, 15px); color: var(--text-body); line-height: 1.55; margin-top: 3px; word-break: break-word; font-family: var(--chat-font-family, var(--font-ui)); }
+    .cv-msg-row[data-continuation="true"] { padding-top: 4px; margin-top: -16px; }
+    .cv-msg-time { font-size: 11px; font-family: var(--font-mono); color: var(--text-dim); margin-left: auto; flex-shrink: 0; }
+    .cv-msg-gif { position: relative; width: 160px; height: 90px; margin-top: 8px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--glass-border);
+      background-image: repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0 10px, rgba(255,255,255,.02) 10px 20px), var(--glass-bg);
+      backdrop-filter: var(--blur-md); -webkit-backdrop-filter: var(--blur-md); box-shadow: var(--glass-shadow); }
+    .cv-msg-gif-label { position: absolute; left: 6px; bottom: 6px; font-family: var(--font-mono); font-size: 10px; color: var(--text-strong); background: rgba(0,0,0,.55); padding: 2px 6px; border-radius: 4px; }
+    .cv-msg-gif-badge { position: absolute; top: 6px; right: 6px; font-size: 9px; font-weight: 700; letter-spacing: .04em; color: #fff; background: rgba(0,0,0,.55); padding: 2px 6px; border-radius: 4px; }
+    .cv-miniplayer-wrap { margin-top: 8px; width: 240px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--glass-border); background: var(--glass-bg); backdrop-filter: var(--blur-md); -webkit-backdrop-filter: var(--blur-md); box-shadow: var(--glass-shadow); }
+    .cv-miniplayer-wrap iframe { display: block; width: 240px; height: 135px; border: 0; }
+    .cv-miniplayer-tag { display: flex; align-items: center; gap: 6px; padding: 5px 8px; font-size: 10px; font-weight: 700; letter-spacing: .04em; color: var(--bd-accent-text); background: rgba(145,70,255,.08); }
+    .cv-settings-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--line-1); }
+    .cv-settings-label { font-size: 13px; font-weight: 600; color: var(--text-body); }
+    .cv-color-swatch-wrap { display: flex; align-items: center; gap: 10px; }
+    .cv-color-swatch { -webkit-appearance: none; appearance: none; width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--glass-border); padding: 0; cursor: pointer; background: none; overflow: hidden; }
+    .cv-color-swatch::-webkit-color-swatch-wrapper { padding: 0; border-radius: 11px; }
+    .cv-color-swatch::-webkit-color-swatch { border: none; border-radius: 11px; }
+    .cv-color-hex { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); text-transform: uppercase; }
+    .cv-settings-number { width: 64px; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-md); color: var(--text-body); font-family: var(--font-mono); font-size: 13px; padding: 6px 8px; outline: none; text-align: right; }
+    .cv-event-banner { width: fit-content; max-width: 100%; display: inline-flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: var(--radius-xl);
+      background: linear-gradient(90deg, color-mix(in oklch, var(--p, var(--bd-accent)) 22%, transparent), transparent);
+      border: 1px solid var(--p, var(--bd-accent)); box-shadow: 0 0 24px color-mix(in oklch, var(--p, var(--bd-accent)) 35%, transparent); }
+    .cv-event-text { font-size: 15px; font-weight: 700; color: var(--text-strong); }
+    .cv-toast { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); z-index: 50; background: var(--glass-bg); backdrop-filter: var(--blur-md); -webkit-backdrop-filter: var(--blur-md); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--radius-lg); padding: 10px 18px; font-size: 13px; font-weight: 600; color: var(--text-strong); }
+    .cv-palette-overlay { position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.5); display: flex; align-items: flex-start; justify-content: center; padding-top: 14vh; }
+    .cv-palette { width: 520px; max-width: 90vw; background: var(--glass-bg); backdrop-filter: var(--blur-lg); -webkit-backdrop-filter: var(--blur-lg); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); border-radius: var(--radius-xl); overflow: hidden; }
+    .cv-palette-input { width: 100%; box-sizing: border-box; background: transparent; border: none; border-bottom: 1px solid var(--line-2); color: var(--text-strong); font-size: 16px; padding: 16px 20px; outline: none; font-family: var(--font-ui); }
+    .cv-palette-list { max-height: 320px; overflow-y: auto; padding: 6px; }
+    .cv-palette-item { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-radius: var(--radius-md); cursor: pointer; font-size: 14px; color: var(--text-body); }
+    .cv-palette-item:hover { background: var(--surface-hover); }
+    .cv-palette-hint { font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); border: 1px solid var(--line-2); border-radius: 4px; padding: 1px 6px; }
+    .cv-msg-row { position: relative; z-index: 1; display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border-radius: var(--radius-xl); background: var(--surface-glass); backdrop-filter: var(--blur-md); -webkit-backdrop-filter: var(--blur-md); border: 1px solid var(--line-1); box-shadow: var(--inset-highlight); }
+    .cv-msg-actions { opacity: 0; transition: opacity .15s ease; flex-shrink: 0; }
+    .cv-msg-row:hover .cv-msg-actions { opacity: 1; }
+    .cv-msg-row:hover, .cv-msg-row:focus-within { z-index: 20; }
+    .cv-compose { display: flex; align-items: center; gap: 12px; padding: 16px 24px; border-top: 1px solid var(--line-2); background: rgba(0,0,0,.3); flex-shrink: 0; }
+    .cv-search-wrap { margin-left: auto; margin-right: 70px; width: 160px; flex-shrink: 0; }
+    .cv-flagged { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: var(--radius-xl); background: rgba(250,204,21,0.06); border: 1px dashed rgba(250,204,21,0.4); width: 100%; box-sizing: border-box; max-width: 480px; }
+    .cv-flagged-head { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--bd-amber); font-weight: 700; }
+    .cv-flagged-text { font-size: 13px; color: var(--text-muted); font-style: italic; }
+    .cv-flagged-actions { display: flex; gap: 8px; }
+  </style>
+</helmet>
+
+<div class="cv-shell" data-screen-label="Multi-Chat Viewer" ref="{{ shellRef }}">
+
+  <div class="cv-top">
+    <div class="cv-wordmark">Multi<span>-Chat</span></div>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.StatusDot" hint-size="80px,20px" status="on" label="LIVE"></x-import>
+    <div class="cv-viewers">👁 {{ viewerTotal }} viewers</div>
+    <div class="cv-presence">
+      <span class="cv-presence-dot"></span>
+      <span class="cv-presence-text">Playing <span class="cv-presence-game">{{ nowPlaying }}</span></span>
+    </div>
+    <div class="cv-spacer"></div>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Tabs" hint-size="260px,40px"
+      tabs="{{ viewTabs }}" value="{{ viewMode }}" onChange="{{ setViewMode }}"></x-import>
+    <dc-import name="CvMenu" hint-size="36px,36px" align="end" items="{{ settingsMenuItems }}" icon="⋯" width="{{ 36 }}" title="Overlay menu"></dc-import>
+  </div>
+
+  <div class="cv-filters">
+    <span class="cv-filters-label">Platforms</span>
+    <sc-for list="{{ platforms }}" as="p" hint-placeholder-count="4">
+      <button class="cv-platform-toggle" data-active="{{ p.active }}" data-dragging="{{ p.isDragging }}" draggable="true" onDragStart="{{ p.onDragStart }}" onDragOver="{{ p.onDragOver }}" onDragEnd="{{ p.onDragEnd }}" onDrop="{{ p.onDrop }}" onClick="{{ p.toggle }}" title="{{ p.healthTitle }}">
+        <img class="cv-chip-icon" data-platform="{{ p.id }}" src="{{ p.icon }}" alt="{{ p.label }}" />
+        <span class="cv-health-dot" data-status="{{ p.health }}"></span>
+        <sc-if value="{{ p.hasMode }}" hint-placeholder-val="{{ false }}">
+          <span class="cv-mode-tag" data-mode="{{ p.mode }}">{{ p.modeShort }}</span>
+        </sc-if>
+      </button>
+    </sc-for>
+    <div class="cv-search-wrap">
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Input" hint-size="220px,36px" placeholder="Search chat…" value="{{ searchQuery }}" onChange="{{ setSearchQuery }}"></x-import>
+    </div>
+  </div>
+
+  <sc-if value="{{ hasPinned }}" hint-placeholder-val="{{ false }}">
+    <div class="cv-pinned">
+      <sc-for list="{{ pinnedMessages }}" as="m" hint-placeholder-count="2">
+        <div class="cv-pin-card" data-platform="{{ m.platformId }}">
+          <div class="cv-pin-head">
+            <span class="cv-pin-user">📌 {{ m.user }}</span>
+            <span class="cv-pin-unpin" onClick="{{ m.unpin }}" title="Unpin">✕</span>
+          </div>
+          <div class="cv-pin-text">{{ m.text }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <div class="cv-main">
+
+    <sc-if value="{{ isFocus }}" hint-placeholder-val="{{ false }}">
+      <div class="cv-focus-rail">
+        <sc-for list="{{ platforms }}" as="p" hint-placeholder-count="4">
+          <div class="cv-focus-item" data-platform="{{ p.id }}" data-active="{{ p.isFocused }}" onClick="{{ p.focus }}" title="{{ p.healthTitle }}">
+            {{ p.initial }}
+            <span class="cv-health-dot" data-status="{{ p.health }}"></span>
+            <sc-if value="{{ p.hasMode }}" hint-placeholder-val="{{ false }}">
+              <span class="cv-mode-tag" data-mode="{{ p.mode }}">{{ p.modeShort }}</span>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isUnified }}" hint-placeholder-val="{{ true }}">
+      <div class="cv-feed">
+        <sc-for list="{{ unifiedMessages }}" as="m" hint-placeholder-count="6">
+          <sc-if value="{{ m.isEventVisible }}" hint-placeholder-val="{{ false }}">
+            <div class="cv-event-banner" data-platform="{{ m.platformId }}">
+              <img class="cv-platform-icon" src="{{ m.platformIcon }}" alt="{{ m.platformLabel }}" />
+              <span class="cv-event-text">🎉 {{ m.eventText }}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ m.isFlagged }}" hint-placeholder-val="{{ false }}">
+            <div class="cv-flagged" data-platform="{{ m.platformId }}">
+              <div class="cv-flagged-head">⚠️ Auto-Mod flagged a message from {{ m.user }}</div>
+              <div class="cv-flagged-text">"{{ m.text }}"</div>
+              <div class="cv-flagged-actions">
+                <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Button" hint-size="90px,30px" variant="ghost" size="sm" onClick="{{ m.approveFlag }}">Approve</x-import>
+                <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Button" hint-size="80px,30px" variant="danger" size="sm" onClick="{{ m.removeFlag }}">Remove</x-import>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ m.showBubble }}" hint-placeholder-val="{{ true }}">
+          <div class="cv-msg-row" data-platform="{{ m.platformId }}" data-continuation="{{ !m.showHead }}">
+            <sc-if value="{{ m.avatarVisible }}" hint-placeholder-val="{{ true }}">
+              <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Avatar" hint-size="34px,34px" name="{{ m.user }}" size="{{ 34 }}"></x-import>
+            </sc-if>
+            <div class="cv-msg-body">
+              <sc-if value="{{ m.showHead }}" hint-placeholder-val="{{ true }}">
+              <div class="cv-msg-head">
+                <sc-if value="{{ showPlatformIcon }}" hint-placeholder-val="{{ true }}">
+                  <img class="cv-platform-icon" src="{{ m.platformIcon }}" alt="{{ m.platformLabel }}" title="{{ m.platformLabel }}" />
+                </sc-if>
+                <sc-if value="{{ showUsername }}" hint-placeholder-val="{{ true }}">
+                  <span class="cv-msg-user">{{ m.user }}</span>
+                </sc-if>
+                <sc-if value="{{ m.showPronounsNow }}" hint-placeholder-val="{{ false }}">
+                  <span class="cv-msg-pronouns">{{ m.pronouns }}</span>
+                </sc-if>
+                <sc-if value="{{ showBadges }}" hint-placeholder-val="{{ true }}">
+                  <sc-if value="{{ m.hasRole }}" hint-placeholder-val="{{ false }}">
+                    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Badge" hint-size="50px,20px" variant="{{ m.roleVariant }}">{{ m.roleLabel }}</x-import>
+                  </sc-if>
+                </sc-if>
+                <sc-if value="{{ showTimestamps }}" hint-placeholder-val="{{ false }}">
+                  <span class="cv-msg-time">{{ m.time }}</span>
+                </sc-if>
+              </div>
+              </sc-if>
+              <div class="cv-msg-text">{{ m.text }}</div>
+              <sc-if value="{{ m.hasGif }}" hint-placeholder-val="{{ false }}">
+                <div class="cv-msg-gif">
+                  <span class="cv-msg-gif-badge">GIF</span>
+                  <span class="cv-msg-gif-label">{{ m.gifLabel }}</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ m.hasMiniplayer }}" hint-placeholder-val="{{ false }}">
+                <div class="cv-miniplayer-wrap">
+                  <div class="cv-miniplayer-tag">▶ Mod/VIP miniplayer</div>
+                  <iframe src="{{ m.ytEmbedUrl }}" title="YouTube miniplayer" allowfullscreen="{{ true }}"></iframe>
+                </div>
+              </sc-if>
+            </div>
+            <div class="cv-msg-actions">
+              <dc-import name="CvMenu" hint-size="30px,30px" align="end" items="{{ m.menuItems }}" icon="⋯" width="{{ 30 }}" title="Message actions"></dc-import>
+            </div>
+          </div>
+          </sc-if>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isSplit }}" hint-placeholder-val="{{ false }}">
+      <sc-for list="{{ splitColumns }}" as="col" hint-placeholder-count="3">
+        <div class="cv-col" data-platform="{{ col.id }}">
+          <div class="cv-col-head">
+            <span class="cv-dot"></span>
+            <span>{{ col.label }}</span>
+            <sc-if value="{{ col.isReconnecting }}" hint-placeholder-val="{{ false }}">
+              <span class="cv-health-badge">Reconnecting…</span>
+            </sc-if>
+            <sc-if value="{{ col.hasMode }}" hint-placeholder-val="{{ false }}">
+              <span class="cv-health-badge cv-mode-badge">{{ col.modeLabel }}</span>
+            </sc-if>
+          </div>
+          <div class="cv-col-feed">
+            <sc-for list="{{ col.messages }}" as="m" hint-placeholder-count="4">
+              <div class="cv-msg-row" data-platform="{{ m.platformId }}" data-continuation="{{ !m.showHead }}">
+                <sc-if value="{{ m.avatarVisible }}" hint-placeholder-val="{{ true }}">
+                  <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Avatar" hint-size="28px,28px" name="{{ m.user }}" size="{{ 28 }}"></x-import>
+                </sc-if>
+                <div class="cv-msg-body">
+                  <sc-if value="{{ m.showHead }}" hint-placeholder-val="{{ true }}">
+                  <div class="cv-msg-head">
+                    <sc-if value="{{ showUsername }}" hint-placeholder-val="{{ true }}">
+                      <span class="cv-msg-user" style="font-size: 13px">{{ m.user }}</span>
+                    </sc-if>
+                    <sc-if value="{{ m.showPronounsNow }}" hint-placeholder-val="{{ false }}">
+                      <span class="cv-msg-pronouns">{{ m.pronouns }}</span>
+                    </sc-if>
+                    <sc-if value="{{ showTimestamps }}" hint-placeholder-val="{{ false }}">
+                      <span class="cv-msg-time">{{ m.time }}</span>
+                    </sc-if>
+                  </div>
+                  </sc-if>
+                  <div class="cv-msg-text" style="font-size: 13px">{{ m.text }}</div>
+                </div>
+                <div class="cv-msg-actions">
+                  <dc-import name="CvMenu" hint-size="26px,26px" align="end" items="{{ m.menuItems }}" icon="⋯" width="{{ 26 }}" title="Message actions"></dc-import>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </sc-if>
+
+    <sc-if value="{{ isFocus }}" hint-placeholder-val="{{ false }}">
+      <div class="cv-feed">
+        <sc-for list="{{ focusMessages }}" as="m" hint-placeholder-count="6">
+          <div class="cv-msg-row" data-platform="{{ m.platformId }}" data-continuation="{{ !m.showHead }}">
+            <sc-if value="{{ m.avatarVisible }}" hint-placeholder-val="{{ true }}">
+              <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Avatar" hint-size="34px,34px" name="{{ m.user }}" size="{{ 34 }}"></x-import>
+            </sc-if>
+            <div class="cv-msg-body">
+              <sc-if value="{{ m.showHead }}" hint-placeholder-val="{{ true }}">
+              <div class="cv-msg-head">
+                <sc-if value="{{ showUsername }}" hint-placeholder-val="{{ true }}">
+                  <span class="cv-msg-user">{{ m.user }}</span>
+                </sc-if>
+                <sc-if value="{{ m.showPronounsNow }}" hint-placeholder-val="{{ false }}">
+                  <span class="cv-msg-pronouns">{{ m.pronouns }}</span>
+                </sc-if>
+                <sc-if value="{{ showBadges }}" hint-placeholder-val="{{ true }}">
+                  <sc-if value="{{ m.hasRole }}" hint-placeholder-val="{{ false }}">
+                    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Badge" hint-size="50px,20px" variant="{{ m.roleVariant }}">{{ m.roleLabel }}</x-import>
+                  </sc-if>
+                </sc-if>
+                <sc-if value="{{ showTimestamps }}" hint-placeholder-val="{{ false }}">
+                  <span class="cv-msg-time">{{ m.time }}</span>
+                </sc-if>
+              </div>
+              </sc-if>
+              <div class="cv-msg-text">{{ m.text }}</div>
+              <sc-if value="{{ m.hasGif }}" hint-placeholder-val="{{ false }}">
+                <div class="cv-msg-gif">
+                  <span class="cv-msg-gif-badge">GIF</span>
+                  <span class="cv-msg-gif-label">{{ m.gifLabel }}</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ m.hasMiniplayer }}" hint-placeholder-val="{{ false }}">
+                <div class="cv-miniplayer-wrap">
+                  <div class="cv-miniplayer-tag">▶ Mod/VIP miniplayer</div>
+                  <iframe src="{{ m.ytEmbedUrl }}" title="YouTube miniplayer" allowfullscreen="{{ true }}"></iframe>
+                </div>
+              </sc-if>
+            </div>
+            <div class="cv-msg-actions">
+              <dc-import name="CvMenu" hint-size="30px,30px" align="end" items="{{ m.menuItems }}" icon="⋯" width="{{ 30 }}" title="Message actions"></dc-import>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+  </div>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div class="cv-toast">🎬 {{ toast }}</div>
+  </sc-if>
+
+  <sc-if value="{{ paletteOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="cv-palette-overlay" onClick="{{ closePalette }}">
+      <div class="cv-palette" onClick="{{ stopPropagation }}">
+        <input class="cv-palette-input" autoFocus="{{ true }}" placeholder="Type a command… (Esc to close)" value="{{ paletteQuery }}" onChange="{{ onPaletteInput }}" />
+        <div class="cv-palette-list">
+          <sc-for list="{{ paletteItems }}" as="it" hint-placeholder-count="4">
+            <div class="cv-palette-item" onClick="{{ it.onClick }}">
+              <span>{{ it.label }}</span>
+              <span class="cv-palette-hint">{{ it.hint }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Drawer" hint-size="0,0"
+    open="{{ settingsOpen }}" onClose="{{ closeSettings }}" title="Overlay Settings">
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Show Avatar</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Switch" hint-size="38px,22px" checked="{{ showAvatar }}" onChange="{{ setShowAvatar }}"></x-import>
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Show Platform Icon</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Switch" hint-size="38px,22px" checked="{{ showPlatformIcon }}" onChange="{{ setShowPlatformIcon }}"></x-import>
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Show Badges</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Switch" hint-size="38px,22px" checked="{{ showBadges }}" onChange="{{ setShowBadges }}"></x-import>
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Show Timestamps</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Switch" hint-size="38px,22px" checked="{{ showTimestamps }}" onChange="{{ setShowTimestamps }}"></x-import>
+    </div>
+
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Exclude Commands</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Switch" hint-size="38px,22px" checked="{{ excludeCommands }}" onChange="{{ setExcludeCommands }}"></x-import>
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Sound Alerts (raids/host)</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Switch" hint-size="38px,22px" checked="{{ soundAlerts }}" onChange="{{ setSoundAlerts }}"></x-import>
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Read Chat Aloud (TTS)</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Switch" hint-size="38px,22px" checked="{{ ttsEnabled }}" onChange="{{ setTtsEnabled }}"></x-import>
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Visual Event Banners</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Switch" hint-size="38px,22px" checked="{{ visualAlerts }}" onChange="{{ setVisualAlerts }}"></x-import>
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Show Pronouns</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Switch" hint-size="38px,22px" checked="{{ showPronouns }}" onChange="{{ setShowPronouns }}"></x-import>
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Show Username</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Switch" hint-size="38px,22px" checked="{{ showUsername }}" onChange="{{ setShowUsername }}"></x-import>
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Group Consecutive Messages</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Switch" hint-size="38px,22px" checked="{{ groupConsecutive }}" onChange="{{ setGroupConsecutive }}"></x-import>
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Theme Preset</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Select" hint-size="150px,36px" value="{{ themePreset }}" onChange="{{ setThemePreset }}" options="{{ themePresetOptions }}"></x-import>
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Font Family</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Input" hint-size="150px,36px" placeholder="font name" value="{{ fontFamily }}" onChange="{{ setFontFamily }}"></x-import>
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Font Size</span>
+      <input class="cv-settings-number" type="number" min="11" max="24" value="{{ fontSize }}" onChange="{{ onFontSizeChange }}" />
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Background</span>
+      <div class="cv-color-swatch-wrap">
+        <input class="cv-color-swatch" type="color" value="{{ bgColor }}" onChange="{{ setBgColor }}" />
+        <span class="cv-color-hex">{{ bgColor }}</span>
+      </div>
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Background Opacity</span>
+      <input class="cv-settings-number" type="number" min="0" max="100" value="{{ bgOpacity }}" onChange="{{ onBgOpacityChange }}" />
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Hide After</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Select" hint-size="150px,36px" value="{{ hideAfter }}" onChange="{{ setHideAfter }}" options="{{ hideAfterOptions }}"></x-import>
+    </div>
+    <div class="cv-settings-row">
+      <span class="cv-settings-label">Ignore Chatters</span>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Input" hint-size="150px,36px" placeholder="usernames" value="{{ ignoreList }}" onChange="{{ setIgnoreList }}"></x-import>
+    </div>
+  </x-import>
+
+  <div class="cv-compose">
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Avatar" hint-size="34px,34px" name="beardds" size="{{ 34 }}"></x-import>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Select" hint-size="150px,44px"
+      value="{{ sendAs }}" onChange="{{ setSendAs }}" options="{{ sendAsOptions }}" style="flex-shrink:0"
+      menu-style="{{ sendAsMenuStyle }}"></x-import>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Input" hint-size="0,44px"
+      placeholder="{{ composePlaceholder }}" value="{{ composeText }}" onChange="{{ setComposeText }}" style="flex:1"></x-import>
+<dc-import name="CvMenu" hint-size="44px,44px" align="end" up="{{ true }}" grid="{{ true }}" items="{{ emoteItems }}" icon="😀" width="{{ 44 }}" title="Emotes"></dc-import>
+    <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Button" hint-size="90px,44px"
+      variant="cta" onClick="{{ sendMessage }}">Send</x-import>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+const PLATFORMS = [
+  { id: "twitch", label: "Twitch", color: "var(--brand-twitch)", icon: "../../assets/logos/chip-twitch.svg", viewers: 842, initial: "T" },
+  { id: "kick", label: "Kick", color: "var(--brand-kick)", icon: "../../assets/logos/chip-kick.svg", viewers: 311, initial: "K", mode: "subs" },
+  { id: "youtube", label: "YouTube", color: "var(--brand-youtube)", icon: "../../assets/logos/youtube-mark.svg", viewers: 205, initial: "Y" },
+  { id: "tiktok", label: "TikTok", color: "var(--brand-tiktok)", icon: "../../assets/logos/tiktok-mark-white.svg", viewers: 431, initial: "♪", mode: "emote" },
+  { id: "rumble", label: "Rumble", color: "var(--brand-rumble)", icon: "../../assets/logos/rumble-mark.svg", viewers: 127, initial: "R" },
+  { id: "joystick", label: "Joystick.tv", color: "var(--brand-joystick)", icon: "../../assets/logos/joystick-mark.svg", viewers: 64, initial: "J" },
+];
+
+const INITIAL_MESSAGES = [
+  { id: 1, platformId: "twitch", user: "pixelwitch", role: "mod", text: "that clutch was insane 😭", time: "1:05 AM", pinned: false, deleted: false },
+  { id: 2, platformId: "kick", user: "greenrunner", role: "sub", text: "GG go next", time: "1:06 AM", pinned: false, deleted: false },
+  { id: 3, platformId: "twitch", user: "vodwatcher", role: "sub", text: "what overlay are you using for the timer?", time: "1:06 AM", pinned: true, deleted: false },
+  { id: 4, platformId: "youtube", user: "latenite_yt", role: null, text: "just found this stream, love the vibe here", time: "1:07 AM", pinned: false, deleted: false, gif: true, gifLabel: "hype.gif" },
+  { id: 5, platformId: "kick", user: "bitcrusher", role: "vip", text: "chat is so fast today lmao", time: "1:07 AM", pinned: false, deleted: false },
+  { id: 6, platformId: "joystick", user: "queststar", role: "sub", text: "any word on the next boss fight?", time: "1:08 AM", pinned: false, deleted: false },
+  { id: 7, platformId: "twitch", user: "modmax", role: "mod", text: "reminder: no spoilers in chat please — also queued this youtu.be/jNQXAC9IVRw", time: "1:08 AM", pinned: true, deleted: false, ytId: "jNQXAC9IVRw" },
+  { id: 8, platformId: "youtube", user: "commentkid", role: "sub", text: "the new overlay looks so clean", time: "1:09 AM", pinned: false, deleted: false },
+  { id: 9, platformId: "twitch", user: "clutchgod", role: "sub", text: "wait how did you dodge that", time: "1:09 AM", pinned: false, deleted: false },
+  { id: 10, platformId: "kick", user: "novacrash", role: null, text: "chat pog", time: "1:10 AM", pinned: false, deleted: false, gif: true, gifLabel: "pog.gif" },
+  { id: 11, platformId: "joystick", user: "pixelate", role: null, text: "following now, this is great content", time: "1:10 AM", pinned: false, deleted: false },
+  { id: 12, platformId: "youtube", user: "streamerfan22", role: null, text: "can you shout out my channel 👉👈", time: "1:11 AM", pinned: false, deleted: false },
+  { id: 13, platformId: "twitch", user: "raidmaster", role: "vip", text: "incoming raid with 40 viewers! check this out youtu.be/dQw4w9WgXcQ", time: "1:11 AM", pinned: false, deleted: false, ytId: "dQw4w9WgXcQ" },
+  { id: 14, platformId: "kick", user: "greenrunner", role: null, text: "wait that was actually so clean", time: "1:12 AM", pinned: false, deleted: false },
+  { id: 15, platformId: "twitch", user: "nightowl_tv", role: null, text: "", time: "1:13 AM", pinned: false, deleted: false, event: "raid", eventCount: 58 },
+  { id: 16, platformId: "joystick", user: "wanderjay", role: null, text: "", time: "1:13 AM", pinned: false, deleted: false, event: "raid", eventCount: 12 },
+  { id: 17, platformId: "kick", user: "sketchy_acct_04", role: null, text: "get free robux instantly at this link, dm me!!", time: "1:14 AM", pinned: false, deleted: false, modReviewed: false },
+  { id: 18, platformId: "tiktok", user: "duet.kid", role: null, text: "went live right when the boss dropped, insane timing", time: "1:14 AM", pinned: false, deleted: false },
+  { id: 19, platformId: "tiktok", user: "scrollzombie", role: "sub", text: "the tiktok live gifts are stacking up fr", time: "1:15 AM", pinned: false, deleted: false },
+  { id: 20, platformId: "rumble", user: "locals_only77", role: "sub", text: "glad this is mirrored here, rumble chat is finally usable", time: "1:15 AM", pinned: false, deleted: false },
+  { id: 21, platformId: "rumble", user: "battlepass_bo", role: null, text: "the rant total is climbing, nice", time: "1:16 AM", pinned: false, deleted: false },
+  { id: 22, platformId: "tiktok", user: "livehost_mimi", role: null, text: "", time: "1:16 AM", pinned: false, deleted: false, event: "raid", eventCount: 27 },
+  { id: 23, platformId: "rumble", user: "rantking_dave", role: null, text: "", time: "1:17 AM", pinned: false, deleted: false, event: "raid", eventCount: 19 },
+  { id: 24, platformId: "kick", user: "greenrunner", role: null, text: "", time: "1:17 AM", pinned: false, deleted: false, event: "raid", eventCount: 33 },
+  { id: 25, platformId: "youtube", user: "streamerfan22", role: null, text: "", time: "1:18 AM", pinned: false, deleted: false, event: "raid", eventCount: 21 },
+];
+
+INITIAL_MESSAGES.forEach((m, i) => { m.createdAt = Date.now() - (INITIAL_MESSAGES.length - i) * 6000; });
+
+const EVENT_VERB = { twitch: "is raiding with", kick: "is hosting with", joystick: "dropped in with", youtube: "is redirecting with", tiktok: "went live-shopping with", rumble: "is rant-raiding with" };
+
+const PRONOUN_MAP = {
+  pixelwitch: "she/her", greenrunner: "he/him", vodwatcher: "they/them", latenite_yt: "she/her",
+  bitcrusher: "he/him", queststar: "they/them", modmax: "he/him", clutchgod: "she/her",
+  novacrash: "they/them", pixelate: "they/them", streamerfan22: "he/him", raidmaster: "she/her",
+  "duet.kid": "they/them", scrollzombie: "she/her", locals_only77: "he/him", battlepass_bo: "they/them",
+};
+
+const FONT_FAMILY_MAP = { ui: "var(--font-ui)", sans: "var(--font-sans)", mono: "var(--font-mono)", heading: "var(--font-heading)" };
+const hexToRgba = (hex, alphaPct) => {
+  const n = parseInt(hex.slice(1), 16);
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(100, alphaPct)) / 100})`;
+};
+
+const BANNED_PATTERNS = [/free\s*(v-?bucks|robux|followers|nitro)/i, /onlyfans/i, /crypto\s*giveaway/i, /discord\.gg\/.*free/i];
+
+const MODE_META = {
+  subs: { label: "SUBS ONLY", short: "S" },
+  emote: { label: "EMOTE ONLY", short: "E" },
+};
+
+const THEME_PRESETS = {
+  default: { bgColor: "#0b0d12", bgOpacity: 0, fontSize: 15, fontFamily: "" },
+  midnight: { bgColor: "#0a0f1e", bgOpacity: 55, fontSize: 15, fontFamily: "" },
+  neon: { bgColor: "#120018", bgOpacity: 45, fontSize: 16, fontFamily: "Poppins" },
+  paper: { bgColor: "#f5f1e8", bgOpacity: 92, fontSize: 15, fontFamily: "Georgia" },
+  minimal: { bgColor: "#000000", bgOpacity: 0, fontSize: 14, fontFamily: "" },
+};
+
+const ROLE_META = {
+  mod: { label: "MOD", variant: "green" },
+  sub: { label: "SUB", variant: "ghost" },
+  vip: { label: "VIP", variant: "amber" },
+};
+
+class Component extends DCLogic {
+  shellRef = React.createRef();
+
+  componentDidMount() {
+    this.applyFontSize();
+    this._seenEventIds = new Set(this.state.messages.filter((m) => m.event === "raid").map((m) => m.id));
+    this._onKeyDown = (e) => {
+      const tag = (document.activeElement && document.activeElement.tagName) || "";
+      const typing = tag === "INPUT" || tag === "TEXTAREA" || document.activeElement?.isContentEditable;
+      if (e.key === "/" && !typing && !this.state.paletteOpen) {
+        e.preventDefault();
+        this.setState({ paletteOpen: true, paletteQuery: "" });
+      } else if (e.key === "Escape" && this.state.paletteOpen) {
+        this.setState({ paletteOpen: false });
+      }
+    };
+    window.addEventListener("keydown", this._onKeyDown);
+    this._healthTimer = setInterval(() => {
+      const ids = PLATFORMS.map((p) => p.id);
+      const id = ids[Math.floor(Math.random() * ids.length)];
+      if ((this.state.health[id] || "live") !== "live") return;
+      this.setState((s) => ({ health: { ...s.health, [id]: "reconnecting" } }));
+      setTimeout(() => {
+        this.setState((s) => ({ health: { ...s.health, [id]: "live" } }));
+      }, 2800);
+    }, 9000);
+    this._tickTimer = setInterval(() => { if (Number(this.state.hideAfter) > 0) this.forceUpdate(); }, 1000);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("keydown", this._onKeyDown);
+    clearInterval(this._healthTimer);
+    clearInterval(this._tickTimer);
+  }
+  reorderPlatforms(dragId, dropId) {
+    if (!dragId || dragId === dropId) return;
+    this.setState((s) => {
+      const order = s.platformOrder.slice();
+      const from = order.indexOf(dragId);
+      const to = order.indexOf(dropId);
+      if (from === -1 || to === -1) return null;
+      order.splice(from, 1);
+      order.splice(to, 0, dragId);
+      return { platformOrder: order };
+    });
+  }
+  setHealth(id, status) {
+    this.setState((s) => ({ health: { ...s.health, [id]: status } }));
+  }
+  componentDidUpdate(prevProps, prevState) {
+    this.applyFontSize();
+    const newEvents = this.state.messages.filter((m) => m.event === "raid" && !this._seenEventIds.has(m.id));
+    if (newEvents.length && this.state.soundAlerts) this.playAlertBeep();
+    newEvents.forEach((m) => this._seenEventIds.add(m.id));
+
+    if (this.state.ttsEnabled && this.state.messages.length > prevState.messages.length) {
+      this.state.messages.slice(prevState.messages.length).forEach((m) => {
+        if (!m.event && m.text) this.speak(`${m.user} says ${m.text}`);
+      });
+    }
+  }
+
+  speak(text) {
+    try {
+      const u = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.speak(u);
+    } catch (e) { /* speech synthesis unsupported */ }
+  }
+  applyFontSize() {
+    const el = this.shellRef.current;
+    if (!el) return;
+    el.style.setProperty("--chat-font-size", this.state.fontSize + "px");
+    const fam = (this.state.fontFamily || "").trim();
+    el.style.setProperty("--chat-font-family", fam ? `"${fam}", var(--font-ui)` : "var(--font-ui)");
+    el.style.background = hexToRgba(this.state.bgColor || "#0b0d12", this.state.bgOpacity);
+  }
+
+  state = {
+    muted: [],
+    platformOrder: PLATFORMS.map((p) => p.id),
+    health: {},
+    draggingId: null,
+    messages: INITIAL_MESSAGES,
+    viewMode: "unified",
+    focusPlatform: "twitch",
+    sendAs: "twitch",
+    composeText: "",
+    settingsOpen: false,
+    showAvatar: true,
+    showPlatformIcon: true,
+    showBadges: true,
+    showTimestamps: false,
+    fontSize: 15,
+    excludeCommands: true,
+    highlightReels: [],
+    toast: null,
+    paletteOpen: false,
+    paletteQuery: "",
+    searchQuery: "",
+    soundAlerts: true,
+    visualAlerts: true,
+    showPronouns: false,
+    showUsername: true,
+    fontFamily: "",
+    bgColor: "#0b0d12",
+    bgOpacity: 0,
+    hideAfter: "0",
+    ignoreList: "",
+    groupConsecutive: false,
+    ttsEnabled: false,
+    themePreset: "default",
+  };
+
+  showToast(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+
+  playAlertBeep() {
+    try {
+      const ctx = this._audioCtx || (this._audioCtx = new (window.AudioContext || window.webkitAudioContext)());
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "sine";
+      o.frequency.setValueAtTime(720, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(420, ctx.currentTime + 0.25);
+      g.gain.setValueAtTime(0.15, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      o.connect(g).connect(ctx.destination);
+      o.start();
+      o.stop(ctx.currentTime + 0.3);
+    } catch (e) { /* audio unsupported */ }
+  }
+
+  reviewFlagged(id, keep) {
+    this.setState((s) => ({
+      messages: s.messages.map((m) => (m.id === id ? { ...m, modReviewed: true, deleted: !keep } : m)),
+    }));
+  }
+
+  exportChatLog(copyOnly) {
+    const lines = this._lastVisible.map((m) => `[${m.time || ""}] ${m.platformLabel || m.platformId} ${m.user}: ${m.text}`);
+    const text = lines.join("\n");
+    if (copyOnly) {
+      navigator.clipboard?.writeText(text);
+      this.showToast("Chat log copied to clipboard");
+    } else {
+      const blob = new Blob([text], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "chat-log.txt";
+      a.click();
+      URL.revokeObjectURL(url);
+      this.showToast("Chat log exported");
+    }
+  }
+
+  runPaletteAction(fn) {
+    fn();
+    this.setState({ paletteOpen: false });
+  }
+
+  toggleMute(id) {
+    this.setState((s) => ({
+      muted: s.muted.includes(id) ? s.muted.filter((x) => x !== id) : [...s.muted, id],
+    }));
+  }
+
+  pinMessage(id, pinned) {
+    this.setState((s) => ({ messages: s.messages.map((m) => (m.id === id ? { ...m, pinned } : m)) }));
+  }
+
+  clipHighlight(m) {
+    const clip = { id: Date.now(), user: m.user, platformId: m.platformId, text: m.text };
+    this.setState((s) => ({ highlightReels: [clip, ...s.highlightReels].slice(0, 8), toast: `Clipped ${m.user}'s moment to Highlight Reels` }));
+    clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+
+  moderate(id, action) {
+    const target = this.state.messages.find((m) => m.id === id);
+    if (!target) return;
+    this.setState((s) => ({
+      messages: s.messages.map((m) => {
+        if (action === "delete") return m.id === id ? { ...m, deleted: true } : m;
+        // timeout / ban: clear all messages from that user across every connected platform
+        return m.user === target.user ? { ...m, deleted: true } : m;
+      }),
+    }));
+    if (action !== "delete") this.showToast(`${action === "ban" ? "Banned" : "Timed out"} ${target.user} across all platforms`);
+  }
+
+  sendMessage() {
+    const text = this.state.composeText.trim();
+    if (!text) return;
+    const nextId = Math.max(0, ...this.state.messages.map((m) => m.id)) + 1;
+    this.setState((s) => {
+      const isCross = s.sendAs === "crossplatform";
+      const connectedIds = PLATFORMS.filter((p) => !s.muted.includes(p.id)).map((p) => p.id);
+      const msg = isCross
+        ? { id: nextId, platformId: "crossplatform", platformIds: connectedIds, user: "beardds", role: "vip", text, pinned: false, deleted: false, time: "now", createdAt: Date.now() }
+        : { id: nextId, platformId: s.sendAs, user: "beardds", role: "vip", text, pinned: false, deleted: false, createdAt: Date.now() };
+      return { messages: [...s.messages, msg], composeText: "" };
+    });
+  }
+
+  renderVals() {
+    const { muted, messages, viewMode, focusPlatform, sendAs, composeText, settingsOpen, showAvatar, showPlatformIcon, showBadges, showTimestamps, fontSize, excludeCommands, searchQuery, soundAlerts, visualAlerts,
+      showPronouns, showUsername, fontFamily, bgColor, bgOpacity, hideAfter, ignoreList, groupConsecutive } = this.state;
+
+    const platformMeta = {};
+    PLATFORMS.forEach((p) => (platformMeta[p.id] = p));
+
+    const buildMenu = (m) => [
+      { label: m.pinned ? "Unpin message" : "Pin message", icon: "📌", onClick: () => this.pinMessage(m.id, !m.pinned) },
+      { label: "Clip last 30s", icon: "🎬", onClick: () => this.clipHighlight(m) },
+      { divider: true },
+      { label: "Timeout user (all platforms)", icon: "⏱️", onClick: () => this.moderate(m.id, "timeout") },
+      { label: "Ban user (all platforms)", icon: "🚫", danger: true, onClick: () => this.moderate(m.id, "ban") },
+      { label: "Delete message", icon: "🗑️", danger: true, onClick: () => this.moderate(m.id, "delete") },
+    ];
+
+
+    const decorate = (m, isContinuation) => {
+      const showHead = !isContinuation;
+      const pronouns = PRONOUN_MAP[m.user] || "";
+      const groupBits = { showHead, avatarVisible: showAvatar && showHead, pronouns, showPronounsNow: showPronouns && !!pronouns };
+      if (m.platformId === "crossplatform") {
+        return { ...m, ...groupBits, isEvent: false, isEventVisible: false, isFlagged: false, showBubble: true, isCrossplatform: true,
+          platformLabel: "Crossplatform",
+          platformIcon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='%23a78bfa' stroke-width='2'/%3E%3Cellipse cx='12' cy='12' rx='3.6' ry='9' fill='none' stroke='%23a78bfa' stroke-width='2'/%3E%3Cline x1='3' y1='12' x2='21' y2='12' stroke='%23a78bfa' stroke-width='2'/%3E%3C/svg%3E",
+          hasRole: false, hasGif: false, hasMiniplayer: false,
+          time: m.time, menuItems: buildMenu(m) };
+      }
+      const p = platformMeta[m.platformId];
+      if (m.event === "raid") {
+        return { ...m, ...groupBits, showHead: true, avatarVisible: showAvatar, isEvent: true, isEventVisible: visualAlerts, isFlagged: false, showBubble: !visualAlerts, platformLabel: p.label, platformIcon: p.icon,
+          eventText: `${m.user} ${EVENT_VERB[m.platformId]} ${m.eventCount} viewers!` };
+      }
+      const isFlagged = !m.modReviewed && BANNED_PATTERNS.some((re) => re.test(m.text));
+      // Placeholder only — a real integration would pull each user's actual
+      // subscriber/member/badge status from that platform's chat API.
+      const role = m.role ? ROLE_META[m.role] : null;
+      return {
+        ...m,
+        ...groupBits,
+        isEvent: false,
+        isEventVisible: false,
+        isFlagged,
+        approveFlag: () => this.reviewFlagged(m.id, true),
+        removeFlag: () => this.reviewFlagged(m.id, false),
+        platformLabel: p.label,
+        platformIcon: p.icon,
+        hasGif: !!m.gif,
+        gifLabel: m.gifLabel || "",
+        // YouTube miniplayers are a privileged-only perk — mods/vips (and the
+        // streamer) get the inline embed, everyone else just sees the link text.
+        hasMiniplayer: !!m.ytId && (m.role === "mod" || m.role === "vip"),
+        ytEmbedUrl: m.ytId ? `https://www.youtube.com/embed/${m.ytId}` : "",
+        hasRole: !!role,
+        roleLabel: role ? role.label : "",
+        roleVariant: role ? role.variant : "ghost",
+        unpin: () => this.pinMessage(m.id, false),
+        menuItems: buildMenu(m),
+        showBubble: !isFlagged,
+      };
+    };
+
+    const computeContinuation = (list) => {
+      const map = {};
+      let prevKey = null;
+      list.forEach((m) => {
+        if (!groupConsecutive || m.event) { map[m.id] = false; prevKey = null; return; }
+        const key = m.platformId + "|" + m.user;
+        map[m.id] = prevKey === key;
+        prevKey = key;
+      });
+      return map;
+    };
+
+    const ignoreSet = new Set(ignoreList.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean));
+    const hideAfterSec = Number(hideAfter) || 0;
+    const now = Date.now();
+
+    const q = searchQuery.trim().toLowerCase();
+    const visible = messages.filter((m) => !m.deleted && !muted.includes(m.platformId) && !(excludeCommands && m.text.trim().startsWith("!"))
+      && !ignoreSet.has((m.user || "").toLowerCase())
+      && (hideAfterSec <= 0 || !m.createdAt || (now - m.createdAt) <= hideAfterSec * 1000)
+      && (!q || m.user.toLowerCase().includes(q) || m.text.toLowerCase().includes(q)));
+    this._lastVisible = visible.map((m) => ({ ...m, platformLabel: (platformMeta[m.platformId] || {}).label || m.platformId }));
+    const orderedPlatforms = this.state.platformOrder.map((id) => PLATFORMS.find((p) => p.id === id)).filter(Boolean);
+    const health = this.state.health;
+    const getHealth = (id) => health[id] || "live";
+    const healthLabel = (id) => (getHealth(id) === "reconnecting" ? " — reconnecting…" : getHealth(id) === "down" ? " — offline" : "");
+    const visiblePlatforms = orderedPlatforms.filter((p) => !muted.includes(p.id));
+
+    const platforms = orderedPlatforms.map((p) => ({
+      id: p.id,
+      label: p.label,
+      initial: p.initial,
+      icon: p.icon,
+      active: !muted.includes(p.id),
+      health: getHealth(p.id),
+      healthTitle: p.label + healthLabel(p.id),
+      hasMode: !!p.mode,
+      mode: p.mode || "",
+      modeShort: p.mode ? MODE_META[p.mode].short : "",
+      modeLabel: p.mode ? MODE_META[p.mode].label : "",
+      isDragging: this.state.draggingId === p.id,
+      onDragStart: () => this.setState({ draggingId: p.id }),
+      onDragEnd: () => this.setState({ draggingId: null }),
+      onDragOver: (e) => e.preventDefault(),
+      onDrop: (e) => { e.preventDefault(); this.reorderPlatforms(this.state.draggingId, p.id); this.setState({ draggingId: null }); },
+      toggle: () => this.toggleMute(p.id),
+      focus: () => this.setState({ focusPlatform: p.id, viewMode: "focus" }),
+      isFocused: focusPlatform === p.id,
+      healthTitle: p.label + healthLabel(p.id) + (p.mode ? ` — ${MODE_META[p.mode].label}` : ""),
+    }));
+
+    return {
+      viewerTotal: visiblePlatforms.reduce((sum, p) => sum + p.viewers, 0).toLocaleString(),
+      nowPlaying: "Valorant — Ranked Grind",
+      platforms,
+      viewTabs: [
+        { value: "unified", label: "Unified" },
+        { value: "split", label: "Split" },
+        { value: "focus", label: "Focus" },
+      ],
+      viewMode,
+      setViewMode: (v) => this.setState({ viewMode: v }),
+      isUnified: viewMode === "unified",
+      isSplit: viewMode === "split",
+      isFocus: viewMode === "focus",
+      settingsMenuItems: [
+        { label: "Overlay Settings", icon: "⚙️", onClick: () => this.setState({ settingsOpen: true }) },
+        { divider: true },
+        { label: "Clear pinned messages", icon: "📌", onClick: () => this.setState((s) => ({ messages: s.messages.map((m) => ({ ...m, pinned: false })) })) },
+        { label: "Reset chat", icon: "🔄", onClick: () => this.setState({ messages: INITIAL_MESSAGES, muted: [], platformOrder: PLATFORMS.map((p) => p.id), health: {} }) },
+        { divider: true },
+        { label: "Copy chat log", icon: "📋", onClick: () => this.exportChatLog(true) },
+        { label: "Export chat log (.txt)", icon: "⬇️", onClick: () => this.exportChatLog(false) },
+      ],
+      settingsOpen,
+      closeSettings: () => this.setState({ settingsOpen: false }),
+      showAvatar,
+      setShowAvatar: (v) => this.setState({ showAvatar: v }),
+      showPlatformIcon,
+      setShowPlatformIcon: (v) => this.setState({ showPlatformIcon: v }),
+      showBadges,
+      setShowBadges: (v) => this.setState({ showBadges: v }),
+      showTimestamps,
+      setShowTimestamps: (v) => this.setState({ showTimestamps: v }),
+      fontSize,
+      onFontSizeChange: (v) => this.setState({ fontSize: Number(v) || 15 }),
+      excludeCommands,
+      setExcludeCommands: (v) => this.setState({ excludeCommands: v }),
+      soundAlerts,
+      setSoundAlerts: (v) => this.setState({ soundAlerts: v }),
+      visualAlerts,
+      setVisualAlerts: (v) => this.setState({ visualAlerts: v }),
+      showPronouns,
+      setShowPronouns: (v) => this.setState({ showPronouns: v }),
+      showUsername,
+      setShowUsername: (v) => this.setState({ showUsername: v }),
+      fontFamily,
+      setFontFamily: (v) => this.setState({ fontFamily: v }),
+      fontFamilyOptionsUnused: [
+        { value: "ui", label: "System UI" },
+        { value: "sans", label: "Inter (Sans)" },
+        { value: "mono", label: "Mono" },
+        { value: "heading", label: "Montserrat" },
+      ],
+      bgColor,
+      setBgColor: (e) => this.setState({ bgColor: e.target ? e.target.value : e }),
+      bgOpacity,
+      onBgOpacityChange: (v) => this.setState({ bgOpacity: Number(v) || 0 }),
+      hideAfter,
+      setHideAfter: (v) => this.setState({ hideAfter: v }),
+      hideAfterOptions: [
+        { value: "0", label: "Never" },
+        { value: "15", label: "15s" },
+        { value: "30", label: "30s" },
+        { value: "60", label: "60s" },
+        { value: "120", label: "2 min" },
+      ],
+      ignoreList,
+      setIgnoreList: (v) => this.setState({ ignoreList: v }),
+      groupConsecutive,
+      setGroupConsecutive: (v) => this.setState({ groupConsecutive: v }),
+      ttsEnabled: this.state.ttsEnabled,
+      setTtsEnabled: (v) => { if (!v) { try { window.speechSynthesis.cancel(); } catch (e) {} } this.setState({ ttsEnabled: v }); },
+      themePreset: this.state.themePreset,
+      setThemePreset: (v) => this.setState({ themePreset: v, ...(THEME_PRESETS[v] || {}) }),
+      themePresetOptions: [
+        { value: "default", label: "Default" },
+        { value: "midnight", label: "Midnight" },
+        { value: "neon", label: "Neon" },
+        { value: "paper", label: "Paper" },
+        { value: "minimal", label: "Minimal" },
+      ],
+      searchQuery,
+      setSearchQuery: (v) => this.setState({ searchQuery: v }),
+      shellRef: this.shellRef,
+      toast: this.state.toast,
+      hasToast: !!this.state.toast,
+      highlightCount: this.state.highlightReels.length,
+      paletteOpen: this.state.paletteOpen,
+      closePalette: () => this.setState({ paletteOpen: false }),
+      paletteQuery: this.state.paletteQuery,
+      onPaletteInput: (e) => this.setState({ paletteQuery: e.target.value }),
+      stopPropagation: (e) => e.stopPropagation(),
+      paletteItems: (() => {
+        const all = [
+          { label: "View: Unified", hint: "V", run: () => this.setState({ viewMode: "unified" }) },
+          { label: "View: Split", hint: "V", run: () => this.setState({ viewMode: "split" }) },
+          { label: "View: Focus", hint: "V", run: () => this.setState({ viewMode: "focus" }) },
+          { label: "Open Overlay Settings", hint: "⚙", run: () => this.setState({ settingsOpen: true }) },
+          ...orderedPlatforms.map((p) => ({
+            label: `${muted.includes(p.id) ? "Unmute" : "Mute"}: ${p.label}`,
+            hint: "M",
+            run: () => this.toggleMute(p.id),
+          })),
+          ...orderedPlatforms.map((p) => ({
+            label: `Jump to: ${p.label}`,
+            hint: "J",
+            run: () => this.setState({ focusPlatform: p.id, viewMode: "focus" }),
+          })),
+          ...orderedPlatforms.map((p) => ({
+            label: `${getHealth(p.id) === "reconnecting" ? "Restore connection" : "Simulate outage"}: ${p.label}`,
+            hint: "H",
+            run: () => this.setHealth(p.id, getHealth(p.id) === "reconnecting" ? "live" : "reconnecting"),
+          })),
+        ];
+        const q = this.state.paletteQuery.trim().toLowerCase();
+        const filtered = q ? all.filter((it) => it.label.toLowerCase().includes(q)) : all;
+        return filtered.map((it) => ({ ...it, onClick: () => this.runPaletteAction(it.run) }));
+      })(),
+      hasPinned: visible.some((m) => m.pinned),
+      pinnedMessages: visible.filter((m) => m.pinned).map((m) => decorate(m, false)),
+      unifiedMessages: (() => { const flags = computeContinuation(visible); return visible.map((m) => decorate(m, flags[m.id])); })(),
+      splitColumns: visiblePlatforms.map((p) => {
+        const colMessages = visible.filter((m) => m.platformId === p.id || (m.platformIds && m.platformIds.includes(p.id)));
+        const flags = computeContinuation(colMessages);
+        return {
+          id: p.id,
+          label: p.label,
+          isReconnecting: getHealth(p.id) === "reconnecting",
+          hasMode: !!p.mode,
+          modeLabel: p.mode ? MODE_META[p.mode].label : "",
+          messages: colMessages.map((m) => decorate(m, flags[m.id])),
+        };
+      }),
+      focusMessages: (() => {
+        const list = visible.filter((m) => m.platformId === focusPlatform || (m.platformIds && m.platformIds.includes(focusPlatform)));
+        const flags = computeContinuation(list);
+        return list.map((m) => decorate(m, flags[m.id]));
+      })(),
+      sendAs,
+      setSendAs: (v) => this.setState({ sendAs: v }),
+      sendAsMenuStyle: { top: "auto", bottom: "calc(100% + 6px)" },
+      sendAsOptions: [{ value: "crossplatform", label: "Crossplatform" }, ...(visiblePlatforms.length ? visiblePlatforms.map((p) => ({ value: p.id, label: p.label })) : orderedPlatforms.map((p) => ({ value: p.id, label: p.label })))],
+      composeText,
+      setComposeText: (v) => this.setState({ composeText: v }),
+      emoteItems: ["😀", "😂", "❤️", "🔥", "👍", "🎉", "😭", "👀"].map((e) => ({
+        label: e,
+        onClick: () => this.setState((s) => ({ composeText: s.composeText + e })),
+      })),
+      composePlaceholder: sendAs === "crossplatform" ? "Message across platforms…" : `Message as ${(platformMeta[sendAs] || PLATFORMS[0]).label}…`,
+      sendMessage: () => this.sendMessage(),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

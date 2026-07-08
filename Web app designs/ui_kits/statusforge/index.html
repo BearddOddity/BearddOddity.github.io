@@ -1,0 +1,268 @@
+<!-- @dsCard group="StatusForge" viewport="1280x720" name="StatusForge — Status Room" subtitle="Rich presence engine: now playing, connections, overlay generator — also available as a Template" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>StatusForge</title>
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { background: #050505; color: var(--text-body); font-family: var(--font-ui); overflow: hidden;
+    background-image: radial-gradient(circle at 15% -10%, rgba(145,70,255,.12), transparent 45%); }
+  #root { height: 100vh; }
+  .scroll::-webkit-scrollbar { width: 6px; }
+  .scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 3px; }
+  .card { background: rgba(0,0,0,.45); backdrop-filter: blur(10px); border: 1px solid var(--line-2); border-radius: 16px; box-shadow: var(--shadow-card); }
+  @keyframes breathe { 0%,100% { transform: scale(1); } 50% { transform: scale(1.015); } }
+  @keyframes glint { 0% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+  .kv { background: rgba(255,255,255,.02); border: 1px solid var(--line-1); border-radius: 12px; padding: 10px 14px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const { useState } = React;
+const ACCENT = "#9146ff";
+const COVER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%232a1a4d'/%3E%3Cstop offset='1' stop-color='%23101022'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='300' height='400'/%3E%3Ccircle cx='150' cy='150' r='70' fill='%239146ff' opacity='.55'/%3E%3Ccircle cx='150' cy='150' r='40' fill='%23c4b5fd' opacity='.5'/%3E%3Crect y='300' width='300' height='100' fill='%23000' opacity='.4'/%3E%3Ctext x='50%25' y='355' text-anchor='middle' fill='%23fff' font-size='22' font-family='system-ui' font-weight='700'%3ENeon Drift%3C/text%3E%3C/svg%3E";
+
+const NAV = [
+  { id: "dashboard", label: "Status Room", icon: "⏳" },
+  { id: "library", label: "Library", icon: "📚" },
+  { id: "settings", label: "Settings", icon: "⚙️" },
+];
+const PLATFORMS = [
+  { name: "Twitch", color: "var(--brand-twitch)", dot: "var(--brand-twitch)" },
+  { name: "Kick", color: "var(--brand-kick)", dot: "var(--brand-kick)" },
+  { name: "Streamer.bot", color: "var(--brand-streamerbot)", dot: "var(--brand-streamerbot)" },
+];
+const PERF = [
+  { label: "CPU", value: "12%", width: "12%", grad: "linear-gradient(to right,#a855f7,#c084fc)", color: "#c084fc" },
+  { label: "Memory", value: "384 MB", width: "24%", grad: "linear-gradient(to right,#10b981,#34d399)", color: "#34d399" },
+  { label: "GPU", value: "42%", width: "42%", grad: "linear-gradient(to right,#f97316,#fb923c)", color: "#fb923c" },
+];
+const OVERLAYS = [
+  { id: "hl", label: "Horizontal Left", icon: "◀", file: "Horizontal_Left.html" },
+  { id: "hr", label: "Horizontal Right", icon: "▶", file: "Horizontal_Right.html" },
+  { id: "vt", label: "Vertical", icon: "▼", file: "Vertical.html" },
+];
+
+function NavBtn({ item, active, onClick }) {
+  return (
+    <button className={`bd-nav ${active ? "bd-nav-active" : ""}`} onClick={onClick} style={{ marginBottom: 6 }}>
+      <span className="bd-nav-icon">{item.icon}</span>
+      <span>{item.label}</span>
+    </button>
+  );
+}
+
+function Dashboard({ running, playing, onToggle, toast }) {
+  const [overlays, setOverlays] = useState([]);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [idx, setIdx] = useState(0);
+  const [metaOpen, setMetaOpen] = useState(false);
+  const wsLive = running;
+
+  const addOverlay = (o) => {
+    setOverlays(p => [...p, { id: Date.now(), label: o.label, url: `/••••••••••kN2x/${o.file}` }]);
+    toast("Overlay URL copied to clipboard", "success");
+  };
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 24, fontWeight: 700, color: "#fff", letterSpacing: "-.01em", margin: "0 0 20px" }}>Status Room</h2>
+
+      {/* Now Playing */}
+      <div className="card" style={{ padding: 20, marginBottom: 20 }}>
+        <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
+          <div style={{ flexShrink: 0, width: 140, height: 180, borderRadius: 16, overflow: "hidden", background: "rgba(0,0,0,.3)", border: playing ? "1px solid rgba(145,70,255,.4)" : "1px solid var(--line-3)", position: "relative", boxShadow: "0 8px 24px rgba(0,0,0,.4)" }}>
+            <img src={COVER} alt="Neon Drift" style={{ width: "100%", height: "100%", objectFit: "cover", animation: playing ? "breathe 8s ease-in-out infinite" : "none" }} />
+            {playing && <div style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}><div style={{ position: "absolute", top: 0, bottom: 0, width: "40%", background: "linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent)", animation: "glint 8s linear infinite" }} /></div>}
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text-faint)", fontWeight: 600, marginBottom: 6 }}>{playing ? "Now Playing" : running ? "Idle" : "Engine offline"}</div>
+            <h3 style={{ fontSize: 22, fontWeight: 700, color: "#fff", margin: 0, lineHeight: 1.1 }}>{playing ? "Neon Drift" : running ? "Just Chatting" : "Offline"}</h3>
+            <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
+              <button className={`bd-btn ${running ? "bd-btn-danger" : "bd-btn-cta"}`} onClick={onToggle}>{running ? "⏹ Stop Engine" : "▶ Start Engine"}</button>
+              {playing && <button className="bd-btn bd-btn-ghost">🚫 Exile to Apps</button>}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Status + Overlay row */}
+      <div className="card" style={{ padding: 20, marginBottom: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr auto 1.2fr", gap: 20, alignItems: "stretch" }}>
+          {/* Platform connections */}
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+              <span style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--text-faint)", fontWeight: 600 }}>Platform Connections</span>
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ width: 6, height: 6, borderRadius: 9999, background: wsLive ? "#4ade80" : "rgba(255,255,255,.2)", animation: wsLive ? "pulse 2s infinite" : "none" }} />
+                <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: wsLive ? "rgba(74,222,128,.6)" : "var(--text-dim)" }}>{wsLive ? "LIVE" : "POLLING"}</span>
+              </span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {PLATFORMS.map(p => (
+                <div key={p.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <span style={{ fontSize: 12, fontWeight: 500, color: "var(--text-muted)" }}>{p.name}</span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ width: 6, height: 6, borderRadius: 9999, background: wsLive ? p.dot : "rgba(255,255,255,.2)" }} />
+                    <span style={{ fontSize: 10, color: wsLive ? "var(--text-muted)" : "var(--text-dim)" }}>{wsLive ? "Connected" : "Offline"}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line-1)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 8, height: 8, borderRadius: 9999, background: wsLive ? "#22d3ee" : "rgba(255,255,255,.1)", animation: wsLive ? "pulse 2s infinite" : "none" }} />
+                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: ".08em", color: "var(--text-faint)" }}>SPARK</span>
+              </span>
+              <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: wsLive ? "rgba(34,211,238,.6)" : "var(--text-dim)" }}>{wsLive ? "SYNCED" : "STANDBY"}</span>
+            </div>
+          </div>
+          <div className="bd-divider-v" />
+          {/* System performance */}
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
+              <span style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--text-faint)", fontWeight: 600 }}>System Performance</span>
+              <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--text-dim)" }}>Live</span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {PERF.map(m => (
+                <div key={m.label}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                    <span style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text-dim)" }}>{m.label}</span>
+                    <span style={{ fontSize: 11, fontWeight: 600, fontFamily: "var(--font-mono)", color: running ? m.color : "var(--text-dim)" }}>{running ? m.value : "—"}</span>
+                  </div>
+                  <div className="bd-progress-track"><div style={{ height: "100%", borderRadius: 9999, width: running ? m.width : "0%", background: running ? m.grad : "rgba(255,255,255,.05)", transition: "width .7s ease" }} /></div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="bd-divider-v" />
+          {/* Overlay generator */}
+          <div>
+            <span style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: ".08em", color: "var(--text-faint)", fontWeight: 600, display: "block", marginBottom: 12 }}>Overlay Generator</span>
+            {overlays.length === 0 && (
+              <div style={{ padding: "8px 12px", background: "rgba(0,0,0,.2)", border: "1px solid var(--line-1)", borderRadius: 10, display: "flex", gap: 8, alignItems: "center", marginBottom: 10 }}>
+                <span style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--text-dim)", flex: 1, wordBreak: "break-all" }}>/••••••••••kN2x/Horizontal_Left.html</span>
+              </div>
+            )}
+            {overlays.map(o => (
+              <div key={o.id} style={{ padding: "8px 12px", background: "rgba(0,0,0,.2)", border: "1px solid var(--line-1)", borderRadius: 10, display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 10, fontWeight: 500, color: "var(--text-faint)" }}>{o.label}</div>
+                  <div style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "var(--text-muted)", wordBreak: "break-all" }}>{o.url}</div>
+                </div>
+                <button onClick={() => setOverlays(p => p.filter(x => x.id !== o.id))} className="bd-btn-icon-sm" style={{ background: "rgba(248,113,113,.1)", color: "rgba(248,113,113,.7)", border: "1px solid rgba(248,113,113,.15)", borderRadius: 6, padding: "4px 8px", cursor: "pointer", fontSize: 11 }}>✕</button>
+              </div>
+            ))}
+            <div style={{ display: "flex", justifyContent: "center", marginTop: 4 }}>
+              <button className="bd-btn bd-btn-ghost" onClick={() => setPickerOpen(true)}>Browse Overlays</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Metadata */}
+      <div style={{ border: "1px solid", borderColor: metaOpen ? "var(--line-strong)" : "var(--line-1)", background: metaOpen ? "rgba(0,0,0,.45)" : "rgba(0,0,0,.2)", borderRadius: 16, overflow: "hidden", transition: "all .3s" }}>
+        <button onClick={() => setMetaOpen(o => !o)} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", padding: 16, background: "transparent", border: "none", cursor: "pointer", color: "inherit" }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span className="bd-section-icon" style={{ width: 32, height: 32 }}>📋</span>
+            <span style={{ fontSize: 12, fontWeight: 600, color: "var(--text-strong)", textTransform: "uppercase", letterSpacing: ".04em" }}>Metadata</span>
+          </span>
+          <span style={{ color: "var(--text-faint)", transform: metaOpen ? "rotate(180deg)" : "none", transition: "transform .3s" }}>▾</span>
+        </button>
+        {metaOpen && (
+          <div style={{ padding: 20, borderTop: "1px solid var(--line-1)", display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
+            {[["Genre", "Racing · Synthwave"], ["Developer", "Chromawave"], ["Publisher", "Neon Interactive"], ["Release", "2024-11-08"]].map(([l, v]) => (
+              <div key={l} className="kv">
+                <div style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text-dim)", fontWeight: 600 }}>{l}</div>
+                <div style={{ fontSize: 12, fontWeight: 500, color: "var(--text-body)", marginTop: 2 }}>{playing ? v : "—"}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Overlay picker modal */}
+      {pickerOpen && (
+        <div onClick={() => setPickerOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,.6)", backdropFilter: "blur(6px)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "rgba(10,10,12,.9)", backdropFilter: "blur(16px)", border: "1px solid var(--line-3)", borderRadius: 16, boxShadow: "var(--shadow-modal)", width: 560, overflow: "hidden" }}>
+            <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--line-1)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#fff" }}>Select Overlay</span>
+              <button onClick={() => setPickerOpen(false)} style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(255,255,255,.04)", border: "1px solid var(--line-3)", color: "var(--text-faint)", cursor: "pointer" }}>✕</button>
+            </div>
+            <div style={{ padding: 20 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <button onClick={() => setIdx(i => (i - 1 + OVERLAYS.length) % OVERLAYS.length)} style={{ width: 36, height: 36, borderRadius: 9999, background: "rgba(0,0,0,.5)", border: "1px solid var(--line-3)", color: "var(--text-muted)", cursor: "pointer" }}>‹</button>
+                <div style={{ flex: 1 }}>
+                  <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid rgba(145,70,255,.5)", boxShadow: "0 8px 24px rgba(145,70,255,.15)", height: 150, background: "linear-gradient(135deg,#1a1a2e,#16213e)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 6 }}>
+                    <div style={{ fontSize: 22 }}>{OVERLAYS[idx].icon}</div>
+                    <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{OVERLAYS[idx].label}</span>
+                  </div>
+                </div>
+                <button onClick={() => setIdx(i => (i + 1) % OVERLAYS.length)} style={{ width: 36, height: 36, borderRadius: 9999, background: "rgba(0,0,0,.5)", border: "1px solid var(--line-3)", color: "var(--text-muted)", cursor: "pointer" }}>›</button>
+              </div>
+              <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 12 }}>
+                {OVERLAYS.map((_, i) => <button key={i} onClick={() => setIdx(i)} style={{ height: 6, width: i === idx ? 16 : 6, borderRadius: 9999, background: i === idx ? ACCENT : "rgba(255,255,255,.2)", border: "none", cursor: "pointer", transition: "all .2s" }} />)}
+              </div>
+              <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
+                <button className="bd-btn bd-btn-cta" onClick={() => { addOverlay(OVERLAYS[idx]); setPickerOpen(false); }}>Use {OVERLAYS[idx].label}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ComingSoon({ label }) {
+  return <div style={{ padding: 60, textAlign: "center", color: "var(--text-faint)" }}><div style={{ fontSize: 15, fontWeight: 600, color: "var(--text-strong)" }}>{label}</div><div style={{ fontSize: 12, marginTop: 8 }}>This surface lives in the full app — Status Room is the showcase view.</div></div>;
+}
+
+function App() {
+  const [view, setView] = useState("dashboard");
+  const [running, setRunning] = useState(true);
+  const [toasts, setToasts] = useState([]);
+  const toast = (msg, variant) => {
+    const id = Date.now();
+    setToasts(t => [...t, { id, msg, variant }]);
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3000);
+  };
+  return (
+    <div style={{ display: "flex", height: "100vh" }}>
+      {/* Sidebar */}
+      <nav style={{ width: 240, flexShrink: 0, background: "rgba(0,0,0,.47)", backdropFilter: "blur(16px)", borderRight: "1px solid var(--line-1)", display: "flex", flexDirection: "column", padding: "16px 12px" }}>
+        <div style={{ textAlign: "center", padding: "10px 0 16px" }}>
+          <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-.01em", color: "#fff" }}>Status<span style={{ color: ACCENT }}>Forge</span></div>
+          <div style={{ fontSize: 10, color: "var(--text-faint)", marginTop: 2, fontFamily: "var(--font-mono)" }}>presence engine · v0.5.0</div>
+        </div>
+        {NAV.map(n => <NavBtn key={n.id} item={n} active={view === n.id} onClick={() => setView(n.id)} />)}
+        <div style={{ flex: 1 }} />
+        <div className="bd-divider" style={{ marginBottom: 12 }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px" }}>
+          <span className={`bd-dot ${running ? "bd-dot-on" : "bd-dot-off"}`} style={{ animation: running ? "pulse 2s infinite" : "none" }} />
+          <span style={{ fontSize: 11, color: "var(--text-faint)", fontWeight: 500 }}>{running ? "Engine Online" : "Engine Offline"}</span>
+        </div>
+      </nav>
+      {/* Main */}
+      <main className="scroll" style={{ flex: 1, padding: 32, overflowY: "auto", minWidth: 0 }}>
+        {view === "dashboard" ? <Dashboard running={running} playing={running} onToggle={() => { setRunning(r => !r); toast(running ? "Engine stopped" : "Engine started", "success"); }} toast={toast} /> : <ComingSoon label={NAV.find(n => n.id === view).label} />}
+      </main>
+      {/* Toasts */}
+      <div style={{ position: "fixed", top: 20, right: 20, zIndex: 100, display: "flex", flexDirection: "column", gap: 10 }}>
+        {toasts.map(t => <div key={t.id} className={`bd-toast bd-toast-${t.variant}`}>{t.msg}</div>)}
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StatusForge — The Oddity Forge</title>
+<link rel="icon" href="../assets/logos/bearddoddity-mascot-head.png">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+  .how-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .how-step { text-align: center; padding: 20px 14px; }
+  .how-step .num { width: 36px; height: 36px; border-radius: 50%; background: rgba(145,70,255,.15); color: var(--bd-accent-text); display: flex; align-items: center; justify-content: center; font-weight: 700; margin: 0 auto 14px; }
+  .section { padding: 52px 0; }
+  .section-head { text-align: center; margin-bottom: 32px; }
+  .section-head p { color: var(--text-faint); margin: 8px 0 0; }
+  @media (max-width: 640px) { .how-steps { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<header class="bd-header">
+  <div class="bd-container bd-header-inner">
+    <a href="../index.html" class="bd-logo" style="display:flex;align-items:center;gap:10px;text-decoration:none;white-space:nowrap;">
+      <img src="../assets/logos/bearddoddity-mascot-head.png" alt="" style="width:28px;height:28px;border-radius:8px;flex-shrink:0;object-fit:cover;">
+      The Oddity Forge
+    </a>
+    <nav class="bd-header-links" style="gap:20px;">
+      <a href="../index.html" class="bd-header-link" style="text-decoration:none;">Home</a>
+      <a href="../index.html#projects" class="bd-header-link" style="text-decoration:none;color:var(--text-strong);">Projects</a>
+      <a href="../guides/index.html" class="bd-header-link" style="text-decoration:none;">Guides</a>
+      <a href="../blog/index.html" class="bd-header-link" style="text-decoration:none;">Blog</a>
+      <a href="../about.html" class="bd-header-link" style="text-decoration:none;">About</a>
+      <a href="../disclosure.html" class="bd-header-link" style="text-decoration:none;">Disclosure</a>
+    </nav>
+    <div class="bd-header-actions">
+      <button class="bd-header-burger" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+  <div class="bd-header-mobile-panel" style="display:none;">
+    <a href="../index.html" class="bd-header-link" style="text-decoration:none;">Home</a>
+    <a href="../index.html#projects" class="bd-header-link" style="text-decoration:none;">Projects</a>
+    <a href="../guides/index.html" class="bd-header-link" style="text-decoration:none;">Guides</a>
+    <a href="../blog/index.html" class="bd-header-link" style="text-decoration:none;">Blog</a>
+    <a href="../about.html" class="bd-header-link" style="text-decoration:none;">About</a>
+    <a href="../disclosure.html" class="bd-header-link" style="text-decoration:none;">Disclosure</a>
+  </div>
+</header>
+
+<section class="bd-hero" style="padding-bottom:32px;">
+  <div class="bd-hero-glow"></div>
+  <div class="bd-container" style="text-align:center;">
+    <span class="bd-badge bd-badge-purple">v0.5.0</span>
+    <img src="../assets/statusforge-icon.png" alt="StatusForge" style="width:80px;height:80px;border-radius:20px;margin:16px 0;box-shadow:0 20px 60px rgba(124,58,237,.35);">
+    <h1 style="margin:0 auto;max-width:none;">StatusForge</h1>
+    <p style="margin:16px auto 0;">A native presence engine for streamers. Detects the game you're playing and broadcasts live status to Twitch, Kick, and your overlay widgets — pure Rust, no Python, no cloud dependency.</p>
+    <div class="bd-hero-actions" style="justify-content:center;">
+      <a href="download.html" class="bd-btn bd-btn-cta" style="text-decoration:none;">Download</a>
+      <a href="https://github.com/BearddOddity/StatusForge.io" class="bd-btn bd-btn-ghost" style="text-decoration:none;">View Source</a>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
+      <span class="bd-badge bd-badge-ghost">🪟 Windows</span>
+      <span class="bd-badge bd-badge-ghost">🍎 macOS</span>
+      <span class="bd-badge bd-badge-ghost">🐧 Linux</span>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="bd-container">
+    <div class="section-head"><div class="bd-h2">How it works</div><p>No account, no cloud relay — everything runs locally.</p></div>
+    <div class="how-steps">
+      <div class="how-step"><div class="num">1</div><div class="bd-h3" style="font-size:16px;">Detect</div><p style="font-size:13px;color:var(--text-faint);margin-top:8px;">A native scanner watches running processes and window titles to figure out what you're playing.</p></div>
+      <div class="how-step"><div class="num">2</div><div class="bd-h3" style="font-size:16px;">Look up</div><p style="font-size:13px;color:var(--text-faint);margin-top:8px;">Matched against a local game database, merged from Steam, GOG, RAWG, IGDB, and SteamGridDB metadata.</p></div>
+      <div class="how-step"><div class="num">3</div><div class="bd-h3" style="font-size:16px;">Broadcast</div><p style="font-size:13px;color:var(--text-faint);margin-top:8px;">Twitch/Kick category updates go out automatically, and your overlay widgets update in real time.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:rgba(255,255,255,0.015);">
+  <div class="bd-container">
+    <div class="section-head"><div class="bd-h2">Features</div></div>
+    <div class="features-grid">
+      <div class="bd-card" style="padding:22px;"><div style="font-size:20px;margin-bottom:12px;">🎮</div><div class="bd-h3" style="font-size:16px;">Native Game Detection</div><p style="font-size:13px;color:var(--text-faint);margin-top:8px;">Pure Rust process/window-title scanner — no browser extensions, no manual game list to maintain.</p></div>
+      <div class="bd-card" style="padding:22px;"><div style="font-size:20px;margin-bottom:12px;">📡</div><div class="bd-h3" style="font-size:16px;">Twitch &amp; Kick Category Sync</div><p style="font-size:13px;color:var(--text-faint);margin-top:8px;">Automatic category updates on game change, with built-in cooldowns to stay well under platform rate limits.</p></div>
+      <div class="bd-card" style="padding:22px;"><div style="font-size:20px;margin-bottom:12px;">🖥️</div><div class="bd-h3" style="font-size:16px;">Overlay Widgets</div><p style="font-size:13px;color:var(--text-faint);margin-top:8px;">Four layouts (horizontal left/right, vertical, logo-only) served locally as Browser Sources for OBS/Streamlabs.</p></div>
+      <div class="bd-card" style="padding:22px;"><div style="font-size:20px;margin-bottom:12px;">🔗</div><div class="bd-h3" style="font-size:16px;">SPARK Dual-PC Link</div><p style="font-size:13px;color:var(--text-faint);margin-top:8px;">Detect on your gaming PC, stream from another — signed heartbeats over your own LAN, no cloud in between.</p></div>
+      <div class="bd-card" style="padding:22px;"><div style="font-size:20px;margin-bottom:12px;">🗂️</div><div class="bd-h3" style="font-size:16px;">Scraped Metadata Library</div><p style="font-size:13px;color:var(--text-faint);margin-top:8px;">Cover art and game info merged from multiple sources into a local, editable game database.</p></div>
+      <div class="bd-card" style="padding:22px;"><div style="font-size:20px;margin-bottom:12px;">🔒</div><div class="bd-h3" style="font-size:16px;">Local-First, No Telemetry</div><p style="font-size:13px;color:var(--text-faint);margin-top:8px;">OAuth tokens live in your OS keychain. Platform pushes can be toggled off entirely if you just want local overlays.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="text-align:center;">
+  <div class="bd-container">
+    <div class="bd-h2">Set it up</div>
+    <p style="color:var(--text-faint);margin:8px 0 24px;">Guides for getting overlays and dual-PC linking running.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="../guides/overlay-setup.html" class="bd-btn bd-btn-ghost" style="text-decoration:none;">Overlay Setup Guide</a>
+      <a href="../guides/spark-dual-pc.html" class="bd-btn bd-btn-ghost" style="text-decoration:none;">SPARK Dual-PC Guide</a>
+    </div>
+  </div>
+</section>
+
+<footer style="text-align:center;padding:36px 24px 44px;border-top:1px solid var(--line-1);">
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:13px;">
+    <a href="https://github.com/BearddOddity/StatusForge.io" class="bd-link">github.com/BearddOddity/StatusForge.io</a>
+    <span style="color:var(--text-dim)">·</span>
+    <a href="https://github.com/BearddOddity/StatusForge.io/releases/latest" class="bd-link">Release Notes</a>
+  </div>
+</footer>
+
+<script src="../assets/nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<!-- @dsCard group="Components" viewport="700x340" name="Media — Cover tiles" subtitle="2:3 covers with fallback, title scrim, badge" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; background: var(--bd-black); font-family: var(--font-ui); color: var(--text-body); }
+  .wrap { padding: 22px; display: flex; gap: 16px; align-items: flex-start; }
+</style>
+</head>
+<body>
+<div id="root" class="wrap"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+const { CoverImage } = window.BearddOddityDesignSystem_726917;
+function Demo() {
+  return (
+    <>
+      <CoverImage title="Celeste" badge="Platformer" width={175}
+        src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='300'><rect width='200' height='300' fill='%23243b6b'/><circle cx='100' cy='120' r='55' fill='%237aa2ff'/><rect y='210' width='200' height='90' fill='%231a2a4d'/></svg>" />
+      <CoverImage title="Berserk · Vol. 12" badge="Seinen" width={175}
+        src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='300'><rect width='200' height='300' fill='%23140a0a'/><path d='M60 40 L140 260 L40 220 Z' fill='%23b33'/></svg>" />
+      <CoverImage alt="Untitled Series" title="No cover art" width={175} />
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+/* ============================================================================
+   BearddOddity Design System — global entry point
+   Consumers link THIS file. It is an @import manifest only; all real
+   declarations live in the token files below (and their closure).
+   ============================================================================ */
+
+@import "./tokens/fonts.css";
+@import "./tokens/colors.css";
+@import "./tokens/typography.css";
+@import "./tokens/spacing.css";
+@import "./tokens/effects.css";
+@import "./tokens/components.css";
+@import "./tokens/web-components.css";

@@ -1,0 +1,39 @@
+<!-- @dsCard group="Components" viewport="700x340" name="Disclosure — Tabs, Accordion" subtitle="Segmented tab strip, collapsible list" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; background: var(--bd-black); font-family: var(--font-ui); color: var(--text-body); }
+  .wrap { padding: 22px; display: flex; flex-direction: column; gap: 22px; }
+</style>
+</head>
+<body>
+<div id="root" class="wrap"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+const { Tabs, Accordion } = window.BearddOddityDesignSystem_726917;
+function Demo() {
+  const [tab, setTab] = React.useState("overview");
+  return (
+    <>
+      <div>
+        <Tabs tabs={[{ value: "overview", label: "Overview" }, { value: "activity", label: "Activity" }, { value: "settings", label: "Settings" }]}
+          value={tab} onChange={setTab} />
+        <div className="bd-tab-panel">{tab === "overview" ? "Engine running · 3 sources connected." : tab === "activity" ? "12 events today." : "Auto-start on login: on."}</div>
+      </div>
+      <Accordion items={[
+        { title: "How does presence detection work?", content: "The engine watches running processes and window titles, matches them to a game database, and pushes the result to your overlay." },
+        { title: "Which platforms are supported?", content: "Twitch, Kick, and Joystick.tv today; Streamer.bot as a relay." },
+      ]} />
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script>
+</body>
+</html>

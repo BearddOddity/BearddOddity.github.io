@@ -1,0 +1,198 @@
+<!-- @dsCard group="PanelForge" viewport="1280x720" name="PanelForge — Library & Reader" subtitle="Comic reader: library grid, detail, fullscreen reader — also available as a Template" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PanelForge</title>
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { background: var(--bd-black); color: var(--text-body); font-family: var(--font-sans); overflow: hidden; }
+  #root { height: 100vh; }
+  .scroll::-webkit-scrollbar { width: 6px; }
+  .scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.06); border-radius: 3px; }
+  .glass { background: var(--surface-glass); border: 1px solid rgba(255,255,255,.08); backdrop-filter: blur(18px) saturate(140%); border-radius: 16px; transition: transform .3s, box-shadow .3s, border-color .3s; }
+  .glass:hover { transform: translateY(-4px); border-color: rgba(255,255,255,.14); box-shadow: 0 12px 40px rgba(0,0,0,.4); }
+  .navlink { font-size: .8rem; color: var(--text-muted); text-decoration: none; padding: 6px 14px; border-radius: 8px; cursor: pointer; transition: all .15s; }
+  .navlink.active { color: var(--bd-accent); font-weight: 700; background: rgba(145,70,255,.1); }
+  .tag { display: inline-block; padding: 4px 12px; border-radius: 9999px; font-size: .72rem; font-weight: 500; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.06); color: var(--text-muted); }
+  .sbadge { display: inline-block; padding: 3px 10px; border-radius: 9999px; font-size: .68rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+  .icon-btn { background: rgba(0,0,0,.6); border: 1px solid rgba(255,255,255,.06); color: var(--text-body); width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: all .2s; }
+  .icon-btn:hover { border-color: var(--bd-accent); box-shadow: var(--glow-accent); }
+  .icon-btn:disabled { opacity: .3; cursor: not-allowed; box-shadow: none; }
+  .num { display: flex; flex-direction: column; align-items: center; padding: 8px 16px; border-radius: 10px; background: var(--surface-glass); border: 1px solid rgba(255,255,255,.08); gap: 2px; min-width: 64px; }
+  .glare { position: absolute; inset: 0; background: radial-gradient(ellipse 160px 240px at 15% 0%, rgba(255,255,255,.22), transparent 60%); pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script type="text/babel">
+const { useState } = React;
+function cover(a, b, label, glyph) {
+  return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 300'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23${a}'/%3E%3Cstop offset='1' stop-color='%23${b}'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='200' height='300'/%3E%3Ctext x='100' y='150' text-anchor='middle' font-size='64' opacity='.85'%3E${glyph}%3C/text%3E%3Crect y='240' width='200' height='60' fill='%23000' opacity='.35'/%3E%3Ctext x='100' y='278' text-anchor='middle' fill='%23fff' font-size='15' font-family='system-ui' font-weight='700'%3E${label}%3C/text%3E%3C/svg%3E`;
+}
+const COMICS = [
+  { id: 1, title: "Neon Requiem", format: "cbz", status: "ongoing", rating: 9.2, pages: 24, progress: .4, cover: cover("312e81","0a0a14", "Neon+Requiem", "🌃") },
+  { id: 2, title: "Hollow Tide", format: "cbr", status: "completed", rating: 8.7, pages: 40, progress: 1, cover: cover("134e4a","0a0a14", "Hollow+Tide", "🌊") },
+  { id: 3, title: "Ashfall", format: "pdf", status: "hiatus", rating: 7.9, pages: 18, progress: 0, cover: cover("7c2d12","0a0a14", "Ashfall", "🔥") },
+  { id: 4, title: "Starbound Kids", format: "cbz", status: "ongoing", rating: 8.4, pages: 30, progress: .7, cover: cover("1e3a8a","0a0a14", "Starbound", "🚀") },
+  { id: 5, title: "Verdant", format: "cbz", status: "completed", rating: 9.0, pages: 52, progress: 1, cover: cover("14532d","0a0a14", "Verdant", "🌿") },
+  { id: 6, title: "Crimson Vow", format: "cbr", status: "ongoing", rating: 8.1, pages: 22, progress: .15, cover: cover("4c0519","0a0a14", "Crimson+Vow", "🗡️") },
+];
+const STATUS_STYLE = {
+  ongoing: { background: "rgba(52,211,153,.15)", color: "#34d399", border: "1px solid rgba(52,211,153,.3)" },
+  completed: { background: "rgba(56,189,248,.15)", color: "#38bdf8", border: "1px solid rgba(56,189,248,.3)" },
+  hiatus: { background: "rgba(251,191,36,.15)", color: "#fbbf24", border: "1px solid rgba(251,191,36,.3)" },
+};
+
+function NavBar({ route, setRoute, comic }) {
+  return (
+    <nav style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 24px", background: "rgba(0,0,0,.2)", borderBottom: "1px solid rgba(255,255,255,.06)", backdropFilter: "blur(10px)", flexShrink: 0 }}>
+      <span style={{ fontSize: "1rem", fontWeight: 800, color: "var(--bd-accent)", marginRight: 16, fontFamily: "var(--font-mono)", letterSpacing: ".02em", cursor: "pointer" }} onClick={() => setRoute("library")}>PanelForge</span>
+      <span className={`navlink ${route === "library" ? "active" : ""}`} onClick={() => setRoute("library")}>Library</span>
+      <span className={`navlink ${route === "browse" ? "active" : ""}`} onClick={() => setRoute("browse")}>Browse &amp; Download</span>
+      {route === "library" && <span style={{ fontSize: ".65rem", color: "var(--text-muted)", marginLeft: "auto" }}>Import from: Comics folder / CSV / Browse</span>}
+      {route === "detail" && comic && <span style={{ fontSize: ".65rem", color: "var(--text-muted)", marginLeft: "auto" }}>{comic.title}</span>}
+    </nav>
+  );
+}
+
+function Library({ onOpen }) {
+  const [sort, setSort] = useState("title");
+  const [q, setQ] = useState("");
+  let list = COMICS.filter(c => c.title.toLowerCase().includes(q.toLowerCase()));
+  list = [...list].sort((a, b) => sort === "rating" ? b.rating - a.rating : a.title.localeCompare(b.title));
+  return (
+    <div className="scroll" style={{ flex: 1, overflowY: "auto", padding: "24px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
+        <h1 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#fff", margin: 0 }}>Library</h1>
+        <span className="tag">{list.length} titles</span>
+        <div style={{ marginLeft: "auto", display: "flex", gap: 10 }}>
+          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search…" style={{ background: "var(--surface-glass)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 10, color: "var(--text-body)", padding: "6px 12px", fontSize: ".8rem", outline: "none", fontFamily: "var(--font-sans)" }} />
+          <select className="glass-select" value={sort} onChange={e => setSort(e.target.value)} style={{ background: "var(--surface-glass)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 10, color: "var(--text-body)", padding: "6px 28px 6px 12px", fontSize: ".75rem", cursor: "pointer" }}>
+            <option value="title">Sort: Title</option>
+            <option value="rating">Sort: Rating</option>
+          </select>
+        </div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 16 }}>
+        {list.map(c => (
+          <article key={c.id} className="glass" style={{ display: "flex", flexDirection: "column", cursor: "pointer", overflow: "hidden" }} onClick={() => onOpen(c)}>
+            <div style={{ position: "relative", aspectRatio: "2/3", overflow: "hidden" }}>
+              <img src={c.cover} alt={c.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              <span style={{ position: "absolute", top: 10, right: 10, fontSize: ".6rem", fontWeight: 700, textTransform: "uppercase", padding: "3px 8px", borderRadius: 9999, background: "rgba(0,0,0,.65)", backdropFilter: "blur(8px)", color: "#fff", letterSpacing: ".04em" }}>{c.format}</span>
+              <div className="glare" />
+            </div>
+            <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
+              <h3 style={{ fontSize: ".95rem", fontWeight: 600, color: "#fff", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.title}</h3>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                <span className="sbadge" style={STATUS_STYLE[c.status]}>{c.status}</span>
+                <span className="sbadge" style={{ background: "rgba(250,204,21,.15)", color: "#facc15", border: "1px solid rgba(250,204,21,.3)" }}>★ {c.rating}</span>
+              </div>
+              <div style={{ width: "100%", height: 4, borderRadius: 2, background: "rgba(255,255,255,.06)", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${c.progress * 100}%`, background: c.progress ? "linear-gradient(90deg,var(--bd-accent),rgba(145,70,255,.55))" : "transparent", borderRadius: 2 }} />
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Detail({ comic, onBack, onRead }) {
+  return (
+    <div className="scroll" style={{ flex: 1, overflowY: "auto", padding: "32px 24px" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", flexDirection: "column", gap: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+          <button className="icon-btn" onClick={onBack}>←</button>
+          <h1 style={{ fontSize: "1.6rem", fontWeight: 700, color: "#fff", flex: 1, margin: 0 }}>{comic.title}</h1>
+          <span style={{ fontSize: ".7rem", fontWeight: 700, textTransform: "uppercase", padding: "4px 10px", borderRadius: 9999, background: "rgba(255,255,255,.06)", color: "var(--bd-accent)" }}>{comic.format}</span>
+          <button onClick={onRead} style={{ fontSize: ".9rem", padding: "10px 22px", fontWeight: 700, background: "var(--bd-accent)", color: "#fff", border: "1px solid var(--bd-accent)", borderRadius: 10, cursor: "pointer" }}>📖 Read</button>
+        </div>
+        <div style={{ display: "flex", gap: 24, flexWrap: "wrap", alignItems: "flex-start" }}>
+          <div className="glass" style={{ width: 240, aspectRatio: "2/3", flexShrink: 0, overflow: "hidden", position: "relative" }}>
+            <img src={comic.cover} alt={comic.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            <div className="glare" />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, flex: 1, minWidth: 260 }}>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <div className="num"><span style={{ fontSize: ".6rem", textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text-muted)" }}>Volume</span><span style={{ fontSize: "1rem", fontWeight: 700, color: "var(--bd-accent)" }}>#3</span></div>
+              <div className="num"><span style={{ fontSize: ".6rem", textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text-muted)" }}>Issue</span><span style={{ fontSize: "1rem", fontWeight: 700, color: "var(--bd-accent)" }}>#12</span></div>
+              <div className="num"><span style={{ fontSize: ".6rem", textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text-muted)" }}>Pages</span><span style={{ fontSize: "1rem", fontWeight: 700, color: "var(--bd-accent)" }}>{comic.pages}</span></div>
+            </div>
+            <div className="glass" style={{ padding: 20, borderRadius: 24 }}>
+              <div style={{ display: "flex", gap: 6, marginBottom: 14, flexWrap: "wrap" }}>
+                <span className="sbadge" style={STATUS_STYLE[comic.status]}>{comic.status}</span>
+                <span className="sbadge" style={{ background: "rgba(250,204,21,.15)", color: "#facc15", border: "1px solid rgba(250,204,21,.3)" }}>★ {comic.rating}</span>
+                <span className="tag">Sci-Fi</span><span className="tag">Cyberpunk</span>
+              </div>
+              {[["Author", "R. Vantablack"], ["Publisher", "Panel Press"], ["Released", "2024"], ["Language", "English"]].map(([l, v]) => (
+                <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
+                  <span style={{ fontSize: ".72rem", textTransform: "uppercase", letterSpacing: ".06em", color: "var(--text-muted)" }}>{l}</span>
+                  <span style={{ fontSize: ".82rem", color: "var(--text-body)", fontWeight: 500 }}>{v}</span>
+                </div>
+              ))}
+              <p style={{ fontSize: ".85rem", color: "var(--text-muted)", lineHeight: 1.6, marginTop: 14, marginBottom: 0 }}>A rain-soaked megacity, a courier with a stolen memory, and a countdown nobody can stop. The definitive neon-noir serial.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Reader({ comic, onClose }) {
+  const [page, setPage] = useState(1);
+  const total = comic.pages;
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 60, background: "var(--bd-black)", display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 20px", borderBottom: "1px solid rgba(255,255,255,.06)", background: "rgba(0,0,0,.4)" }}>
+        <button className="icon-btn" style={{ width: 36, height: 36, fontSize: "1rem" }} onClick={onClose}>✕</button>
+        <span style={{ fontSize: ".9rem", fontWeight: 600, color: "#fff" }}>{comic.title}</span>
+        <span style={{ marginLeft: "auto", fontSize: ".8rem", color: "var(--text-muted)", fontFamily: "var(--font-mono)" }}>{page} / {total}</span>
+      </div>
+      <div className="scroll" style={{ flex: 1, overflowY: "auto", display: "flex", justifyContent: "center", padding: 24 }}>
+        <div style={{ width: "100%", maxWidth: 620, aspectRatio: "2/3", borderRadius: 16, overflow: "hidden", boxShadow: "0 8px 40px rgba(0,0,0,.6)", position: "relative", background: "var(--bd-panel-solid)" }}>
+          <img src={comic.cover} alt={`Page ${page}`} style={{ width: "100%", height: "100%", objectFit: "cover", opacity: .9 }} />
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem", fontWeight: 800, color: "rgba(255,255,255,.7)", fontFamily: "var(--font-mono)" }}>PAGE {page}</div>
+        </div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 20, padding: "16px 20px", borderTop: "1px solid rgba(255,255,255,.06)", background: "rgba(0,0,0,.4)" }}>
+        <button className="icon-btn" disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}>‹</button>
+        <div style={{ width: 260, height: 4, borderRadius: 2, background: "rgba(255,255,255,.08)", overflow: "hidden" }}>
+          <div style={{ height: "100%", width: `${(page / total) * 100}%`, background: "linear-gradient(90deg,var(--bd-accent),var(--bd-accent-text))", transition: "width .2s" }} />
+        </div>
+        <button className="icon-btn" disabled={page >= total} onClick={() => setPage(p => Math.min(total, p + 1))}>›</button>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [route, setRoute] = useState("library");
+  const [comic, setComic] = useState(null);
+  const [reading, setReading] = useState(false);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <NavBar route={route} setRoute={setRoute} comic={comic} />
+      {route === "library" && <Library onOpen={c => { setComic(c); setRoute("detail"); }} />}
+      {route === "detail" && comic && <Detail comic={comic} onBack={() => setRoute("library")} onRead={() => setReading(true)} />}
+      {route === "browse" && (
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, color: "#9ca3af" }}>
+          <div style={{ fontSize: 40 }}>⬇️</div>
+          <div style={{ fontSize: "1rem", fontWeight: 600, color: "#fff" }}>Browse &amp; Download</div>
+          <div style={{ fontSize: ".85rem", maxWidth: 340, textAlign: "center", lineHeight: 1.6 }}>Search connected sources and pull new issues straight into your library.</div>
+        </div>
+      )}
+      {reading && comic && <Reader comic={comic} onClose={() => setReading(false)} />}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

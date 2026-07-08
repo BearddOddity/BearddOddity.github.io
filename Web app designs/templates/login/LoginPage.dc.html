@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Login / Auth Page" description="Centered auth card — platform OAuth buttons, or email/password fallback" -->
+<helmet>
+  <script src="./ds-base.js"></script>
+  <style>
+    html, body { margin: 0; height: 100%; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+    .auth-shell { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; }
+    .auth-glow { position: absolute; inset: -160px 0 auto 0; height: 480px; background: radial-gradient(circle at 50% 0%, var(--accent-glow), transparent 65%); pointer-events: none; }
+    .auth-card { width: 100%; max-width: 380px; padding: 36px 32px; position: relative; z-index: 1; }
+    .auth-logo { font-family: var(--font-heading); font-weight: 700; font-size: 18px; color: var(--text-strong); text-align: center; margin-bottom: 6px; }
+    .auth-sub { text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 28px; }
+    .platform-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; border-radius: 12px;
+      font-size: 13px; font-weight: 600; border: 1px solid var(--line-2); cursor: pointer; margin-bottom: 10px; transition: all .15s ease; color: #fff; }
+    .platform-btn:hover { transform: translateY(-1px); }
+    .platform-twitch { background: #9146ff; }
+    .platform-kick { background: #53fc18; color: #0a0a0a; }
+    .divider-row { display: flex; align-items: center; gap: 10px; margin: 22px 0; color: var(--text-dim); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+    .divider-row .bd-divider { flex: 1; }
+    .auth-foot { text-align: center; font-size: 12px; color: var(--text-faint); margin-top: 20px; }
+    .auth-foot a { color: var(--bd-accent-text); }
+  </style>
+</helmet>
+
+<div class="auth-shell" data-screen-label="Login">
+  <div class="auth-glow"></div>
+  <div class="bd-card auth-card">
+    <div class="auth-logo">beardd//oddity</div>
+    <div class="auth-sub">Sign in to StatusForge</div>
+
+    <div class="platform-btn platform-twitch">Continue with Twitch</div>
+    <div class="platform-btn platform-kick">Continue with Kick</div>
+
+    <div class="divider-row"><span class="bd-divider"></span>or<span class="bd-divider"></span></div>
+
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Input" hint-size="100%,63px" label="Email" placeholder="you@example.com"></x-import>
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Input" hint-size="100%,63px" label="Password" type="password" placeholder="••••••••"></x-import>
+    </div>
+
+    <div style="margin-top:22px;">
+      <x-import component-from-global-scope="BearddOddityDesignSystem_726917.Button" hint-size="100%,44px" variant="cta">Sign in</x-import>
+    </div>
+
+    <div class="auth-foot">No account? <a href="#">Create one</a></div>
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>
