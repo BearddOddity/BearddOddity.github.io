@@ -57,17 +57,19 @@
 
 <div class="guide-wrap">
   <div class="bd-h2">1. Open the Dashboard</div>
-  <p>Launch StatusForge and make sure the engine is running (top of the Dashboard shows the engine status). The overlay picker lives on the Dashboard — pick from four layouts:</p>
+  <p>Launch StatusForge and make sure the engine is running (top of the Dashboard shows the engine status). The overlay picker lives on the Dashboard — pick from six layouts:</p>
   <ul>
     <li><strong>Horizontal Left</strong> / <strong>Horizontal Right</strong> — game cover + title, anchored to one side</li>
     <li><strong>Vertical</strong> — tall layout for side-panel placement</li>
     <li><strong>Logo Only</strong> — just the game's logo, no cover art or text</li>
+    <li><strong>Info Box</strong> — compact text-first strip, no cover art</li>
+    <li><strong>Compact Cover</strong> — small cover-art-first tile</li>
   </ul>
 
   <div class="bd-h2">2. Copy the widget URL</div>
   <p>Each overlay is served locally by StatusForge itself — no external hosting, no account needed. The URL follows this pattern:</p>
-  <p><code>http://127.0.0.1:53735/forge-widget/&lt;your-widget-token&gt;/&lt;layout&gt;.html</code></p>
-  <p>Your widget token is unique per install and shown (partially masked) on the Dashboard. Copying a layout from the picker copies the full URL with the token already filled in — you shouldn't need to type it by hand.</p>
+  <p><code>http://127.0.0.1:53735/forge-widget/&lt;your-overlay-token&gt;/&lt;layout&gt;.html</code></p>
+  <p>Your overlay token is unique per install and shown (partially masked) in Settings → Engine. Copying a layout from the picker copies the full URL with the token already filled in — you shouldn't need to type it by hand.</p>
 
   <div class="bd-h2">3. Add it as a Browser Source</div>
   <ol>
@@ -84,6 +86,8 @@
         <tr><td>Horizontal Left / Right</td><td>850</td><td>480</td></tr>
         <tr><td>Vertical</td><td>360</td><td>620</td></tr>
         <tr><td>Logo Only</td><td>560</td><td>280</td></tr>
+        <tr><td>Info Box</td><td>560</td><td>200</td></tr>
+        <tr><td>Compact Cover</td><td>620</td><td>230</td></tr>
       </tbody>
     </table>
   </div>
