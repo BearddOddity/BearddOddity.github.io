@@ -353,15 +353,65 @@
 
   search.addEventListener("input", render);
 
-  fetch("games.json")
-    .then(function (r) { return r.ok ? r.json() : []; })
-    .catch(function () { return []; })
-    .then(function (data) {
-      games = Array.isArray(data) ? data : [];
-      statCount.textContent = String(games.length);
-      buildGenreTabs();
-      render();
-    });
+  // ── entries/ folder auto-discovery ───────────────────────────────────
+  // No manifest to hand-maintain: GitHub's public Contents API lists
+  // whatever's actually in the folder, so dropping a metadata-signer
+  // output (or a plain export) in there and pushing is the whole workflow.
+  var ENTRIES_API = "https://api.github.com/repos/BearddOddity/BearddOddity.github.io/contents/gamedatabase/entries";
+
+  function unwrapEntry(obj) {
+    if (!obj || typeof obj !== "object") return null;
+    // Signed envelope from metadata-signer — entry_json is the exact
+    // signed payload; signature/signed_by aren't re-verified here (see
+    // entries/README.md for why that's fine in this repo's own content).
+    if (typeof obj.entry_json === "string") {
+      try {
+        return JSON.parse(obj.entry_json);
+      } catch (e) {
+        return null;
+      }
+    }
+    return obj;
+  }
+
+  function unwrapFileContent(raw) {
+    if (Array.isArray(raw)) return raw.map(unwrapEntry).filter(Boolean);
+    var single = unwrapEntry(raw);
+    return single ? [single] : [];
+  }
+
+  function loadUploadedEntries() {
+    return fetch(ENTRIES_API)
+      .then(function (r) { return r.ok ? r.json() : []; })
+      .then(function (files) {
+        if (!Array.isArray(files)) return [];
+        var jsonFiles = files.filter(function (f) {
+          return f.type === "file" && /\.json$/i.test(f.name) && f.download_url;
+        });
+        return Promise.all(
+          jsonFiles.map(function (f) {
+            return fetch(f.download_url)
+              .then(function (r) { return r.ok ? r.json() : null; })
+              .then(unwrapFileContent)
+              .catch(function () { return []; });
+          })
+        );
+      })
+      .then(function (perFile) { return [].concat.apply([], perFile); })
+      .catch(function () { return []; });
+  }
+
+  Promise.all([
+    fetch("games.json").then(function (r) { return r.ok ? r.json() : []; }).catch(function () { return []; }),
+    loadUploadedEntries(),
+  ]).then(function (results) {
+    var seeded = Array.isArray(results[0]) ? results[0] : [];
+    var uploaded = results[1] || [];
+    games = seeded.concat(uploaded);
+    statCount.textContent = String(games.length);
+    buildGenreTabs();
+    render();
+  });
 })();
 </script>
 </body>
