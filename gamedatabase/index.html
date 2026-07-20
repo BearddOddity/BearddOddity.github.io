@@ -20,7 +20,8 @@
      blended with PanelForge's indigo accent + verified-status pill ─────── */
   .gd-grid-container { container-name: gd-grid; container-type: inline-size; }
   .gd-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(160px, 100%), 1fr)); }
-  .gd-card-outer { position: relative; cursor: default; perspective: 600px; padding: 8px; margin: -8px; }
+  .gd-card-outer { position: relative; cursor: pointer; perspective: 600px; padding: 8px; margin: -8px; }
+  .gd-card-outer:focus-visible .gd-card-inner { outline: 2px solid var(--bd-indigo); outline-offset: 2px; }
   .gd-card-inner {
     width: 100%; height: 100%; border-radius: 14px; position: relative; overflow: hidden;
     background: rgba(0,0,0,0.25); border: 1px solid var(--line-2);
@@ -147,6 +148,21 @@
   </div>
 </section>
 
+<div class="bd-modal-backdrop" id="gd-modal-backdrop" style="display:none;">
+  <div class="bd-modal" style="max-width:560px;" role="dialog" aria-modal="true">
+    <div class="bd-modal-header">
+      <h3 id="gd-modal-title">—</h3>
+      <button class="bd-modal-close" id="gd-modal-close" aria-label="Close">✕</button>
+    </div>
+    <div class="bd-modal-body">
+      <div style="display:flex;gap:18px;">
+        <div class="gd-cover" id="gd-modal-cover" style="width:110px;flex-shrink:0;border-radius:10px;"></div>
+        <div id="gd-modal-fields" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer style="text-align:center;padding:36px 24px 44px;border-top:1px solid var(--line-1);">
   <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:13px;">
     <a href="https://github.com/BearddOddity" class="bd-link">github.com/BearddOddity</a>
@@ -169,6 +185,25 @@
 
   var games = [];
   var activeGenre = "";
+  var currentFiltered = [];
+
+  var METADATA_FIELDS = [
+    ["genre", "Genre"],
+    ["release_year", "Release Year"],
+    ["developer", "Developer"],
+    ["publisher", "Publisher"],
+    ["steam_id", "Steam ID"],
+    ["gog_id", "GOG ID"],
+    ["igdb_id", "IGDB ID"],
+    ["rawg_id", "RAWG ID"],
+    ["sgdb_id", "SteamGridDB ID"],
+    ["thegamesdb_id", "TheGamesDB ID"],
+    ["twitch_id", "Twitch Category ID"],
+    ["kick_id", "Kick Category ID"],
+    ["discord_app_id", "Discord App ID"],
+    ["xbox_title_id", "Xbox Title ID"],
+    ["epic_id", "Epic ID"],
+  ];
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -187,13 +222,15 @@
       return matchesGenre && matchesQuery;
     });
 
-    grid.innerHTML = filtered.map(function (g) {
+    currentFiltered = filtered;
+
+    grid.innerHTML = filtered.map(function (g, i) {
       var cover = g.cover_url
         ? '<img src="' + escapeHtml(g.cover_url) + '" alt="" loading="lazy">'
         : '<span class="gd-cover-monogram">' + escapeHtml((g.title || "?").charAt(0).toUpperCase()) + "</span>";
       var genreBadge = g.genre ? '<div class="gd-genre-badge">' + escapeHtml(g.genre) + "</div>" : "";
       return (
-        '<div class="gd-card-outer">' +
+        '<div class="gd-card-outer" data-index="' + i + '" role="button" tabindex="0">' +
           '<div class="gd-card-inner">' +
             '<div class="gd-cover">' + cover + '<div class="gd-gradient"></div></div>' +
             genreBadge +
@@ -235,6 +272,64 @@
       var inner = outer.querySelector(".gd-card-inner");
       if (inner) inner.style.transform = "";
     }
+  });
+
+  // ── Detail modal — shows every metadata field present on the entry,
+  // not just what fits on the card. ────────────────────────────────────
+  var modalBackdrop = document.getElementById("gd-modal-backdrop");
+  var modalTitle = document.getElementById("gd-modal-title");
+  var modalCover = document.getElementById("gd-modal-cover");
+  var modalFields = document.getElementById("gd-modal-fields");
+  var modalClose = document.getElementById("gd-modal-close");
+
+  function openModal(g) {
+    modalTitle.textContent = g.title || "Untitled";
+    modalCover.innerHTML = g.cover_url
+      ? '<img src="' + escapeHtml(g.cover_url) + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">'
+      : '<span class="gd-cover-monogram">' + escapeHtml((g.title || "?").charAt(0).toUpperCase()) + "</span>";
+
+    var rows = METADATA_FIELDS
+      .filter(function (f) { return g[f[0]]; })
+      .map(function (f) {
+        return (
+          '<div>' +
+            '<div class="bd-label">' + escapeHtml(f[1]) + "</div>" +
+            '<div style="color:var(--text-strong);font-size:14px;margin-top:2px;">' + escapeHtml(g[f[0]]) + "</div>" +
+          "</div>"
+        );
+      });
+    modalFields.innerHTML = rows.length
+      ? rows.join("")
+      : '<div style="color:var(--text-faint);font-size:13px;">No additional metadata on this entry.</div>';
+
+    modalBackdrop.style.display = "flex";
+  }
+
+  function closeModal() {
+    modalBackdrop.style.display = "none";
+  }
+
+  grid.addEventListener("click", function (e) {
+    var outer = e.target.closest(".gd-card-outer");
+    if (!outer) return;
+    var g = currentFiltered[Number(outer.getAttribute("data-index"))];
+    if (g) openModal(g);
+  });
+  grid.addEventListener("keydown", function (e) {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    var outer = e.target.closest(".gd-card-outer");
+    if (!outer) return;
+    e.preventDefault();
+    var g = currentFiltered[Number(outer.getAttribute("data-index"))];
+    if (g) openModal(g);
+  });
+
+  modalClose.addEventListener("click", closeModal);
+  modalBackdrop.addEventListener("click", function (e) {
+    if (e.target === modalBackdrop) closeModal();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeModal();
   });
 
   function buildGenreTabs() {
