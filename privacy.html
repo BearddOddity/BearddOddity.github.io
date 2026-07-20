@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — The Oddity Forge</title>
+<link rel="icon" href="assets/logos/bearddoddity-mascot-head.png">
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+  .disc-wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 80px; }
+  .disc-wrap .bd-h2 { margin: 40px 0 14px; }
+  .disc-wrap .bd-h2:first-of-type { margin-top: 0; }
+  .disc-wrap p, .disc-wrap li { font-size: 15px; line-height: 1.8; color: var(--text-body); }
+  .disc-wrap ul { padding-left: 22px; margin: 0 0 16px; }
+  .disc-wrap li { margin-bottom: 8px; }
+  .disc-wrap .updated { font-size: 13px; color: var(--text-faint); margin-top: 52px; }
+  .disc-wrap .legal-note { font-size: 13px; color: var(--text-faint); background: rgba(255,255,255,0.03); border: 1px solid var(--line-2); border-radius: 12px; padding: 14px 18px; margin: 0 0 32px; }
+</style>
+</head>
+<body>
+
+<header class="bd-header">
+  <div class="bd-container bd-header-inner">
+    <a href="index.html" class="bd-logo" style="display:flex;align-items:center;gap:10px;text-decoration:none;white-space:nowrap;">
+      <img src="assets/logos/bearddoddity-mascot-head.png" alt="" style="width:28px;height:28px;border-radius:8px;flex-shrink:0;object-fit:cover;">
+      The Oddity Forge
+    </a>
+    <nav class="bd-header-links" style="gap:20px;">
+      <a href="index.html" class="bd-header-link" style="text-decoration:none;">Home</a>
+      <a href="index.html#projects" class="bd-header-link" style="text-decoration:none;">Projects</a>
+      <a href="guides/index.html" class="bd-header-link" style="text-decoration:none;">Guides</a>
+      <a href="blog/index.html" class="bd-header-link" style="text-decoration:none;">Blog</a>
+      <a href="about.html" class="bd-header-link" style="text-decoration:none;">About</a>
+      <a href="disclosure.html" class="bd-header-link" style="text-decoration:none;">Disclosure</a>
+    </nav>
+    <div class="bd-header-actions">
+      <button class="bd-header-burger" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+  <div class="bd-header-mobile-panel" style="display:none;">
+    <a href="index.html" class="bd-header-link" style="text-decoration:none;">Home</a>
+    <a href="index.html#projects" class="bd-header-link" style="text-decoration:none;">Projects</a>
+    <a href="guides/index.html" class="bd-header-link" style="text-decoration:none;">Guides</a>
+    <a href="blog/index.html" class="bd-header-link" style="text-decoration:none;">Blog</a>
+    <a href="about.html" class="bd-header-link" style="text-decoration:none;">About</a>
+    <a href="disclosure.html" class="bd-header-link" style="text-decoration:none;">Disclosure</a>
+  </div>
+</header>
+
+<section class="bd-hero" style="padding-bottom:24px;">
+  <div class="bd-container" style="text-align:center;">
+    <h1 style="margin:0 auto;max-width:none;font-size:var(--fs-xl);">Privacy Policy</h1>
+    <p style="margin:14px auto 0;">The short version: everything runs on your machine, and there's no server of mine collecting anything.</p>
+  </div>
+</section>
+
+<div class="disc-wrap">
+  <div class="legal-note">This formalizes what's already explained in plain language on the <a href="disclosure.html" class="bd-link">Disclosure</a> page. If the two ever seem to disagree, this page is the accurate one — tell me on GitHub so I can fix the mismatch.</div>
+
+  <div class="bd-h2">1. Overview</div>
+  <p>StatusForge, Blipy, and Joystick Companion (collectively "the Software") run entirely on your own machine. There is no backend server operated by this project, no account system, no analytics, and no telemetry. This policy describes exactly what data the Software touches and where it goes — which, for almost everything, is nowhere.</p>
+
+  <div class="bd-h2">2. What StatusForge reads locally</div>
+  <p>To detect what game you're playing, StatusForge reads process names, window titles, launch arguments, and — for some emulators — their own log files. These are passive, OS-level reads: the Software never touches a game's or emulator's memory, injects code, or reads save data. This data is used locally to look up the game and, if you've connected a platform, to update its category — it is not stored anywhere beyond your own local game library file, and not sent anywhere except as described below.</p>
+
+  <div class="bd-h2">3. What leaves your computer</div>
+  <p>StatusForge makes outbound network calls only in these cases, and only if you've set them up:</p>
+  <ul>
+    <li><strong>Twitch and Kick</strong> — OAuth-authenticated requests to push a category update, only when you've connected that platform.</li>
+    <li><strong>Steam, GOG, RAWG, IGDB, SteamGridDB, TheGamesDB</strong> — metadata lookups (cover art, genre, developer, release year), only when you scan a game.</li>
+    <li><strong>GitHub Releases</strong> — a check for newer app versions, which you can disable in Settings.</li>
+  </ul>
+  <p>Streamer.bot automation, if you enable it, is a local websocket connection on your own machine — it never touches the internet.</p>
+
+  <div class="bd-h2">4. Where your credentials are stored</div>
+  <p>OAuth tokens for Twitch and Kick are stored in your operating system's own credential store (Windows Credential Manager, macOS Keychain, or the Linux equivalent) — never in plaintext in a config file, and never sent anywhere except directly to that platform's own API.</p>
+
+  <div class="bd-h2">5. Companion apps</div>
+  <p><strong>Blipy</strong> (optional dual-PC linking) only talks to StatusForge itself, over your own local network — no external accounts, no OAuth, no internet calls of its own.</p>
+  <p><strong>Joystick Companion</strong> (optional Joystick.tv integration) is a separate app with its own OAuth connection to Joystick.tv and its own OS credential-store entry for that token, independent of StatusForge's. It polls StatusForge's local status endpoint (using a token you generate) to know what game is currently detected — that request stays on your machine.</p>
+
+  <div class="bd-h2">6. Third-party privacy policies</div>
+  <p>Once data reaches a third-party platform (Twitch, Kick, Joystick.tv, Steam, GOG, RAWG, IGDB, SteamGridDB, TheGamesDB, GitHub), that platform's own privacy policy governs it — this project has no visibility or control over how they handle it.</p>
+
+  <div class="bd-h2">7. This website</div>
+  <p>This site is static and hosted on GitHub Pages. It doesn't set its own cookies or run analytics. GitHub itself may log standard server access data (IP address, request time) as part of hosting the site — see <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" class="bd-link">GitHub's Privacy Statement</a> for that.</p>
+
+  <div class="bd-h2">8. Children's privacy</div>
+  <p>The Software isn't directed at children under 13, and doesn't knowingly collect any data from anyone — children included, since it doesn't collect data from anyone at all.</p>
+
+  <div class="bd-h2">9. Changes to this policy</div>
+  <p>This policy may change as the Software changes. Material changes will update the date below.</p>
+
+  <div class="bd-h2">10. Contact</div>
+  <p>Questions about this policy: <a href="https://github.com/BearddOddity/StatusForge.io/issues" class="bd-link">open a GitHub issue</a>.</p>
+
+  <p class="updated">Last updated: July 2026</p>
+</div>
+
+<footer style="text-align:center;padding:36px 24px 44px;border-top:1px solid var(--line-1);">
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:13px;">
+    <a href="https://github.com/BearddOddity" class="bd-link">github.com/BearddOddity</a>
+    <span style="color:var(--text-dim)">·</span>
+    <a href="terms.html" class="bd-link">Terms of Service</a>
+    <span style="color:var(--text-dim)">·</span>
+    <a href="disclosure.html" class="bd-link">Disclosure</a>
+  </div>
+</footer>
+
+<script src="assets/nav.js"></script>
+</body>
+</html>
