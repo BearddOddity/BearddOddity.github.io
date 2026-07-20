@@ -66,11 +66,12 @@
     <li>RAWG</li>
     <li>IGDB (Twitch-authenticated)</li>
     <li>SteamGridDB (cover art / logos)</li>
+    <li>TheGamesDB</li>
   </ul>
   <p>All trademarks, cover art, and game names belong to their respective owners.</p>
 
   <div class="bd-h2">Data &amp; privacy</div>
-  <p>StatusForge doesn't collect analytics or telemetry. OAuth tokens for Twitch/Kick are stored in your OS's own keychain, not sent anywhere except directly to Twitch/Kick's own APIs when pushing a category update. The only outbound network calls the app makes on its own are: the platform APIs you connect (Twitch/Kick), the metadata sources above (only when you scan a game), and a GitHub Releases check for app updates.</p>
+  <p>StatusForge doesn't collect analytics or telemetry. OAuth tokens for Twitch/Kick/Joystick.tv are stored in your OS's own keychain, not sent anywhere except directly to those platforms' own APIs when pushing a category update or chat message. The only outbound network calls the app makes on its own are: the platform APIs you connect (Twitch, Kick, Joystick.tv), the metadata sources above (only when you scan a game), and a GitHub Releases check for app updates.</p>
 
   <div class="bd-h2">Unsigned software</div>
   <p>Windows builds aren't signed with a paid code-signing certificate, so SmartScreen will warn on first run — this is expected, not a sign something's wrong. macOS builds are unsigned and un-notarized (no Apple Developer account behind this project yet), so macOS requires a manual right-click → Open the first time.</p>

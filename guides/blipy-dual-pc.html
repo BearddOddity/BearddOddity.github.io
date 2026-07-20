@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SPARK Dual-PC Setup Guide — The Oddity Forge</title>
+<title>Blipy Dual-PC Setup Guide — The Oddity Forge</title>
 <link rel="icon" href="../assets/logos/bearddoddity-mascot-head.png">
 <link rel="stylesheet" href="../../styles.css">
 <style>
@@ -55,21 +55,21 @@
 <section class="bd-hero" style="padding-bottom:24px;">
   <div class="bd-container" style="text-align:center;">
     <span class="bd-badge bd-badge-purple">StatusForge Guide</span>
-    <h1 style="margin:16px auto 0;max-width:none;font-size:var(--fs-xl);">SPARK Dual-PC Link Setup</h1>
+    <h1 style="margin:16px auto 0;max-width:none;font-size:var(--fs-xl);">Blipy Dual-PC Link Setup</h1>
     <p style="margin:14px auto 0;">Game on one PC, stream from another — no cloud relay, signed over your own LAN.</p>
   </div>
 </section>
 
 <div class="guide-wrap">
   <div class="bd-card diagram">
-    <div class="box"><div class="label">Gaming PC</div><div class="sub">runs SPARK</div></div>
+    <div class="box"><div class="label">Gaming PC</div><div class="sub">runs Blipy</div></div>
     <div class="arrow">→ udp/53735 →</div>
     <div class="box"><div class="label">Streaming PC</div><div class="sub">runs StatusForge (Hub)</div></div>
   </div>
 
   <div class="bd-h2">1. Install on both machines</div>
   <ul>
-    <li><strong>SPARK</strong> on the PC that's actually running the game</li>
+    <li><strong>Blipy</strong> on the PC that's actually running the game</li>
     <li><strong>StatusForge</strong> on the PC that's streaming/broadcasting</li>
   </ul>
   <p>Both need to be on the same local network (LAN or same Wi-Fi).</p>
@@ -77,17 +77,17 @@
   <div class="bd-h2">2. Set a matching PIN</div>
   <p>Set the same 4-digit PIN in both apps:</p>
   <ul>
-    <li>SPARK: main window, PIN field</li>
-    <li>StatusForge: Settings → Detection Engine → SPARK Dual-PC Link</li>
+    <li>Blipy: main window, PIN field</li>
+    <li>StatusForge: Settings → Engine → Detection Engine &amp; Pipeline → Blipy Dual-PC Link</li>
   </ul>
   <p>Optionally set a matching <strong>pairing key</strong> on both sides too — it's mixed into the shared secret for a stronger signature than the PIN alone.</p>
 
   <div class="bd-h2">3. Let them find each other</div>
-  <p>SPARK broadcasts signed heartbeats on <code>udp/53735</code>; the StatusForge Hub announces itself on <code>udp/53736</code>. Packets with the wrong PIN, missing signature, or a tampered payload are rejected outright. Once paired, your overlays update exactly as they would from local detection — same widgets, same behavior.</p>
+  <p>Blipy broadcasts signed heartbeats on <code>udp/53735</code>; the StatusForge Hub announces itself on <code>udp/53736</code>. Packets with the wrong PIN, missing signature, or a tampered payload are rejected outright. Once paired, your overlays update exactly as they would from local detection — same widgets, same behavior.</p>
 
   <div class="bd-alert bd-alert-info" style="margin-bottom:20px;">
     <span class="bd-alert-icon">ℹ️</span>
-    <div>Enabling the SPARK link on the StatusForge side stops that PC's own local scanner from reporting detections, so you don't get two conflicting game-state sources fighting each other.</div>
+    <div>Enabling the Blipy link on the StatusForge side stops that PC's own local scanner from reporting detections, so you don't get two conflicting game-state sources fighting each other.</div>
   </div>
 
   <div class="bd-h2">Firewall notes</div>
