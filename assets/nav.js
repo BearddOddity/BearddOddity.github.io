@@ -1,4 +1,4 @@
-// Mobile nav toggle for The Oddity Forge site — shared across pages.
+// Mobile nav toggle for BearddOddity's Compendium site — shared across pages.
 document.addEventListener("DOMContentLoaded", () => {
   const burger = document.querySelector(".bd-header-burger");
   const panel = document.querySelector(".bd-header-mobile-panel");

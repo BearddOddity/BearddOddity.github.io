@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Joystick Companion — BearddOddity's Compendium</title>
+<link rel="icon" href="../assets/logos/bearddoddity-mascot-head.png">
+<link rel="stylesheet" href="../../styles.css">
+<style>
+  body { margin: 0; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+  .download-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+  .file-link { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid var(--line-2); margin-bottom: 10px; text-decoration: none; color: var(--text-body); font-size: 14px; transition: border-color .15s ease; }
+  .file-link:hover { border-color: rgba(145,70,255,.4); }
+  .file-link .ext { color: var(--text-faint); font-size: 12px; }
+  .section { padding: 52px 0; }
+</style>
+</head>
+<body>
+
+<header class="bd-header">
+  <div class="bd-container bd-header-inner">
+    <a href="../index.html" class="bd-logo" style="display:flex;align-items:center;gap:10px;text-decoration:none;white-space:nowrap;">
+      <img src="../assets/logos/bearddoddity-mascot-head.png" alt="" style="width:28px;height:28px;border-radius:8px;flex-shrink:0;object-fit:cover;">
+      BearddOddity's Compendium
+    </a>
+    <nav class="bd-header-links" style="gap:20px;">
+      <a href="../index.html" class="bd-header-link" style="text-decoration:none;">Home</a>
+      <a href="../index.html#projects" class="bd-header-link" style="text-decoration:none;color:var(--text-strong);">Projects</a>
+      <a href="../guides/index.html" class="bd-header-link" style="text-decoration:none;">Guides</a>
+      <a href="../blog/index.html" class="bd-header-link" style="text-decoration:none;">Blog</a>
+      <a href="../about.html" class="bd-header-link" style="text-decoration:none;">About</a>
+      <a href="../disclosure.html" class="bd-header-link" style="text-decoration:none;">Disclosure</a>
+    </nav>
+    <div class="bd-header-actions">
+      <button class="bd-header-burger" aria-label="Menu" aria-expanded="false">☰</button>
+    </div>
+  </div>
+  <div class="bd-header-mobile-panel" style="display:none;">
+    <a href="../index.html" class="bd-header-link" style="text-decoration:none;">Home</a>
+    <a href="../index.html#projects" class="bd-header-link" style="text-decoration:none;">Projects</a>
+    <a href="../guides/index.html" class="bd-header-link" style="text-decoration:none;">Guides</a>
+    <a href="../blog/index.html" class="bd-header-link" style="text-decoration:none;">Blog</a>
+    <a href="../about.html" class="bd-header-link" style="text-decoration:none;">About</a>
+    <a href="../disclosure.html" class="bd-header-link" style="text-decoration:none;">Disclosure</a>
+  </div>
+</header>
+
+<div style="text-align:center;margin-top:20px;">
+  <a href="../statusforge/index.html" class="bd-link" style="font-size:13px;">← Back to StatusForge overview</a>
+</div>
+
+<section class="bd-hero" style="padding-bottom:32px;">
+  <div class="bd-hero-glow"></div>
+  <div class="bd-container" style="text-align:center;">
+    <div style="display:flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:20px;margin:0 auto 18px;background:rgba(124,58,237,.12);box-shadow:0 20px 60px rgba(124,58,237,.35);font-size:38px;">🎮</div>
+    <div style="margin-bottom:8px;"><span class="bd-badge bd-badge-purple" id="sf-version">v0.1.0</span> <span class="bd-badge bd-badge-ghost">Early Access</span></div>
+    <h1 style="margin:0 auto 18px;max-width:none;">Joystick Companion</h1>
+    <p style="margin:0 auto 30px;">Joystick.tv category push + chat bot addon — keeps your Joystick.tv category and chat in sync with whatever StatusForge detects you playing.</p>
+    <div class="bd-hero-actions" style="justify-content:center;">
+      <a href="#download" class="bd-btn bd-btn-cta" style="text-decoration:none;">Download</a>
+      <a href="https://github.com/BearddOddity/StatusForge.io" class="bd-btn bd-btn-ghost" style="text-decoration:none;">View Source</a>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
+      <span class="bd-badge bd-badge-ghost">🪟 Windows</span>
+      <span class="bd-badge bd-badge-ghost">🍎 macOS</span>
+      <span class="bd-badge bd-badge-ghost">🐧 Linux</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="download">
+  <div class="bd-container">
+    <div style="text-align:center;margin-bottom:8px;"><div class="bd-h2">Download</div></div>
+    <p style="text-align:center;font-size:13px;color:var(--text-faint);max-width:560px;margin:14px auto 0;line-height:1.55;">Early access — no in-app updater yet, check back here for new builds. Runs standalone alongside StatusForge. Hit a problem? <a href="https://github.com/BearddOddity/StatusForge.io/issues/new" class="bd-link">Open an issue</a> with your OS and any error output/logs.</p>
+    <div class="download-grid" style="margin-top:24px;">
+      <div class="bd-card" style="padding:24px;">
+        <div style="font-size:28px;margin-bottom:10px;">🪟</div>
+        <div class="bd-h3">Windows</div>
+        <p style="font-size:13px;color:var(--text-faint);line-height:1.55;margin:6px 0 18px;">64-bit only. SmartScreen may warn on first run — click "More info" → "Run anyway."</p>
+        <a class="file-link" data-asset="win-exe" href="https://github.com/BearddOddity/StatusForge.io/releases/download/joystick-latest/BearOs.Joystick.Companion_0.1.0_x64-setup.exe">Installer (NSIS) <span class="ext">.exe</span></a>
+        <a class="file-link" data-asset="win-msi" href="https://github.com/BearddOddity/StatusForge.io/releases/download/joystick-latest/BearOs.Joystick.Companion_0.1.0_x64_en-US.msi">Installer (MSI) <span class="ext">.msi</span></a>
+        <a class="file-link" data-asset="win-portable" href="https://github.com/BearddOddity/StatusForge.io/releases/download/joystick-latest/joystickbot-joystick-latest-portable-windows-x64.zip">Portable (no install) <span class="ext">.zip</span></a>
+      </div>
+      <div class="bd-card" style="padding:24px;">
+        <div style="font-size:28px;margin-bottom:10px;">🍎</div>
+        <div class="bd-h3">macOS</div>
+        <p style="font-size:13px;color:var(--text-faint);line-height:1.55;margin:6px 0 18px;">Apple Silicon (M-series) only. Unsigned/un-notarized — right-click the app → Open, or run <code>xattr -dr com.apple.quarantine</code> on it.</p>
+        <a class="file-link" data-asset="mac-dmg" href="https://github.com/BearddOddity/StatusForge.io/releases/download/joystick-latest/BearOs.Joystick.Companion_0.1.0_aarch64.dmg">Disk Image <span class="ext">.dmg</span></a>
+        <a class="file-link" data-asset="mac-portable" href="https://github.com/BearddOddity/StatusForge.io/releases/download/joystick-latest/joystickbot-joystick-latest-portable-macos.zip">Portable (no install) <span class="ext">.zip</span></a>
+      </div>
+      <div class="bd-card" style="padding:24px;">
+        <div style="font-size:28px;margin-bottom:10px;">🐧</div>
+        <div class="bd-h3">Linux</div>
+        <p style="font-size:13px;color:var(--text-faint);line-height:1.55;margin:6px 0 18px;">AppImage needs no install — just chmod +x and run. .deb, .rpm, and .flatpak install via your package manager.</p>
+        <a class="file-link" data-asset="linux-appimage" href="https://github.com/BearddOddity/StatusForge.io/releases/download/joystick-latest/BearOs.Joystick.Companion_0.1.0_amd64.AppImage">AppImage <span class="ext">.AppImage</span></a>
+        <a class="file-link" data-asset="linux-deb" href="https://github.com/BearddOddity/StatusForge.io/releases/download/joystick-latest/BearOs.Joystick.Companion_0.1.0_amd64.deb">Debian/Ubuntu <span class="ext">.deb</span></a>
+        <a class="file-link" data-asset="linux-rpm" href="https://github.com/BearddOddity/StatusForge.io/releases/download/joystick-latest/BearOs.Joystick.Companion-0.1.0-1.x86_64.rpm">Fedora/RHEL <span class="ext">.rpm</span></a>
+        <a class="file-link" data-asset="linux-flatpak" href="https://github.com/BearddOddity/StatusForge.io/releases/download/joystick-latest/com.bearddoddity.joystickbot.flatpak">Flatpak <span class="ext">.flatpak</span></a>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:28px;">
+      <a class="bd-btn bd-btn-ghost" href="https://github.com/BearddOddity/StatusForge.io/releases/tag/joystick-latest" style="text-decoration:none;">See release notes on GitHub</a>
+    </p>
+  </div>
+</section>
+
+<footer style="text-align:center;padding:36px 24px 44px;border-top:1px solid var(--line-1);">
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;font-size:13px;">
+    <a href="https://github.com/BearddOddity/StatusForge.io" class="bd-link">github.com/BearddOddity/StatusForge.io</a>
+    <span style="color:var(--text-dim)">·</span>
+    <a href="../terms.html" class="bd-link">Terms</a>
+    <span style="color:var(--text-dim)">·</span>
+    <a href="../privacy.html" class="bd-link">Privacy</a>
+  </div>
+</footer>
+
+<script src="../assets/nav.js"></script>
+</body>
+</html>
