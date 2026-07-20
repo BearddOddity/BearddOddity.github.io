@@ -8,6 +8,62 @@
 <link rel="stylesheet" href="../styles.css">
 <style>
   body { margin: 0; background: var(--bd-black); color: var(--text-body); font-family: var(--font-ui); }
+  .section { padding: 0 0 64px; }
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; max-width: 640px; margin: 0 auto 8px; }
+
+  /* ── Toolbar: search + genre tabs ─────────────────────────────────────── */
+  .gd-toolbar { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; margin: 40px 0 28px; }
+  .gd-search { max-width: 320px; }
+  .gd-genre-tabs { display: flex; flex-wrap: wrap; gap: 2px; }
+
+  /* ── Grid — ported from the StatusForge app's Library "binder" cards,
+     blended with PanelForge's indigo accent + verified-status pill ─────── */
+  .gd-grid-container { container-name: gd-grid; container-type: inline-size; }
+  .gd-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(160px, 100%), 1fr)); }
+  .gd-card-outer { position: relative; cursor: default; perspective: 600px; padding: 8px; margin: -8px; }
+  .gd-card-inner {
+    width: 100%; height: 100%; border-radius: 14px; position: relative; overflow: hidden;
+    background: rgba(0,0,0,0.25); border: 1px solid var(--line-2);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94), border-color 0.3s ease, box-shadow 0.3s ease;
+    transform-style: preserve-3d;
+  }
+  .gd-cover { position: relative; aspect-ratio: 2/3; border-radius: inherit; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(150deg, rgba(145,70,255,0.18), rgba(129,140,248,0.18)); }
+  .gd-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .gd-cover-monogram { font-family: var(--font-heading); font-size: 34px; font-weight: var(--fw-bold); color: rgba(255,255,255,0.16); }
+  .gd-gradient { position: absolute; inset: auto 0 0 0; height: 55%; background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, transparent 100%); pointer-events: none; }
+  .gd-title-plate { position: absolute; inset: auto 0 0 0; padding: 8px 10px; }
+  .gd-title-plate .t { color: #fff; font-size: 12px; font-weight: 700; line-height: 1.25; text-shadow: 0 2px 6px rgba(0,0,0,0.6); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .gd-title-plate .y { color: rgba(255,255,255,0.4); font-size: 10px; margin-top: 1px; }
+  .gd-genre-badge {
+    position: absolute; top: 7px; left: 7px; padding: 3px 9px; border-radius: 9999px;
+    background: rgba(0,0,0,0.55); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.1);
+    font-size: 9px; font-weight: 600; letter-spacing: 0.03em; color: var(--bd-indigo-2);
+    display: none; align-items: center; justify-content: center; line-height: 1.2;
+  }
+  @container gd-grid (min-width: 400px) { .gd-genre-badge { display: flex; } }
+  .gd-verified-badge {
+    position: absolute; top: 7px; right: 7px; width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(74,222,128,0.16); border: 1px solid rgba(74,222,128,0.35); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--bd-green);
+    box-shadow: 0 0 10px rgba(74,222,128,0.25);
+  }
+  .gd-glint { inset: 0; position: absolute; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; mix-blend-mode: screen;
+    background: linear-gradient(105deg, transparent 0%, transparent 35%, rgba(255,255,255,0.04) 42%, rgba(255,255,255,0.14) 48%,
+      rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.14) 52%, rgba(255,255,255,0.04) 58%, transparent 65%, transparent 100%);
+    background-size: 250% 100%; }
+  .gd-card-outer:hover .gd-glint { opacity: 1; animation: gd-glint-sweep 3s linear infinite; }
+  @keyframes gd-glint-sweep { 0% { background-position: 250% 0; } 100% { background-position: -250% 0; } }
+  .gd-holo { inset: 0; position: absolute; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; border-radius: inherit;
+    background: linear-gradient(135deg, rgba(145,70,255,0.35), rgba(129,140,248,0.35), rgba(236,72,153,0.35), rgba(145,70,255,0.35));
+    background-size: 300% 300%; }
+  .gd-card-outer:hover .gd-holo { opacity: 1; animation: gd-holo-shift 4s ease infinite; }
+  @keyframes gd-holo-shift { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+  .gd-card-outer:hover .gd-card-inner { border-color: rgba(129,140,248,0.4); box-shadow: 0 25px 60px rgba(0,0,0,0.65), 0 0 40px rgba(129,140,248,0.2); }
+  @media (prefers-reduced-motion: reduce) {
+    .gd-card-inner, .gd-glint, .gd-holo { transition: none !important; animation: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -40,12 +96,46 @@
   </div>
 </header>
 
-<section class="bd-hero" style="padding-bottom:32px;">
+<section class="bd-hero" style="padding-bottom:28px;">
+  <div class="bd-hero-glow"></div>
   <div class="bd-container" style="text-align:center;">
-    <h1 style="margin:0 auto;max-width:none;">Game Database</h1>
-    <p style="margin:14px auto 0;">Still an idea more than a project. The plan is a central place for game data, stats, and metadata that StatusForge (and whatever else needs it) can pull from — but there's nothing to show yet.</p>
-    <div class="bd-hero-actions" style="justify-content:center;">
-      <a href="https://github.com/BearddOddity/GameDatabase" class="bd-btn bd-btn-ghost" style="text-decoration:none;">Follow along on GitHub</a>
+    <div class="bd-hero-kicker" style="justify-content:center;display:flex;">✓ Curated &amp; Fact-Checked</div>
+    <h1 style="margin:0 auto 16px;max-width:none;">Game Database</h1>
+    <p style="margin:0 auto 26px;">Every entry here is metadata I've personally curated and fact-checked myself — genre, release year, developer, publisher. The same database StatusForge can import straight into your Library, signed so the app knows it's really mine.</p>
+    <div class="stats-row">
+      <div class="bd-card bd-stat-card">
+        <div class="bd-stat-label">Games catalogued</div>
+        <div class="bd-stat-value" id="gd-stat-count">—</div>
+      </div>
+      <div class="bd-card bd-stat-card">
+        <div class="bd-stat-label">Genres</div>
+        <div class="bd-stat-value" id="gd-stat-genres">—</div>
+      </div>
+    </div>
+    <div class="bd-hero-actions" style="justify-content:center;margin-top:24px;">
+      <a href="games.json" class="bd-btn bd-btn-cta" style="text-decoration:none;">Download Full Database (.json)</a>
+      <a href="https://github.com/BearddOddity/StatusForge.io" class="bd-btn bd-btn-ghost" style="text-decoration:none;">Contribute on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="bd-container">
+    <div class="gd-toolbar">
+      <input class="bd-input gd-search" id="gd-search" type="text" placeholder="Search by title or developer...">
+      <div class="bd-tabs-list gd-genre-tabs" id="gd-genre-tabs">
+        <button class="bd-tab bd-tab-active" data-genre="">All</button>
+      </div>
+    </div>
+
+    <div class="gd-grid-container">
+      <div class="gd-grid" id="gd-grid"></div>
+    </div>
+
+    <div class="bd-empty" id="gd-empty" style="display:none;">
+      <div class="bd-empty-icon">🗂️</div>
+      <div class="bd-empty-title">Nothing matches that search</div>
+      <div class="bd-empty-desc">Try a different title, developer, or genre filter.</div>
     </div>
   </div>
 </section>
@@ -61,5 +151,116 @@
 </footer>
 
 <script src="../assets/nav.js"></script>
+<script>
+(function () {
+  var grid = document.getElementById("gd-grid");
+  var empty = document.getElementById("gd-empty");
+  var search = document.getElementById("gd-search");
+  var tabsWrap = document.getElementById("gd-genre-tabs");
+  var statCount = document.getElementById("gd-stat-count");
+  var statGenres = document.getElementById("gd-stat-genres");
+
+  var games = [];
+  var activeGenre = "";
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function render() {
+    var q = search.value.trim().toLowerCase();
+    var filtered = games.filter(function (g) {
+      var matchesGenre = !activeGenre || g.genre === activeGenre;
+      var matchesQuery = !q ||
+        (g.title || "").toLowerCase().includes(q) ||
+        (g.developer || "").toLowerCase().includes(q) ||
+        (g.publisher || "").toLowerCase().includes(q);
+      return matchesGenre && matchesQuery;
+    });
+
+    grid.innerHTML = filtered.map(function (g) {
+      var cover = g.cover_url
+        ? '<img src="' + escapeHtml(g.cover_url) + '" alt="" loading="lazy">'
+        : '<span class="gd-cover-monogram">' + escapeHtml((g.title || "?").charAt(0).toUpperCase()) + "</span>";
+      var genreBadge = g.genre ? '<div class="gd-genre-badge">' + escapeHtml(g.genre) + "</div>" : "";
+      return (
+        '<div class="gd-card-outer">' +
+          '<div class="gd-card-inner">' +
+            '<div class="gd-cover">' + cover + '<div class="gd-gradient"></div></div>' +
+            genreBadge +
+            '<div class="gd-verified-badge" title="Fact-checked by BearddOddity">✓</div>' +
+            '<div class="gd-title-plate">' +
+              '<div class="t">' + escapeHtml(g.title || "Untitled") + "</div>" +
+              (g.release_year ? '<div class="y">' + escapeHtml(g.release_year) + "</div>" : "") +
+            "</div>" +
+            '<div class="gd-glint"></div>' +
+            '<div class="gd-holo"></div>' +
+          "</div>" +
+        "</div>"
+      );
+    }).join("");
+
+    empty.style.display = filtered.length === 0 ? "flex" : "none";
+  }
+
+  // 3D tilt-on-hover — same interaction as the StatusForge app's Library
+  // grid cards, wired via delegation on the grid container so it survives
+  // the innerHTML rebuild on every render() call.
+  grid.addEventListener("mousemove", function (e) {
+    var outer = e.target.closest(".gd-card-outer");
+    if (!outer) return;
+    var inner = outer.querySelector(".gd-card-inner");
+    var rect = outer.getBoundingClientRect();
+    var x = (e.clientX - rect.left) / rect.width;
+    var y = (e.clientY - rect.top) / rect.height;
+    var rx = (y - 0.5) * -20;
+    var ry = (x - 0.5) * 20;
+    inner.style.transform = "rotateX(" + rx + "deg) rotateY(" + ry + "deg) scale(1.06)";
+  });
+  grid.addEventListener("mouseout", function (e) {
+    var outer = e.target.closest && e.target.closest(".gd-card-outer");
+    // mouseout bubbles from nested elements too (cover, title plate, ...);
+    // only reset when the pointer actually left the whole card, not just
+    // moved between two elements inside the same one.
+    if (outer && !outer.contains(e.relatedTarget)) {
+      var inner = outer.querySelector(".gd-card-inner");
+      if (inner) inner.style.transform = "";
+    }
+  });
+
+  function buildGenreTabs() {
+    var genres = Array.from(new Set(games.map(function (g) { return g.genre; }).filter(Boolean))).sort();
+    tabsWrap.innerHTML = '<button class="bd-tab bd-tab-active" data-genre="">All</button>' +
+      genres.map(function (g) {
+        return '<button class="bd-tab" data-genre="' + escapeHtml(g) + '">' + escapeHtml(g) + "</button>";
+      }).join("");
+
+    tabsWrap.querySelectorAll(".bd-tab").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        tabsWrap.querySelectorAll(".bd-tab").forEach(function (b) { b.classList.remove("bd-tab-active"); });
+        btn.classList.add("bd-tab-active");
+        activeGenre = btn.getAttribute("data-genre") || "";
+        render();
+      });
+    });
+
+    statGenres.textContent = String(genres.length);
+  }
+
+  search.addEventListener("input", render);
+
+  fetch("games.json")
+    .then(function (r) { return r.ok ? r.json() : []; })
+    .catch(function () { return []; })
+    .then(function (data) {
+      games = Array.isArray(data) ? data : [];
+      statCount.textContent = String(games.length);
+      buildGenreTabs();
+      render();
+    });
+})();
+</script>
 </body>
 </html>

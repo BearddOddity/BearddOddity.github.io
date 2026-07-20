@@ -1,0 +1,66 @@
+[
+  {
+    "title": "Celeste",
+    "genre": "Platformer",
+    "release_year": "2018",
+    "developer": "Maddy Makes Games",
+    "publisher": "Maddy Makes Games",
+    "cover_url": ""
+  },
+  {
+    "title": "Hollow Knight",
+    "genre": "Metroidvania",
+    "release_year": "2017",
+    "developer": "Team Cherry",
+    "publisher": "Team Cherry",
+    "cover_url": ""
+  },
+  {
+    "title": "Hades",
+    "genre": "Roguelike",
+    "release_year": "2020",
+    "developer": "Supergiant Games",
+    "publisher": "Supergiant Games",
+    "cover_url": ""
+  },
+  {
+    "title": "Half-Life 2",
+    "genre": "FPS",
+    "release_year": "2004",
+    "developer": "Valve",
+    "publisher": "Valve",
+    "cover_url": ""
+  },
+  {
+    "title": "Stardew Valley",
+    "genre": "Simulation",
+    "release_year": "2016",
+    "developer": "ConcernedApe",
+    "publisher": "ConcernedApe",
+    "cover_url": ""
+  },
+  {
+    "title": "Disco Elysium",
+    "genre": "RPG",
+    "release_year": "2019",
+    "developer": "ZA/UM",
+    "publisher": "ZA/UM",
+    "cover_url": ""
+  },
+  {
+    "title": "Portal 2",
+    "genre": "Puzzle",
+    "release_year": "2011",
+    "developer": "Valve",
+    "publisher": "Valve",
+    "cover_url": ""
+  },
+  {
+    "title": "Outer Wilds",
+    "genre": "Adventure",
+    "release_year": "2019",
+    "developer": "Mobius Digital",
+    "publisher": "Annapurna Interactive",
+    "cover_url": ""
+  }
+]
