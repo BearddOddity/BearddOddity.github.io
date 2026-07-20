@@ -1,21 +1,27 @@
-# Game database entries
+# Game database entries — verified only
 
-Drop files here that were produced by `metadata-signer` (`./sign.sh entry.json
-signed_out.json`) — either a single-game export or a whole database dump. The
-Game Database page auto-discovers everything in this folder through GitHub's
-public Contents API and merges it into the catalog on load; there's no
-manifest file to keep in sync by hand, just push and it shows up.
+Everything in this folder is checked against BearddOddity's public signing
+key **client-side, in the browser**, before it's ever rendered on the Game
+Database page. Repo-push access to this folder is not enough on its own —
+a file has to actually carry a valid Ed25519 signature from the matching
+private key (see `tools/metadata-signer` in the StatusForge.io repo) or the
+page silently skips it. That's what stops someone from pushing false
+"fact-checked" data in here; it isn't an honor system.
 
-Accepted shapes, per file:
+Only files shaped like a `metadata-signer` output are accepted:
 
-- A signed envelope: `{ "entry_json": "...", "signature": "...", "signed_by": "..." }`
-  — the page reads `entry_json` (parsed as JSON) and ignores `signature`/
-  `signed_by`. Verification isn't re-checked client-side; the trust boundary
-  here is that only you can push to this repo, not the signature itself
-  (that check matters for the app importing a random file from elsewhere,
-  not for content you put in your own repo).
-- A plain entry object: `{ "title": "...", "genre": "...", ... }` — used as-is.
-- A plain array of entry objects (a bulk export) — each one added
-  individually.
+```json
+{
+  "entry_json": "{...}",
+  "signature": "...",
+  "signed_by": "BearddOddity"
+}
+```
 
-Only `.json` files are read; this README is skipped.
+`entry_json` (after signature verification) can be a single game entry, an
+array of entries, or a `{title: entry, ...}` map (a full database dump) —
+same shapes the app's bulk import accepts.
+
+**Have game data to contribute?** Don't put it here directly — see
+`../submissions/README.md`. Files land in this folder only after
+BearddOddity has reviewed and signed them.

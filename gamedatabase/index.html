@@ -115,13 +115,13 @@
     </div>
     <div class="bd-hero-actions" style="justify-content:center;margin-top:24px;">
       <a href="games.json" class="bd-btn bd-btn-cta" style="text-decoration:none;">Download Full Database (.json)</a>
-      <a href="https://github.com/BearddOddity/StatusForge.io" class="bd-btn bd-btn-ghost" style="text-decoration:none;">Contribute on GitHub</a>
+      <a href="https://github.com/BearddOddity/BearddOddity.github.io/new/main/gamedatabase/submissions" class="bd-btn bd-btn-ghost" style="text-decoration:none;">Submit Game Data</a>
     </div>
     <div class="bd-alert bd-alert-info" style="max-width:640px;margin:28px auto 0;text-align:left;">
       <span class="bd-alert-icon">ℹ️</span>
       <div class="bd-alert-body">
         <div class="bd-alert-title">Not a game library, not pirated files</div>
-        This database is metadata only — title, genre, release year, developer, publisher. No game files, executables, or copyrighted assets are hosted or distributed here or through any import in the app. It's reference data for identifying games you already own, nothing more.
+        This database is metadata only — title, genre, release year, developer, publisher. No game files, executables, or copyrighted assets are hosted or distributed here or through any import in the app. It's reference data for identifying games you already own, nothing more. Every entry shown here is cryptographically signed and verified in your browser before it's ever rendered — submitted data goes through review and gets signed by BearddOddity first, so nothing false can slip in.
       </div>
     </div>
   </div>
@@ -353,31 +353,89 @@
 
   search.addEventListener("input", render);
 
-  // ── entries/ folder auto-discovery ───────────────────────────────────
+  // ── entries/ folder auto-discovery, signature-gated ──────────────────
   // No manifest to hand-maintain: GitHub's public Contents API lists
-  // whatever's actually in the folder, so dropping a metadata-signer
-  // output (or a plain export) in there and pushing is the whole workflow.
+  // whatever's actually in the folder. But repo-push access alone isn't
+  // trust — a file in here MUST verify against BearddOddity's public key
+  // (same key + Ed25519 scheme the app uses, see
+  // src-tauri/src/metadata_signing.rs) or it's silently dropped, never
+  // rendered. This is what actually stops someone from pushing false
+  // "fact-checked" data into the folder, not just an honor system.
   var ENTRIES_API = "https://api.github.com/repos/BearddOddity/BearddOddity.github.io/contents/gamedatabase/entries";
+  var OFFICIAL_PUBLIC_KEY_B64 = "ApISHpdtip3ezaOflMlN+f2b+asysAaCeyUW0WzK+Zs=";
 
-  function unwrapEntry(obj) {
-    if (!obj || typeof obj !== "object") return null;
-    // Signed envelope from metadata-signer — entry_json is the exact
-    // signed payload; signature/signed_by aren't re-verified here (see
-    // entries/README.md for why that's fine in this repo's own content).
-    if (typeof obj.entry_json === "string") {
+  function base64ToBytes(b64) {
+    var bin = atob(b64);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+
+  // Ed25519 in WebCrypto is recent (Chrome 113+, Firefox 130+, Safari 17+)
+  // — on an older browser this quietly resolves to null and every entry
+  // gets skipped (fail closed, not open: no signature check available
+  // means nothing gets trusted, not "trust everything").
+  var publicKeyPromise = (window.crypto && window.crypto.subtle && window.crypto.subtle.importKey)
+    ? crypto.subtle.importKey("raw", base64ToBytes(OFFICIAL_PUBLIC_KEY_B64), { name: "Ed25519" }, false, ["verify"])
+        .catch(function () { return null; })
+    : Promise.resolve(null);
+
+  function verifySignedEnvelope(obj) {
+    return publicKeyPromise.then(function (key) {
+      if (!key) return null;
+      var sigBytes, dataBytes;
       try {
-        return JSON.parse(obj.entry_json);
+        sigBytes = base64ToBytes(obj.signature);
+        dataBytes = new TextEncoder().encode(obj.entry_json);
       } catch (e) {
         return null;
       }
+      return crypto.subtle.verify({ name: "Ed25519" }, key, sigBytes, dataBytes)
+        .then(function (ok) {
+          if (!ok) return null;
+          try {
+            return JSON.parse(obj.entry_json);
+          } catch (e) {
+            return null;
+          }
+        })
+        .catch(function () { return null; });
+    });
+  }
+
+  // A signed payload can be one entry, an array of entries, or a
+  // {title: entry} map (mirroring a full Forge_Database.json's "library"
+  // field) — same shapes the app's bulk import accepts.
+  function normalizeParsed(parsed) {
+    if (Array.isArray(parsed)) return parsed;
+    if (parsed && typeof parsed === "object") {
+      var map = parsed.library && typeof parsed.library === "object" ? parsed.library : parsed;
+      if (parsed.title) return [parsed];
+      var keys = Object.keys(map);
+      if (keys.length && map[keys[0]] && typeof map[keys[0]] === "object") {
+        return keys.map(function (k) {
+          var e = map[k];
+          if (!e.title) e.title = k;
+          return e;
+        });
+      }
     }
-    return obj;
+    return [];
   }
 
   function unwrapFileContent(raw) {
-    if (Array.isArray(raw)) return raw.map(unwrapEntry).filter(Boolean);
-    var single = unwrapEntry(raw);
-    return single ? [single] : [];
+    if (!raw || typeof raw !== "object" || Array.isArray(raw) ||
+        typeof raw.entry_json !== "string" || typeof raw.signature !== "string") {
+      console.warn("gamedatabase/entries/: skipped a file that isn't a signed metadata-signer envelope.");
+      return Promise.resolve([]);
+    }
+    return verifySignedEnvelope(raw).then(function (parsed) {
+      if (!parsed) {
+        console.warn("gamedatabase/entries/: skipped a file whose signature didn't verify.");
+        return [];
+      }
+      return normalizeParsed(parsed);
+    });
   }
 
   function loadUploadedEntries() {
