@@ -71,7 +71,7 @@
     <div class="bd-card" style="padding:24px;">
       <div style="font-size:28px;margin-bottom:10px;">🍎</div>
       <div class="bd-h3">macOS</div>
-      <p style="font-size:13px;color:var(--text-faint);line-height:1.55;margin:6px 0 18px;">Apple Silicon (M-series) only. Unsigned/un-notarized — right-click the app → Open, or run <code>xattr -dr com.apple.quarantine</code> on it.</p>
+      <p style="font-size:13px;color:var(--text-faint);line-height:1.55;margin:6px 0 18px;">Apple Silicon (M-series) only. Unsigned/un-notarized — macOS will say it's "damaged and can't be opened." It's not actually damaged, that's just Gatekeeper blocking unsigned apps. Fix: open Terminal and run <code>xattr -cr</code> on the .app (right-click → Open does <em>not</em> work for this specific message).</p>
       <a class="file-link" data-asset="mac-dmg" href="https://github.com/BearddOddity/StatusForge.io/releases/download/v1.0.0/StatusForge_1.0.0_aarch64.dmg">Disk Image <span class="ext">.dmg</span></a>
       <a class="file-link" data-asset="mac-portable" href="https://github.com/BearddOddity/StatusForge.io/releases/download/v1.0.0/statusforge-v1.0.0-portable-macos.zip">Portable (no install) <span class="ext">.zip</span></a>
     </div>
